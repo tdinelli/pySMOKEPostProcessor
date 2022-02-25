@@ -38,8 +38,7 @@
 #define ROPA_H
 
 #include <boost/filesystem.hpp>
-
-class ProfilesDatabase;
+#include "ProfilesDatabase.h"
 
 class ROPA 
 {

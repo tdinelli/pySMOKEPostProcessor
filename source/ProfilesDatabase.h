@@ -1,6 +1,6 @@
 #ifndef PROFILESDATABASE_H
-#define PROFILESDATBASE_H
- 
+#define PROFILESDATABASE_H
+
 #include <iostream>
 
 #include <boost/filesystem.hpp>

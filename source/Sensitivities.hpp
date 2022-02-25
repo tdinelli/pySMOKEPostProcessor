@@ -40,32 +40,31 @@
 #include "Sensitivities_Database.h"
 #include "Utilities.h"
 
-#include <sstream>
-#include <Eigen/Dense>
-#include <sstream>
-
-Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType)
+Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie)
 {
 	normalizationType_ = normalizationType;
 	sensitivityType_ = sensitivityType;
 	orderingType_ = orderingType;
+	specie_ = specie;
 }
 
-Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, double localValue)
+Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue)
 {
 	normalizationType_ = normalizationType;
 	sensitivityType_ = sensitivityType;
 	orderingType_ = orderingType;
 	localValue_ = localValue;
+	specie_ = specie;
 }
 
-Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, double lowerBound, double upperBound)
+Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie,double lowerBound, double upperBound)
 {
 	normalizationType_ = normalizationType;
 	sensitivityType_ = sensitivityType;
 	orderingType_ = orderingType;
 	lowerBound_ = lowerBound;
 	upperBound_ = upperBound;
+	specie_ = specie;
 }
 
 Sensitivities::~Sensitivities()
@@ -263,3 +262,12 @@ void Sensitivities::Sensitivities_PostProcessing()
 		}
 	}
 }
+
+void Sensitivities::ReadSensitvityCoefficients()
+{
+	if (specie_.size() == 0)
+		return;
+
+	sensitivities->ReadFromChildFile(specie_);
+}
+

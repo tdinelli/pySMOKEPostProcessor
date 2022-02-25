@@ -38,20 +38,20 @@
 #define SENSITIVITIES_H
 
 #include <iostream>
+#include "ProfilesDatabase.h"
+#include "Sensitivities_Database.h"
 
-class ProfilesDatabase;
-class Sensitivities_Database;
 
 class Sensitivities
 {
 	
 
 public:
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType);
+	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie);
 
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, double localValue);
+	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue);
 
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, double lowerBound, double upperBound);
+	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double lowerBound, double upperBound);
 
 	~Sensitivities();
 
@@ -59,16 +59,19 @@ public:
 	
 	void Prepare();
 
+	void Sensitivities_PostProcessing();
+
+	void ReadSensitvityCoefficients();
+
 private:
 	ProfilesDatabase* data_;
 	
 	Sensitivities_Database* sensitivities;
 
-	void Sensitivities_PostProcessing();
-
 	std::string normalizationType_;
 	std::string sensitivityType_;
 	std::string orderingType_;
+	std::string specie_;
 
 	double localValue_;
 	double lowerBound_;

@@ -15,6 +15,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+    <ClCompile Include="..\..\source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\PostProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ProfilesDatabase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ROPA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\CollectionOfClasses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Sensitivities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Sensitivities_Database.cpp">
+=======
     <ClCompile Include="..\..\source\CollectionOfClasses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -22,6 +46,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\PostProcessor.cpp">
+>>>>>>> main
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,6 +57,12 @@
     <ClInclude Include="..\..\source\ProfilesDatabase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
+    <ClInclude Include="..\..\source\ROPA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Utilities.h">
+=======
     <ClInclude Include="..\..\source\ProfilesDatabase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,11 +70,17 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\ROPA.hpp">
+>>>>>>> main
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Sensitivities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
+    <ClInclude Include="..\..\source\Sensitivities_Database.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+=======
     <ClInclude Include="..\..\source\Sensitivities.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -59,5 +96,6 @@
     <ClInclude Include="..\..\source\Utilities.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+>>>>>>> main
   </ItemGroup>
 </Project>
