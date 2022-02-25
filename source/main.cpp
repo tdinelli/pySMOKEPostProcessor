@@ -43,9 +43,12 @@ int main() {
 	std::cout << " Hello which kind of postprocessing do you want?" << std::endl;
 	std::cin >> postprocessorType;
 	std::cout << " Plese provide the directory for the kinetic mechanism: " << std::endl;
-	std::cin >> kineticFolder;
+	//std::cin >> kineticFolder;
+	kineticFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\kinetics";
+	std::cout << kineticFolder << std::endl;
 	std::cout << " Plese provide the directory for the results: " << std::endl;
-	std::cin >> outputFolder;
+	//std::cin >> outputFolder;
+	outputFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\Output";
 
 	if (postprocessorType == "ropa" || postprocessorType == "sensitivity") 
 	{
@@ -57,7 +60,8 @@ int main() {
 		}
 		if (postprocessorType == "sensitivity") 
 		{
-			
+			PostProcessor.Prepare();
+			PostProcessor.SensitivityAnalysis();
 		}
 	}
 	else

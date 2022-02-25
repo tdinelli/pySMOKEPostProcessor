@@ -20,12 +20,19 @@ public:
 
 	void SensitivityAnalysis();
 
-	void PrintRecap();
+	void PrintRecap_ROPA();
+
+	void PrintRecap_SENSITIVITY();
 
 	std::string ropaType_;
+	std::string sensitivityType_;
 	std::string kineticFolder_;
 	std::string outputFolder_;
 	std::string species_;
+
+	std::string normalizationType_;
+	std::string orderingType_;
+
 	double localValue_;
 	double lowerBound_;
 	double upperBound_;
