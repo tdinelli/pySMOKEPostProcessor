@@ -38,9 +38,9 @@
 #define SENSITIVITIES_H
 
 #include <iostream>
+#include "ProfilesDatabase.h"
+//#include "Sensitivities_Database.h"
 
-class ProfilesDatabase;
-class Sensitivities_Database;
 
 class Sensitivities
 {

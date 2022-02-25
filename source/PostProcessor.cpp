@@ -1,7 +1,6 @@
 #include "PostProcessor.h"
-#include "ProfilesDatabase.h"
 #include "ROPA.h"
-#include "Sensitivities.h"
+//#include "Sensitivities.h"
 
 // Global
 PostProcessor::PostProcessor(std::string postporcessorType, std::string kineticFolder, std::string outputFolder)
@@ -66,21 +65,19 @@ void PostProcessor::Prepare()
 
 void PostProcessor::ComputeROPA()
 {
+    ROPA* widget;
+
 	if (ropaType_ == "global") 
 	{
 		PrintRecap();
-		ROPA* widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_);
-		widget->SetDatabase(data_);
-		widget->ROPA_Calculations();
+		widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_);
 	}
 	else if (ropaType_ == "local") 
 	{
 		std::cout << " Please insert the value for which you want to compute ropa:" << std::endl;
 		std::cin >> localValue_;
 		PrintRecap();
-		ROPA* widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_, localValue_);
-		widget->SetDatabase(data_);
-		widget->ROPA_Calculations();
+		widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_, localValue_);
 	}
 	else if (ropaType_ == "region") 
 	{
@@ -89,15 +86,16 @@ void PostProcessor::ComputeROPA()
 		std::cout << " Please insert the value of the upper bound for which you want to compute ropa:" << std::endl;
 		std::cin >> upperBound_;
 		PrintRecap();
-		ROPA* widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_, lowerBound_, upperBound_);
-		widget->SetDatabase(data_);
-		widget->ROPA_Calculations();
+		widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_, lowerBound_, upperBound_);
 	}
 	else 
 	{
 		std::cout << " Plese select one of the available type of ROPA: global | local | region" << std::endl;
 		exit(-1);
 	}
+
+    widget->SetDatabase(data_);
+    widget->ROPA_Calculations();
 }
 
 void PostProcessor::SensitivityAnalysis() 

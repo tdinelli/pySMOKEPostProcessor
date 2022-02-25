@@ -16,8 +16,6 @@
 #include "Utilities.h"
 
 // Classes that need to be compiled
-#include "Utilities.hpp"
-#include "ProfilesDatabase.hpp"
-#include "Sensitivities_Database.hpp"
-#include "ROPA.hpp"
-#include "Sensitivities.hpp"
+#include "Utilities.cpp"
+#include "ProfilesDatabase.cpp"
+#include "ROPA.cpp"

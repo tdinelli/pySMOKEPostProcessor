@@ -1,6 +1,6 @@
-#ifndef PROFILESDATABASE_H
-#define PROFILESDATBASE_H
- 
+#ifndef EDO
+#define EDO
+
 #include <iostream>
 
 #include <boost/filesystem.hpp>
