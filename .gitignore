@@ -37,5 +37,6 @@
 
 # Ignore visual studio stuff
 
-projec/MSVS_2019/x64/
-projec/.vs/
+project/MSVS_2019/x64/
+project/.vs/
+project/MSVS_2019/.vs/
