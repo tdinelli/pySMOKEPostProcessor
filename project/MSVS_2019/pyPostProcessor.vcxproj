@@ -118,6 +118,12 @@
     <ClCompile Include="..\..\source\ROPA.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\source\Sensitivities.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Sensitivities_Database.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\source\Utilities.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -126,6 +132,8 @@
     <ClInclude Include="..\..\source\PostProcessor.h" />
     <ClInclude Include="..\..\source\ProfilesDatabase.h" />
     <ClInclude Include="..\..\source\ROPA.h" />
+    <ClInclude Include="..\..\source\Sensitivities.h" />
+    <ClInclude Include="..\..\source\Sensitivities_Database.h" />
     <ClInclude Include="..\..\source\Utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
