@@ -34,4 +34,6 @@
 .DS_Store
 
 .idea/
-project/
+project/MSVS_2019/x64/
+project/MSVS_2019/.vs/
+project/MSVS_2019/pyPostProcessor.vcxproj.user
