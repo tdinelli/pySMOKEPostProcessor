@@ -37,3 +37,10 @@
 project/MSVS_2019/x64/
 project/MSVS_2019/.vs/
 project/MSVS_2019/pyPostProcessor.vcxproj.user
+
+# Ignore visual studio stuff
+
+project/MSVS_2019/x64/
+project/.vs/
+project/MSVS_2019/.vs/
+project/MSVS_2019/pyPostProcessor.vcxproj.user

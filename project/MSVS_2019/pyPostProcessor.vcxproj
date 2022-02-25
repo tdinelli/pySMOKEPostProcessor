@@ -18,9 +18,33 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+<<<<<<< HEAD
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{9AE10A00-7309-4AA3-AF84-9607D6DC896A}</ProjectGuid>
+=======
+  <ItemGroup>
+    <ClCompile Include="..\..\source\CollectionOfClasses.cpp" />
+    <ClCompile Include="..\..\source\main.cpp" />
+    <ClCompile Include="..\..\source\PostProcessor.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\PostProcessor.h" />
+    <ClInclude Include="..\..\source\ProfilesDatabase.h" />
+    <ClInclude Include="..\..\source\ProfilesDatabase.hpp" />
+    <ClInclude Include="..\..\source\ROPA.h" />
+    <ClInclude Include="..\..\source\ROPA.hpp" />
+    <ClInclude Include="..\..\source\Sensitivities.h" />
+    <ClInclude Include="..\..\source\Sensitivities.hpp" />
+    <ClInclude Include="..\..\source\Sensitivities_Database.h" />
+    <ClInclude Include="..\..\source\Sensitivities_Database.hpp" />
+    <ClInclude Include="..\..\source\Utilities.h" />
+    <ClInclude Include="..\..\source\Utilities.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{2771527D-5BD4-4928-8FBA-2C594BCCB5E0}</ProjectGuid>
+>>>>>>> main
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -69,7 +93,14 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+<<<<<<< HEAD
     <IncludePath>C:\Users\timot\Desktop\Numerical_libraries\eigen-3.4.0;C:\Users\timot\Desktop\GitHub\OpenSMOKEpp\source;C:\NumericalLibraries\boost_1_78_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+=======
+    <IncludePath>C:\Users\timot\Desktop\Numerical_libraries\eigen-3.4.0;C:\Users\timot\Desktop\GitHub\OpenSMOKEpp\source;C:\NumericalLibraries\boost_1_78_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\timot\Desktop\Numerical_libraries\eigen-3.4.0;C:\Users\timot\Desktop\GitHub\OpenSMOKEpp\source;C:\NumericalLibraries\boost_1_78_0\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+>>>>>>> main
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -101,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+<<<<<<< HEAD
     <Link>
       <AdditionalLibraryDirectories>C:\NumericalLibraries\boost_1_78_0\lib64-msvc-14.2</AdditionalLibraryDirectories>
     </Link>
@@ -136,6 +168,23 @@
     <ClInclude Include="..\..\source\Sensitivities_Database.h" />
     <ClInclude Include="..\..\source\Utilities.h" />
   </ItemGroup>
+=======
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\NumericalLibraries\boost_1_78_0\lib64-msvc-14.2</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\NumericalLibraries\boost_1_78_0\lib64-msvc-14.2</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+>>>>>>> main
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
