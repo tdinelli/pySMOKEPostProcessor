@@ -1,5 +1,5 @@
-#ifndef EDO
-#define EDO
+#ifndef PROFILESDATABASE_H
+#define PROFILESDATABASE_H
 
 #include <iostream>
 
