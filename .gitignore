@@ -34,3 +34,8 @@
 .DS_Store
 
 .idea/
+
+# Ignore visual studio stuff
+
+projec/MSVS_2019/x64/
+projec/.vs/
