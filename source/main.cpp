@@ -49,6 +49,7 @@ int main() {
 	std::cout << " Plese provide the directory for the results: " << std::endl;
 	//std::cin >> outputFolder;
 	outputFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\Output";
+	std::cout <<  outputFolder << std::endl;
 
 	if (postprocessorType == "ropa" || postprocessorType == "sensitivity") 
 	{

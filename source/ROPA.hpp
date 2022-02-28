@@ -11,27 +11,12 @@
 |   Department of Chemistry, Materials and Chemical Engineering           |
 |   Politecnico di Milano                                                 |
 |   P.zza Leonardo da Vinci 32, 20133 Milano                              |
-|                                                                         |
-|-------------------------------------------------------------------------|
-|                                                                         |
-|   This file is part of OpenSMOKE++PostProcessor.                        |
-|                                                                         |
-|   License                                                               |
-|                                                                         |
-|   Copyright(C) 2014, 2013  Alberto Cuoci                                |
-|   OpenSMOKE++PostProcessor is free software: you can redistribute it    |
-|   and/or modify it under the terms of the GNU General Public            |
-|   License as published by the Free Software Foundation, either          |
-|   version 3 of the License, or (at your option) any later version.      |
-|                                                                         |
-|   OpenSMOKE++PostProcessor is distributed in the hope that it will be   |
-|   useful, but WITHOUT ANY WARRANTY; without even the implied warranty   |
-|   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      |
-|   GNU General Public License for more details.                          |
-|                                                                         |
-|   You should have received a copy of the GNU General Public License     |
-|   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
-|                                                                         |
+|																		  |
+|   This file has been modified from the original OpenSMOKE postprocessor |
+|	to adapt it in python.                                                |
+|																		  |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>                  |
+|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>                  |
 \*-----------------------------------------------------------------------*/
 
 #include "ROPA.h"
@@ -79,14 +64,14 @@ void ROPA::SetDatabase(ProfilesDatabase* data)
 void ROPA::ROPA_Calculations()
 {
 	// Select y variables among the species
-	
-	if (species_.size() == 0)
+	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
 	{
-		std::cout << "You have to select one of the available species" << std::endl;
-		exit(-1);
-	}
-	else {
 		speciesIsSelected = true;
+	}
+	else 
+	{
+		std::cout << " ERROR: Please select an existing specie." << std::endl;
+		exit(-1);
 	}
 	
 	unsigned int index_of_species;

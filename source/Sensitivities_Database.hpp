@@ -11,27 +11,12 @@
 |   Department of Chemistry, Materials and Chemical Engineering           |
 |   Politecnico di Milano                                                 |
 |   P.zza Leonardo da Vinci 32, 20133 Milano                              |
-|                                                                         |
-|-------------------------------------------------------------------------|
-|                                                                         |
-|   This file is part of OpenSMOKE++PostProcessor.                        |
-|                                                                         |
-|   License                                                               |
-|                                                                         |
-|   Copyright(C) 2014, 2013  Alberto Cuoci                                |
-|   OpenSMOKE++PostProcessor is free software: you can redistribute it    |
-|   and/or modify it under the terms of the GNU General Public            |
-|   License as published by the Free Software Foundation, either          |
-|   version 3 of the License, or (at your option) any later version.      |
-|                                                                         |
-|   OpenSMOKE++PostProcessor is distributed in the hope that it will be   |
-|   useful, but WITHOUT ANY WARRANTY; without even the implied warranty   |
-|   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      |
-|   GNU General Public License for more details.                          |
-|                                                                         |
-|   You should have received a copy of the GNU General Public License     |
-|   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
-|                                                                         |
+|																		  |
+|   This file has been modified from the original OpenSMOKE postprocessor |
+|	to adapt it in python.                                                |
+|																		  |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>                  |
+|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>                  |
 \*-----------------------------------------------------------------------*/
 
 
@@ -140,10 +125,17 @@ void Sensitivities_Database::ReadParentFile()
 void Sensitivities_Database::ReadFromChildFile(const std::string name)
 {
 	std::string local_name = "Sensitivities." + name + ".xml";
-	boost::filesystem::path path_file = data_->path_folder_results_ / local_name;   
-
 	boost::property_tree::ptree ptree;
-	boost::property_tree::read_xml((path_file).string(), ptree);
+	try 
+	{
+		boost::filesystem::path path_file = data_->path_folder_results_ / local_name;
+		boost::property_tree::read_xml((path_file).string(), ptree);
+	}
+	catch (...)
+	{
+		std::cout << " The file named: " << local_name << " it is not present in the output folder select another specie." << std::endl;
+		exit(-1);
+	}
 
 	boost::optional< boost::property_tree::ptree& > child = ptree.get_child_optional("opensmoke.coefficients");
 
