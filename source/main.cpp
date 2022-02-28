@@ -12,6 +12,7 @@ void printHeader() {
 	std::cout << "                                                                             " << std::endl;
 	std::cout << "                           CRECK modeling group                              " << std::endl;
 	std::cout << "-----------------------------------------------------------------------------" << std::endl;
+	std::cout << "-----------------------------------------------------------------------------" << std::endl;
 	
 }
 
@@ -43,13 +44,13 @@ int main() {
 	std::cout << " Hello which kind of postprocessing do you want?" << std::endl;
 	std::cin >> postprocessorType;
 	std::cout << " Plese provide the directory for the kinetic mechanism: " << std::endl;
-	//std::cin >> kineticFolder;
-	kineticFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\kinetics";
-	std::cout << kineticFolder << std::endl;
+	std::cin >> kineticFolder;
+	// kineticFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\kinetics";
+	// std::cout << kineticFolder << std::endl;
 	std::cout << " Plese provide the directory for the results: " << std::endl;
-	//std::cin >> outputFolder;
-	outputFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\Output";
-	std::cout <<  outputFolder << std::endl;
+	std::cin >> outputFolder;
+	// outputFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\Output";
+	// std::cout <<  outputFolder << std::endl;
 
 	if (postprocessorType == "ropa" || postprocessorType == "sensitivity") 
 	{
@@ -67,7 +68,7 @@ int main() {
 	}
 	else
 	{
-		std::cout << " Please select one of the available type: ropa | sensitivity" << std::endl;
+		std::cout << " Please select one of the available post-processing type: ropa | sensitivity" << std::endl;
 		return -1;
 	}
 		

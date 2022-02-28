@@ -45,6 +45,7 @@ void PostProcessor::Prepare()
 		std::cout << " Plese insert the specie you want to compute the ropa: " << std::endl;
 		std::cin >> species_;
 		std::cout << "-----------------------------------------------------------------------------" << std::endl;
+		std::cout << "-----------------------------------------------------------------------------" << std::endl;
 		
 		std::cout.setstate(std::ios_base::failbit);
 		
@@ -67,6 +68,8 @@ void PostProcessor::Prepare()
 			std::cout.clear();
 			std::cout << " Kinetic Mechanism read OK!" << std::endl;
 			std::cout << "-----------------------------------------------------------------------------" << std::endl;
+			std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
 		}
 		else
 		{
@@ -87,6 +90,7 @@ void PostProcessor::Prepare()
 		std::cin >> normalizationType_;
 		std::cout << " Please insert which kind of ordering do you want: " << std::endl;
 		std::cin >> orderingType_;
+		std::cout << "-----------------------------------------------------------------------------" << std::endl;
 		std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
 		std::cout.setstate(std::ios_base::failbit);

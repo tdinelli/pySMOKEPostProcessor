@@ -124,7 +124,7 @@ void Sensitivities::Sensitivities_PostProcessing()
 		// Printaggio risultati
 
 		std::cout << "\ncoefficients \t\t indices \t\t names\n" << std::endl;
-		for (int i = 0; i < coefficients.size(); i++)
+		for (int i = 0; i < 25; i++)  // coefficients.size()
 		{
 			std::cout << coefficients[i] << "\t\t" << indices[i] << "\t\t" << reaction_names[i] << std::endl;
 		}
@@ -232,7 +232,7 @@ void Sensitivities::Sensitivities_PostProcessing()
 		{
 			//horizontal_bars->setRectangles(	coefficients, indices, peaks, reaction_names);
 			std::cout << "\ncoefficients \t\t indices \t\t names\n" << std::endl;
-			for (int i = 0; i < coefficients.size(); i++)
+			for (int i = 0; i < 25; i++)  // coefficients.size()
 			{
 				std::cout << coefficients[i] << "\t\t" << indices[i] << "\t\t" << reaction_names[i] << std::endl;
 			}
@@ -240,7 +240,7 @@ void Sensitivities::Sensitivities_PostProcessing()
 		else 
 		{
 			std::cout << "\ncoefficients \t\t indices \t\t names\n" << std::endl;
-			for (int i = 0; i < coefficients.size(); i++)
+			for (int i = 0; i < 25; i++)  // coefficients.size()
 			{
 				std::cout << coefficients[i] << "\t\t" << indices[i] << "\t\t" << reaction_names[i] << std::endl;
 			}
