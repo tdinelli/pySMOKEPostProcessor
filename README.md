@@ -2,7 +2,7 @@
 
 Non graphical postprocessor for OpenSMOKEpp simulations results
 
-# External libraires dependencies
+## External libraires dependencies
 
 - OpenSMOKEpp distibuted under request contact Alberto Cuoci <alberto.cuoci@polimi.it>
 - Eigen freely downloadable at https://eigen.tuxfamily.org/index.php?title=Main_Page
