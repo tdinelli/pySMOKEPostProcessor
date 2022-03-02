@@ -52,9 +52,20 @@ ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::strin
 
 }
 
-ROPA::~ROPA()
+ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType,	std::string species, double localValue, double lowerBound, double upperBound)
 {
+	ropaType_ = ropaType;
+	kineticFolder_ = kineticFolder;
+	outputFolder_ = outputFolder;
+	species_ = species;
+
+	localValue_ = localValue;
+	upperBound_ = upperBound;
+	lowerBound_ = lowerBound;
+
 }
+
+
 
 void ROPA::SetDatabase(ProfilesDatabase* data)
 {
@@ -265,7 +276,7 @@ void ROPA::ROPA_Calculations()
 			// PRINTAGGIO RISULTATI
 
 			std::cout << "\ncoefficients \t\t indices \t\t names\n" << std::endl;
-			for (int i = 0; i < reaction_coefficients.size(); i++) 
+			for (int i = 0; i < reaction_coefficients.size(); i++)
 			{
 				std::cout << reaction_coefficients[i] << "\t\t" << reaction_indices[i] << "\t\t" << production_reaction_names[i] << std::endl;
 			}
@@ -274,6 +285,210 @@ void ROPA::ROPA_Calculations()
 	}
 
 }
+
+int ROPA::ROPA_CalculationsPython(float* coefficients, int* reactions, int len)
+{
+	// Select y variables among the species
+	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
+	{
+		speciesIsSelected = true;
+	}
+	else
+	{
+		return -5;
+	}
+
+	unsigned int index_of_species;
+	for (unsigned int j = 0; j < data_->thermodynamicsMapXML->NumberOfSpecies(); j++)
+		if (speciesIsSelected == true)
+			if (species_ == data_->string_list_massfractions_sorted[j])
+			{
+				index_of_species = data_->sorted_index[j];
+				break;
+			}
+
+
+    OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
+    OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
+    OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
+
+    std::vector<int> reaction_indices;
+    std::vector<double> reaction_coefficients;
+
+    // Local Analysis
+    if (ropaType_ == "local")
+    {
+        unsigned int index = 0;
+        for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
+            if (data_->additional[0][j] >= localValue_)
+            {
+                index = j;
+                break;
+            }
+
+        // Recovers mass fractions
+        for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+            omega[k + 1] = data_->omega[k][index];
+
+        // Calculates mole fractions
+        double MWmix;
+        data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+
+        // Calculates concentrations
+        const double P_Pa = data_->additional[data_->index_P][index];
+        const double T = data_->additional[data_->index_T][index];
+        const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+        Product(cTot, x, &c);
+
+        // Calculates formations rates
+        data_->kineticsMapXML->SetTemperature(T);
+        data_->kineticsMapXML->SetPressure(P_Pa);
+        data_->thermodynamicsMapXML->SetTemperature(T);
+        data_->thermodynamicsMapXML->SetPressure(P_Pa);
+
+        data_->kineticsMapXML->KineticConstants();
+        data_->kineticsMapXML->ReactionRates(c.GetHandle());
+
+        // Ropa
+        OpenSMOKE::ROPA_Data ropa;
+        data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
+
+
+        // qua devo agire ioooooo
+        MergePositiveAndNegativeBars(ropa.production_reaction_indices[index_of_species],
+            ropa.destruction_reaction_indices[index_of_species],
+            ropa.production_coefficients[index_of_species], ropa.destruction_coefficients[index_of_species],
+            reaction_indices, reaction_coefficients);
+
+        // The OpenSMOKE ROPA Analysis returns 0-based indices that needs to be
+        // transformed into 1-based indices before calling the Widget_Horizontal_Bars
+        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+            reaction_indices[i]++;
+
+        std::vector<std::string> production_reaction_names(reaction_indices.size());
+        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+            production_reaction_names[i] = data_->reaction_strings_[reaction_indices[i] - 1];
+
+        // PRINTAGGIO RISULTATI
+
+
+    } // Global | Region
+    else
+    {
+        unsigned int index_min = 0;
+        unsigned int index_max = data_->number_of_abscissas_ - 1;
+        if (ropaType_ == "region")
+        {
+            for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
+                if (data_->additional[0][j] >= lowerBound_)
+                {
+                    index_min = j;
+                    break;
+                }
+
+            for (unsigned int j = index_min; j < data_->number_of_abscissas_; j++)
+                if (data_->additional[0][j] >= upperBound_)
+                {
+                    index_max = j;
+                    break;
+                }
+
+            if (index_min == index_max)
+            {
+                if (index_max == data_->number_of_abscissas_ - 1)
+                    index_min = index_max - 1;
+                else
+                    index_max = index_min + 1;
+            }
+        }
+
+        const double delta = data_->additional[0][index_max] - data_->additional[0][index_min];
+
+        std::vector<double> global_production_coefficients;
+        std::vector<double> global_destruction_coefficients;
+        std::vector<unsigned int> global_production_reaction_indices;
+        std::vector<unsigned int> global_destruction_reaction_indices;
+
+        for (unsigned int j = index_min; j < index_max - 1; j++)
+        {
+            // Recovers mass fractions
+            for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+                omega[k + 1] = data_->omega[k][j];
+
+            // Calculates mole fractions
+            double MWmix;
+            data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+
+            // Calculates concentrations
+            const double P_Pa = data_->additional[data_->index_P][j];
+            const double T = data_->additional[data_->index_T][j];
+            const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+            Product(cTot, x, &c);
+
+            // Calculates formations rates
+            data_->kineticsMapXML->SetTemperature(T);
+            data_->kineticsMapXML->SetPressure(P_Pa);
+            data_->thermodynamicsMapXML->SetTemperature(T);
+            data_->thermodynamicsMapXML->SetPressure(P_Pa);
+
+            data_->kineticsMapXML->KineticConstants();
+            data_->kineticsMapXML->ReactionRates(c.GetHandle());
+
+            // Ropa
+            OpenSMOKE::ROPA_Data ropa;
+            data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
+
+            if (ropa.production_coefficients[index_of_species].size() != ropa.production_reaction_indices[index_of_species].size() ||
+                ropa.destruction_coefficients[index_of_species].size() != ropa.destruction_reaction_indices[index_of_species].size())
+            {
+                std::cout << "SSS" << std::endl;
+            }
+
+            if (j == index_min)
+            {
+                global_production_coefficients.resize(ropa.production_coefficients[index_of_species].size());
+                global_destruction_coefficients.resize(ropa.destruction_coefficients[index_of_species].size());
+                global_production_reaction_indices = ropa.production_reaction_indices[index_of_species];
+                global_destruction_reaction_indices = ropa.destruction_reaction_indices[index_of_species];
+
+            }
+
+            const double dt = (data_->additional[0][j + 1] - data_->additional[0][j]) / delta;
+            for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size(); k++)
+                global_production_coefficients[k] += dt * ropa.production_coefficients[index_of_species][k];
+
+            for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++)
+                global_destruction_coefficients[k] += dt * ropa.destruction_coefficients[index_of_species][k];
+        }
+
+        // same shit di sopra qua devo agire io
+        MergePositiveAndNegativeBars(global_production_reaction_indices,
+            global_destruction_reaction_indices,
+            global_production_coefficients, global_destruction_coefficients,
+            reaction_indices, reaction_coefficients);
+
+        // The OpenSMOKE ROPA Analysis returns 0-based indices that needs to be
+        // transformed into 1-based indices before calling the Widget_Horizontal_Bars
+        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+            reaction_indices[i]++;
+
+        std::vector<std::string> production_reaction_names(reaction_indices.size());
+        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+            production_reaction_names[i] = data_->reaction_strings_[reaction_indices[i] - 1];
+
+    }
+
+
+
+    for (int i = 0; i < len; i++){
+        coefficients[i] = reaction_coefficients[i];
+        reactions[i] = reaction_indices[i];
+    }
+
+    return 0;
+
+}
+
 
 void ROPA::FluxAnalysis()
 {

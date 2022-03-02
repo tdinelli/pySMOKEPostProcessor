@@ -32,12 +32,59 @@ PostProcessor::PostProcessor(std::string postporcessorType, std::string kineticF
 	outputFolder_ = outputFolder;
 }
 
-PostProcessor::~PostProcessor()
-{
+int PostProcessor::PreparePython(std::string specie, int ropa_type, float local_value, float lower_value, float upper_value){
+	if (postprocessorType_ == "ropa"){
+		species_ = specie;
+		localValue_ = local_value;
+        lowerBound_ = lower_value;
+        upperBound_ = upper_value;
+
+		if (ropa_type == 0){
+		    ropaType_ = "local";
+		}
+		else if (ropa_type == 1){
+		    ropaType_ = "global";
+		}
+		else if (ropa_type == 2){
+		    ropaType_ = "region";
+		}
+		else {
+		    return -1;
+		}
+
+
+	}
+
+	else if (postprocessorType_ == "sensitivity")
+	{
+		std::cout << " Plese insert which kind of Sensitivity analysis do you want to compute: " << std::endl;
+		std::cin >> sensitivityType_;
+		std::cout << " Plese insert the specie you want to compute the ropa: " << std::endl;
+		std::cin >> species_;
+		std::cout << " Please insert which kind of normalization do you want: " << std::endl;
+		std::cin >> normalizationType_;
+		std::cout << " Please insert which kind of ordering do you want: " << std::endl;
+		std::cin >> orderingType_;
+		std::cout << "-----------------------------------------------------------------------------" << std::endl;
+		std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+	}
+
+	if (data_->ReadFileResults(outputFolder_) != true){
+			return -2;
+	}
+
+    if (data_->ReadKineticMechanism(kineticFolder_) != true)
+    {
+        return -3;
+    }
+
+    return 0;
+
 }
 
-void PostProcessor::Prepare()
-{	
+
+void PostProcessor::Prepare(){
 	if (postprocessorType_ == "ropa") 
 	{
 		std::cout << " Plese insert which kind of ROPA do you want to compute: " << std::endl;
@@ -60,25 +107,7 @@ void PostProcessor::Prepare()
 			std::cout << " ERROR: Provide a valid directory for the output folder" << std::endl;
 			exit(-1);
 		}
-		
-		std::cout.setstate(std::ios_base::failbit);
-		
-		if (data_->ReadKineticMechanism(kineticFolder_) == true) 
-		{
-			std::cout.clear();
-			std::cout << " Kinetic Mechanism read OK!" << std::endl;
-			std::cout << "-----------------------------------------------------------------------------" << std::endl;
-			std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
-		}
-		else
-		{
-			std::cout.clear();
-			std::cout << " ERROR: Provide a valid directory for the kineic mechanism folder" << std::endl;
-			exit(-1);
-		}
-		
-		std::cout.clear();
 	}
 	else if (postprocessorType_ == "sensitivity") 
 	{
@@ -92,38 +121,38 @@ void PostProcessor::Prepare()
 		std::cin >> orderingType_;
 		std::cout << "-----------------------------------------------------------------------------" << std::endl;
 		std::cout << "-----------------------------------------------------------------------------" << std::endl;
-
-		std::cout.setstate(std::ios_base::failbit);
-
-		if (data_->ReadFileResults(outputFolder_) == true)
-		{
-			std::cout.clear();
-			std::cout << " Output read OK!" << std::endl;
-		}
-		else
-		{
-			std::cout.clear();
-			std::cout << " ERROR: Provide a valid directory for the output folder" << std::endl;
-			exit(-1);
-		}
-
-		std::cout.setstate(std::ios_base::failbit);
-
-		if (data_->ReadKineticMechanism(kineticFolder_) == true)
-		{
-			std::cout.clear();
-			std::cout << " Kinetic Mechanism read OK!" << std::endl;
-			std::cout << "-----------------------------------------------------------------------------" << std::endl;
-		}
-		else
-		{
-			std::cout.clear();
-			std::cout << " ERROR: Provide a valid directory for the kineic mechanism folder" << std::endl;
-			exit(-1);
-		}
-
-		std::cout.clear();
 	}
+
+    std::cout.setstate(std::ios_base::failbit);
+
+    if (data_->ReadFileResults(outputFolder_) == true)
+    {
+        std::cout.clear();
+        std::cout << " Output read OK!" << std::endl;
+    }
+    else
+    {
+        std::cout.clear();
+        std::cout << " ERROR: Provide a valid directory for the output folder" << std::endl;
+        exit(-1);
+    }
+
+    if (data_->ReadKineticMechanism(kineticFolder_) == true)
+    {
+        std::cout.clear();
+        std::cout << " Kinetic Mechanism read OK!" << std::endl;
+        std::cout << "-----------------------------------------------------------------------------" << std::endl;
+    }
+    else
+    {
+        std::cout.clear();
+        std::cout << " ERROR: Provide a valid directory for the kineic mechanism folder" << std::endl;
+        exit(-1);
+    }
+
+    std::cout.clear();
+
+
 
 }
 
@@ -160,6 +189,14 @@ void PostProcessor::ComputeROPA()
 
     widget->SetDatabase(data_);
     widget->ROPA_Calculations();
+}
+
+int PostProcessor::ComputeROPAPython(float* coefficients, int* reactions, int len)
+{
+    ROPA* widget;
+    widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_, localValue_, lowerBound_, upperBound_);
+    widget->SetDatabase(data_);
+    return widget->ROPA_CalculationsPython(coefficients, reactions, len);
 }
 
 void PostProcessor::SensitivityAnalysis() 

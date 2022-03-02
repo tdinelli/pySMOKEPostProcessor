@@ -36,12 +36,15 @@ public:
 	
 	// Region
 	ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType, std::string species, double lowerBound, double upperBound);
-	
-	~ROPA();
+
+	//Python
+    ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType, std::string species, double localValue, double lowerBound, double upperBound);
 
 	void SetDatabase(ProfilesDatabase* data);
 
 	void ROPA_Calculations();
+
+    int ROPA_CalculationsPython(float* coefficients, int* reactions, int len);
 
 	void MergePositiveAndNegativeBars (const std::vector<unsigned int>& positive_indices,
 		const std::vector<unsigned int>& negative_indices,

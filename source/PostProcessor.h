@@ -32,12 +32,14 @@ public:
 	
 	
 	PostProcessor(std::string postprocessorType, std::string kineticFolder, std::string outputFolder);
-	
-	~PostProcessor();
 
 	void Prepare();
 
+	int PreparePython(std::string, int ropa_type, float ropa_local_value, float ropa_region_lower_value, float ropa_region_upper_value);
+
 	void ComputeROPA();
+
+	int ComputeROPAPython(float* coefficients, int* reactions, int len);
 
 	void SensitivityAnalysis();
 

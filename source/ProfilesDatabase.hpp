@@ -52,8 +52,8 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 		boost::property_tree::ptree ptree;
 		boost::property_tree::read_xml((path_mechanism).string(), ptree);
 
-		thermodynamicsMapXML = new OpenSMOKE::ThermodynamicsMap_CHEMKIN(ptree);
-		kineticsMapXML = new OpenSMOKE::KineticsMap_CHEMKIN(*thermodynamicsMapXML, ptree);
+		thermodynamicsMapXML = new OpenSMOKE::ThermodynamicsMap_CHEMKIN(ptree, false);
+		kineticsMapXML = new OpenSMOKE::KineticsMap_CHEMKIN(*thermodynamicsMapXML, ptree, false);
 	}
 
 	if (thermodynamicsMapXML->NumberOfSpecies() == omega.size())
