@@ -29,7 +29,7 @@ int pyPostProcessor(
     float ropa_local_value,
     float ropa_region_lower_value,
     float ropa_region_upper_value,
-    float* coefficients,
+    double* coefficients,
     int* reactions,
     int len){
 
@@ -42,9 +42,6 @@ int pyPostProcessor(
         postprocessorType = "sensitivity";
     }
     else{
-        if(VERBOSE){
-	        std::cout << " Please select one of the available post-processing type: ropa | sensitivity" << std::endl;
-	    }
 	    return -1;
     }
 
@@ -59,6 +56,7 @@ int pyPostProcessor(
 			    return return_value;
 			}
 			return PostProcessor.ComputeROPAPython(coefficients, reactions, len);
+
 		}
 		if (postprocessorType == "sensitivity")
 		{
@@ -68,10 +66,6 @@ int pyPostProcessor(
 	}
 	else
 	{
-	    if(VERBOSE){
-	        std::cout << " Please select one of the available post-processing type: ropa | sensitivity" << std::endl;
-	    }
-
 		return -1;
 	}
 
@@ -98,19 +92,19 @@ int main() {
 
 //	void printHeader();
 //	printHeader();
-
+//
 //	std::string kineticFolder; // = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\01a-isothermal-constantvolume\\kinetics";
 //	std::string outputFolder; // = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\01a-isothermal-constantvolume\\Output";
-//
-//	kineticFolder = "/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/sciexpem/ChemModels/26";
-//	outputFolder = "/Users/edoardo/Desktop/Case0";
-//
+//    std::string postprocessorType = "ropa";
+//	kineticFolder = "/Users/edoardo/Downloads";
+//	outputFolder = "/Users/edoardo/Downloads";
+
 //    int num = 10;
 //    float* coefficients = (float *)malloc(num*sizeof(float));
 //    int* reactions = (int *)malloc(num*sizeof(int));
-//
+
 //	edoardo(kineticFolder, outputFolder, "H2", 0, 1, 0, 0, 0, coefficients, reactions, num);
-//
+
 //	for (int i = 0; i < num; i++){
 //	    std::cout << reactions[i] << " : " << coefficients[i] << std::endl;
 //	}
@@ -120,12 +114,12 @@ int main() {
 //	std::cin >> postprocessorType;
 //	std::cout << " Plese provide the directory for the kinetic mechanism: " << std::endl;
 //	std::cin >> kineticFolder;
-//	// kineticFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\kinetics";
-//	// std::cout << kineticFolder << std::endl;
+	// kineticFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\kinetics";
+	// std::cout << kineticFolder << std::endl;
 //	std::cout << " Plese provide the directory for the results: " << std::endl;
 //	std::cin >> outputFolder;
-//	// outputFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\Output";
-//	// std::cout <<  outputFolder << std::endl;
+	// outputFolder = "C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\Output";
+	// std::cout <<  outputFolder << std::endl;
 
 //	if (postprocessorType == "ropa" || postprocessorType == "sensitivity")
 //	{

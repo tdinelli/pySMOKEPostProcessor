@@ -44,7 +44,7 @@ public:
 
 	void ROPA_Calculations();
 
-    int ROPA_CalculationsPython(float* coefficients, int* reactions, int len);
+    int ROPA_CalculationsPython(double* coefficients, int* reactions, int len);
 
 	void MergePositiveAndNegativeBars (const std::vector<unsigned int>& positive_indices,
 		const std::vector<unsigned int>& negative_indices,

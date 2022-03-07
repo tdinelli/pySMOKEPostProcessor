@@ -191,7 +191,7 @@ void PostProcessor::ComputeROPA()
     widget->ROPA_Calculations();
 }
 
-int PostProcessor::ComputeROPAPython(float* coefficients, int* reactions, int len)
+int PostProcessor::ComputeROPAPython(double* coefficients, int* reactions, int len)
 {
     ROPA* widget;
     widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_, localValue_, lowerBound_, upperBound_);

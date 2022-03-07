@@ -21,6 +21,7 @@
 
 #include "ROPA.h"
 #include "math/OpenSMOKEUtilities.h"
+#include <algorithm>
 
 ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType, std::string species)
 {
@@ -286,7 +287,7 @@ void ROPA::ROPA_Calculations()
 
 }
 
-int ROPA::ROPA_CalculationsPython(float* coefficients, int* reactions, int len)
+int ROPA::ROPA_CalculationsPython(double* coefficients, int* reactions, int len)
 {
 	// Select y variables among the species
 	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
@@ -362,12 +363,12 @@ int ROPA::ROPA_CalculationsPython(float* coefficients, int* reactions, int len)
 
         // The OpenSMOKE ROPA Analysis returns 0-based indices that needs to be
         // transformed into 1-based indices before calling the Widget_Horizontal_Bars
-        for (unsigned int i = 0; i < reaction_indices.size(); i++)
-            reaction_indices[i]++;
-
-        std::vector<std::string> production_reaction_names(reaction_indices.size());
-        for (unsigned int i = 0; i < reaction_indices.size(); i++)
-            production_reaction_names[i] = data_->reaction_strings_[reaction_indices[i] - 1];
+//        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+//            reaction_indices[i]++;
+//
+//        std::vector<std::string> production_reaction_names(reaction_indices.size());
+//        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+//            production_reaction_names[i] = data_->reaction_strings_[reaction_indices[i] - 1];
 
         // PRINTAGGIO RISULTATI
 
@@ -469,18 +470,18 @@ int ROPA::ROPA_CalculationsPython(float* coefficients, int* reactions, int len)
 
         // The OpenSMOKE ROPA Analysis returns 0-based indices that needs to be
         // transformed into 1-based indices before calling the Widget_Horizontal_Bars
-        for (unsigned int i = 0; i < reaction_indices.size(); i++)
-            reaction_indices[i]++;
-
-        std::vector<std::string> production_reaction_names(reaction_indices.size());
-        for (unsigned int i = 0; i < reaction_indices.size(); i++)
-            production_reaction_names[i] = data_->reaction_strings_[reaction_indices[i] - 1];
+//        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+//            reaction_indices[i]++;
+//
+//        std::vector<std::string> production_reaction_names(reaction_indices.size());
+//        for (unsigned int i = 0; i < reaction_indices.size(); i++)
+//            production_reaction_names[i] = data_->reaction_strings_[reaction_indices[i] - 1];
 
     }
 
 
 
-    for (int i = 0; i < len; i++){
+    for (int i = 0; i < std::min<int>(len, reaction_coefficients.size()); i++){
         coefficients[i] = reaction_coefficients[i];
         reactions[i] = reaction_indices[i];
     }
