@@ -1,23 +1,27 @@
 from ctypes import c_int, c_double, c_void_p, c_char_p, byref, cdll
 
-path = '/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/pyPostProcessor/source/pyPostProcessor.o'
+# TITOOO
 
 path = r'C:\Users\timot\Desktop\GitHub\pyPostProcessor\project\x64\Debug\pySMOKEpostprocessor.dll' 
+
+# ROPA
+
 kineticFolder = b"C:\\Users\\timot\\Desktop\\Example_ROPA_AMN\\TOT2110_soot_last"
 outputFolder = b"C:\\Users\\timot\\Desktop\\Example_ROPA_AMN\\Sun2017_RCM_AMN\\output\\Case0"
 specie = b"H2"
-# TITOOOOO
 
+# EDOOOO
 
+# path = '/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/pyPostProcessor/source/pyPostProcessor.o'
 # kineticFolder = b"/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/sciexpem/ChemModels/26"
 # outputFolder = b"/Users/edoardo/Desktop/Case0"
-# EDOOOO
+
 
 # path = '/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/pyPostProcessor/source/edo.o'
 
 c_library = cdll.LoadLibrary(path)
 
-c_library.pyPostProcessor.argtypes = [c_char_p,
+c_library.pyROPAPostProcessor.argtypes = [c_char_p,
                                       c_char_p,
                                       c_char_p,
                                       c_int,
@@ -29,14 +33,14 @@ c_library.pyPostProcessor.argtypes = [c_char_p,
                                       c_void_p,
                                       c_int]
 
-c_library.pyPostProcessor.restype = c_int
+c_library.pyROPAPostProcessor.restype = c_int
 n = 10
 
 coefficients = (c_double * n)()
 reactions = (c_int * n)()
 
 
-code = c_library.pyPostProcessor(c_char_p(kineticFolder),
+code = c_library.pyROPAPostProcessor(c_char_p(kineticFolder),
                                  c_char_p(outputFolder),
                                  c_char_p(specie),
                                  c_int(0),
