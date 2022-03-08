@@ -39,7 +39,7 @@ public:
 
 	void ComputeROPA();
 
-	int ComputeROPAPython(float* coefficients, int* reactions, int len);
+	int ComputeROPAPython(double* coefficients, int* reactions, int len);
 
 	void SensitivityAnalysis();
 
