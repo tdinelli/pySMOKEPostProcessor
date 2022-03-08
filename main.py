@@ -21,17 +21,17 @@ specie = b"H2"
 
 c_library = cdll.LoadLibrary(path)
 
-c_library.pyROPAPostProcessor.argtypes = [c_char_p,
-                                      c_char_p,
-                                      c_char_p,
-                                      c_int,
-                                      c_int,
-                                      c_double,
-                                      c_double,
-                                      c_double,
-                                      c_void_p,
-                                      c_void_p,
-                                      c_int]
+c_library.pyROPAPostProcessor.argtypes = [c_char_p, # kinetic folder
+                                          c_char_p, # output folder
+                                          c_char_p, # sepcie
+                                          c_int,    # command
+                                          c_int,    # ropa type 0: local | 1: global | 2: region
+                                          c_double, # ropa local value
+                                          c_double, # ropa region lower value
+                                          c_double, # ropa region upper value
+                                          c_void_p, # ropa coefficients
+                                          c_void_p, # ropa reactions indices
+                                          c_int]    # ropa number of reactions
 
 c_library.pyROPAPostProcessor.restype = c_int
 n = 10
@@ -41,16 +41,16 @@ reactions = (c_int * n)()
 
 
 code = c_library.pyROPAPostProcessor(c_char_p(kineticFolder),
-                                 c_char_p(outputFolder),
-                                 c_char_p(specie),
-                                 c_int(0),
-                                 c_int(1),
-                                 c_double(0),
-                                 c_double(0),
-                                 c_double(0),
-                                 byref(coefficients),
-                                 byref(reactions),
-                                 c_int(n))
+                                    c_char_p(outputFolder),
+                                    c_char_p(specie),
+                                    c_int(0),
+                                    c_int(1),
+                                    c_double(0),
+                                    c_double(0),
+                                    c_double(0),
+                                    byref(coefficients),
+                                    byref(reactions),
+                                    c_int(n))
 
 print (code)
 

@@ -11,19 +11,19 @@ specie = b"H2"
 
 c_library = cdll.LoadLibrary(path)
 
-c_library.pySensitivityPostProcessor.argtypes = [c_char_p,
-                                                c_char_p,
-                                                c_char_p,
-                                                c_int,
-                                                c_int,
-                                                c_int,
-                                                c_int,
-                                                c_double,
-                                                c_double,
-                                                c_double,
-                                                c_void_p,
-                                                c_void_p,
-                                                c_int]
+c_library.pySensitivityPostProcessor.argtypes = [c_char_p, # kinetic folder
+                                                c_char_p,  # output folder
+                                                c_char_p,  # specie
+                                                c_int,     # command
+                                                c_int,     # sensitivity type 0: local | 1: global | 2: region
+                                                c_int,     # ordering type 0: peakvalues | 1: area | 2: absolutearea
+                                                c_int,     # normalization type 0: local | 1: maxvalue
+                                                c_double,  # sensitivity local value
+                                                c_double,  # sensitivity region lower value
+                                                c_double,  # sensitivity region upper value
+                                                c_void_p,  # sensitivity coefficients
+                                                c_void_p,  # reactions indices
+                                                c_int]     # sensitivity number of reactions
 
 c_library.pySensitivityPostProcessor.restype = c_int
 n = 10
