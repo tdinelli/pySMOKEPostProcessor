@@ -2,9 +2,18 @@ from ctypes import c_int, c_double, c_void_p, c_char_p, byref, cdll
 
 path = '/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/pyPostProcessor/source/pyPostProcessor.o'
 
-kineticFolder = b"/Users/edoardo/Downloads"
-outputFolder = b"/Users/edoardo/Downloads"
-specie = b"HE"
+path = r'C:\Users\timot\Desktop\GitHub\pyPostProcessor\project\x64\Debug\pySMOKEpostprocessor.dll' 
+kineticFolder = b"C:\\Users\\timot\\Desktop\\Example_ROPA_AMN\\TOT2110_soot_last"
+outputFolder = b"C:\\Users\\timot\\Desktop\\Example_ROPA_AMN\\Sun2017_RCM_AMN\\output\\Case0"
+specie = b"H2"
+# TITOOOOO
+
+
+# kineticFolder = b"/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/sciexpem/ChemModels/26"
+# outputFolder = b"/Users/edoardo/Desktop/Case0"
+# EDOOOO
+
+# path = '/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Projects/pyPostProcessor/source/edo.o'
 
 c_library = cdll.LoadLibrary(path)
 

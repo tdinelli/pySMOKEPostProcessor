@@ -19,8 +19,7 @@ void printHeader() {
 
 bool VERBOSE = false;
 
-extern "C"
-int pyPostProcessor(
+extern "C" __declspec(dllexport) int pyPostProcessor(
     char* kineticFolder,
     char* outputFolder,
     char* specie,
