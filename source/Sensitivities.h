@@ -38,6 +38,8 @@ public:
 
 	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double lowerBound, double upperBound);
 
+	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue, double lowerBound, double upperBound);
+
 	~Sensitivities();
 
 	void SetDatabase(ProfilesDatabase* data);
@@ -46,7 +48,9 @@ public:
 
 	void Sensitivities_PostProcessing();
 
-	void ReadSensitvityCoefficients();
+	int Sensitivities_Python_PostProcessing(double* sensitivity_coefficients, int* reactions, int len);
+
+	int ReadSensitvityCoefficients();
 
 private:
 	ProfilesDatabase* data_;

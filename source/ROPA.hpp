@@ -66,8 +66,6 @@ ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::strin
 
 }
 
-
-
 void ROPA::SetDatabase(ProfilesDatabase* data)
 {
 	data_ = data;

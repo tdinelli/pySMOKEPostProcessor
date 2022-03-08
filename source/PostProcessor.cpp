@@ -23,7 +23,6 @@
 #include "ROPA.h"
 #include "Sensitivities.h"
 
-// Global
 PostProcessor::PostProcessor(std::string postporcessorType, std::string kineticFolder, std::string outputFolder)
 {
 	data_ = new ProfilesDatabase();
@@ -32,7 +31,7 @@ PostProcessor::PostProcessor(std::string postporcessorType, std::string kineticF
 	outputFolder_ = outputFolder;
 }
 
-int PostProcessor::PreparePython(std::string specie, int ropa_type, float local_value, float lower_value, float upper_value){
+int PostProcessor::PrepareROPAPython(std::string specie, int ropa_type, float local_value, float lower_value, float upper_value){
 	if (postprocessorType_ == "ropa"){
 		species_ = specie;
 		localValue_ = local_value;
@@ -51,23 +50,6 @@ int PostProcessor::PreparePython(std::string specie, int ropa_type, float local_
 		else {
 		    return -1;
 		}
-
-
-	}
-
-	else if (postprocessorType_ == "sensitivity")
-	{
-		std::cout << " Plese insert which kind of Sensitivity analysis do you want to compute: " << std::endl;
-		std::cin >> sensitivityType_;
-		std::cout << " Plese insert the specie you want to compute the ropa: " << std::endl;
-		std::cin >> species_;
-		std::cout << " Please insert which kind of normalization do you want: " << std::endl;
-		std::cin >> normalizationType_;
-		std::cout << " Please insert which kind of ordering do you want: " << std::endl;
-		std::cin >> orderingType_;
-		std::cout << "-----------------------------------------------------------------------------" << std::endl;
-		std::cout << "-----------------------------------------------------------------------------" << std::endl;
-
 	}
 
 	if (data_->ReadFileResults(outputFolder_) != true){
@@ -83,6 +65,63 @@ int PostProcessor::PreparePython(std::string specie, int ropa_type, float local_
 
 }
 
+int PostProcessor::PrepareSensitivityPython(std::string specie, int sensitivity_type, float sensitivity_local_value, float sensitivity_region_lower_value, 
+	float sensitivity_region_upper_value,int sensitivity_normalization_type, int sensitivity_ordering_type) 
+{
+	if (postprocessorType_ == "sensitivity") {
+		species_ = specie;
+		localValue_ = sensitivity_local_value;
+		lowerBound_ = sensitivity_region_lower_value;
+		upperBound_ = sensitivity_region_upper_value;
+
+		if (sensitivity_type == 0) {
+			sensitivityType_ = "local";
+		}
+		else if (sensitivity_type == 1) {
+			sensitivityType_ = "global";
+		}
+		else if (sensitivity_type == 2) {
+			sensitivityType_ = "region";
+		}
+		else {
+			return -1;
+		}
+
+		if (sensitivity_ordering_type == 0) {
+			orderingType_ = "peakvalues";
+		}
+		else if (sensitivity_ordering_type == 1) {
+			orderingType_ = "area";
+		}
+		else if (sensitivity_ordering_type == 2) {
+			orderingType_ = "absolutearea";
+		}
+		else {
+			return -1;
+		}
+
+		if (sensitivity_normalization_type == 0) {
+			normalizationType_ = "local";
+		}
+		else if (sensitivity_normalization_type == 1) {
+			normalizationType_ = "maxvalue";
+		}
+		else {
+			return -1;
+		}
+	}
+
+	if (data_->ReadFileResults(outputFolder_) != true) {
+		return -2;
+	}
+
+	if (data_->ReadKineticMechanism(kineticFolder_) != true)
+	{
+		return -3;
+	}
+
+	return 0;
+}
 
 void PostProcessor::Prepare(){
 	if (postprocessorType_ == "ropa") 
@@ -197,6 +236,18 @@ int PostProcessor::ComputeROPAPython(double* coefficients, int* reactions, int l
     widget = new ROPA(kineticFolder_, outputFolder_, ropaType_, species_, localValue_, lowerBound_, upperBound_);
     widget->SetDatabase(data_);
     return widget->ROPA_CalculationsPython(coefficients, reactions, len);
+}
+
+int PostProcessor::ComputeSensitivityPython(double* coefficients, int* reactions, int len) 
+{
+	Sensitivities* widget;
+	widget = new Sensitivities(normalizationType_, sensitivityType_, orderingType_, species_);
+	widget->SetDatabase(data_);
+	widget->Prepare();
+	widget->ReadSensitvityCoefficients();
+	widget->Sensitivities_Python_PostProcessing(coefficients, reactions, len);
+
+	return 0;
 }
 
 void PostProcessor::SensitivityAnalysis() 
