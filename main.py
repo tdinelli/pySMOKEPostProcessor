@@ -44,7 +44,7 @@ code = c_library.pyROPAPostProcessor(c_char_p(kineticFolder),
                                     c_char_p(outputFolder),
                                     c_char_p(specie),
                                     c_int(0),
-                                    c_int(1),
+                                    c_int(0), # ropa type
                                     c_double(0),
                                     c_double(0),
                                     c_double(0),

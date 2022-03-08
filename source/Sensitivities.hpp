@@ -263,6 +263,8 @@ void Sensitivities::Sensitivities_PostProcessing()
 
 int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coefficients, int* reactions, int len) 
 {
+	std::vector<int> indices;
+    std::vector<double> coefficients;
 	bool iLocalNormalization;
 	if (normalizationType_ == "local")
 	{
@@ -295,8 +297,8 @@ int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coeff
 			total_coefficients[j] = sensitivities->NormalizedProfile(j, iLocalNormalization, index);
 
 		// Reorder the coefficients
-		std::vector<int> indices;
-		std::vector<double> coefficients;
+		//std::vector<int> indices;
+		//std::vector<double> coefficients;
 		MergeBars(total_indices, total_coefficients, indices, coefficients);
 
 		// Fill the vector containing the reaction strings
@@ -306,10 +308,10 @@ int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coeff
 
 		// Printaggio risultati
 
-		for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
-			sensitivity_coefficients[i] = coefficients[i];
-			reactions[i] = indices[i];
-		}
+		//for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
+		//	sensitivity_coefficients[i] = 2;// coefficients[i];
+		//	reactions[i] = indices[i];
+		//}//
 	}
 	else
 	{
@@ -395,8 +397,8 @@ int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coeff
 		}
 
 		// Reorder the coefficients
-		std::vector<int> indices;
-		std::vector<double> coefficients;
+		//std::vector<int> indices;
+		//std::vector<double> coefficients;
 		std::vector<double> peaks;
 
 		if (orderingType_ == "peakvalues")
@@ -409,23 +411,26 @@ int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coeff
 		for (unsigned int i = 0; i < indices.size(); i++)
 			reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
 
-		if (orderingType_ == "peakvalues")
-		{
+		//if (orderingType_ == "peakvalues")
+		//{
 			
-			for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
-				sensitivity_coefficients[i] = coefficients[i];
-				reactions[i] = indices[i];
-			}
-		}
-		else
-		{
-			for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
-				sensitivity_coefficients[i] = coefficients[i];
-				reactions[i] = indices[i];
-			}
-		}
+			//for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
+			//	sensitivity_coefficients[i] = coefficients[i];
+			//	reactions[i] = indices[i];
+			//}
+		//}
+		//else
+		//{
+			//for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
+			//	sensitivity_coefficients[i] = coefficients[i];
+			//	reactions[i] = indices[i];
+			//}
+		//}
 	}
-
+	for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
+		sensitivity_coefficients[i] = coefficients[i];
+		reactions[i] = indices[i];
+	}
 	return 0;
 }
 
@@ -435,5 +440,7 @@ int Sensitivities::ReadSensitvityCoefficients()
 		return -5;
 
 	sensitivities->ReadFromChildFile(specie_);
+
+	return 0;
 }
 

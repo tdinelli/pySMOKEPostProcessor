@@ -1,4 +1,4 @@
-from ctypes import c_int, c_double, c_void_p, c_char_p, byref, cdll
+from ctypes import c_float, c_int, c_double, c_void_p, c_char_p, byref, cdll
 
 # TITOOO
 
@@ -18,7 +18,7 @@ c_library.pySensitivityPostProcessor.argtypes = [c_char_p, # kinetic folder
                                                 c_int,     # sensitivity type 0: local | 1: global | 2: region
                                                 c_int,     # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                 c_int,     # normalization type 0: local | 1: maxvalue
-                                                c_double,  # sensitivity local value
+                                                c_float,  # sensitivity local value
                                                 c_double,  # sensitivity region lower value
                                                 c_double,  # sensitivity region upper value
                                                 c_void_p,  # sensitivity coefficients
@@ -36,10 +36,10 @@ code = c_library.pySensitivityPostProcessor(c_char_p(kineticFolder),
                                  c_char_p(outputFolder),
                                  c_char_p(specie),
                                  c_int(0),
+                                 c_int(0),
+                                 c_int(2),
                                  c_int(1),
-                                 c_int(0),
-                                 c_int(0),
-                                 c_double(0),
+                                 c_float(0.005),
                                  c_double(0),
                                  c_double(0),
                                  byref(coefficients),

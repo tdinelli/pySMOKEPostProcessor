@@ -35,9 +35,9 @@ public:
 
 	void Prepare();
 
-	int PrepareROPAPython(std::string specie, int ropa_type, float ropa_local_value, float ropa_region_lower_value, float ropa_region_upper_value);
+	int PrepareROPAPython(std::string specie, int ropa_type, double ropa_local_value, double ropa_region_lower_value, double ropa_region_upper_value);
 	
-	int PrepareSensitivityPython(std::string specie, int sensitivity_type, float sensitivity_local_value, float sensitivity_region_lower_value, float sensitivity_region_upper_value,
+	int PrepareSensitivityPython(std::string specie, int sensitivity_type, double sensitivity_local_value, double sensitivity_region_lower_value, double sensitivity_region_upper_value,
 								int sensitivity_normalization_type, int sensitivity_ordering_type);
 
 	void ComputeROPA();

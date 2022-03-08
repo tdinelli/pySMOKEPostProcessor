@@ -31,7 +31,7 @@ PostProcessor::PostProcessor(std::string postporcessorType, std::string kineticF
 	outputFolder_ = outputFolder;
 }
 
-int PostProcessor::PrepareROPAPython(std::string specie, int ropa_type, float local_value, float lower_value, float upper_value){
+int PostProcessor::PrepareROPAPython(std::string specie, int ropa_type, double local_value, double lower_value, double upper_value){
 	if (postprocessorType_ == "ropa"){
 		species_ = specie;
 		localValue_ = local_value;
@@ -65,8 +65,8 @@ int PostProcessor::PrepareROPAPython(std::string specie, int ropa_type, float lo
 
 }
 
-int PostProcessor::PrepareSensitivityPython(std::string specie, int sensitivity_type, float sensitivity_local_value, float sensitivity_region_lower_value, 
-	float sensitivity_region_upper_value,int sensitivity_normalization_type, int sensitivity_ordering_type) 
+int PostProcessor::PrepareSensitivityPython(std::string specie, int sensitivity_type, double sensitivity_local_value, double sensitivity_region_lower_value, 
+	double sensitivity_region_upper_value,int sensitivity_normalization_type, int sensitivity_ordering_type) 
 {
 	if (postprocessorType_ == "sensitivity") {
 		species_ = specie;
@@ -241,11 +241,11 @@ int PostProcessor::ComputeROPAPython(double* coefficients, int* reactions, int l
 int PostProcessor::ComputeSensitivityPython(double* coefficients, int* reactions, int len) 
 {
 	Sensitivities* widget;
-	widget = new Sensitivities(normalizationType_, sensitivityType_, orderingType_, species_);
+	widget = new Sensitivities(normalizationType_, sensitivityType_, orderingType_, species_, localValue_, lowerBound_, upperBound_);
 	widget->SetDatabase(data_);
 	widget->Prepare();
 	widget->ReadSensitvityCoefficients();
-	widget->Sensitivities_Python_PostProcessing(coefficients, reactions, len);
+	return widget->Sensitivities_Python_PostProcessing(coefficients, reactions, len);
 
 	return 0;
 }
