@@ -6,6 +6,7 @@ path = r'C:\Users\timot\Desktop\GitHub\pyPostProcessor\project\x64\Debug\pySMOKE
 
 # SENSITIVITA'
 kineticFolder = b"C:\\Users\\timot\\OpenSMOKE++Suite\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\kinetics"
+print(kineticFolder)
 outputFolder = b"C:\\Users\\timot\\OpenSMOKE++Suite\\examples\\OpenSMOKEpp_BatchReactor\\04b-sensitivity-isothermal-constantpressure\\Output"
 specie = b"H2"
 
@@ -32,19 +33,19 @@ coefficients = (c_double * n)()
 reactions = (c_int * n)()
 
 
-code = c_library.pySensitivityPostProcessor(c_char_p(kineticFolder),
-                                 c_char_p(outputFolder),
-                                 c_char_p(specie),
-                                 c_int(0),
-                                 c_int(2),
-                                 c_int(2),
-                                 c_int(1),
-                                 c_double(0),
-                                 c_double(0),
-                                 c_double(0.005),
-                                 byref(coefficients),
-                                 byref(reactions),
-                                 c_int(n))
+code = c_library.pySensitivityPostProcessor(c_char_p(kineticFolder), # kinetic folder
+                                            c_char_p(outputFolder),  # output folder
+                                            c_char_p(specie),        # specie
+                                            c_int(0),                # command
+                                            c_int(2),                # sensitivity type 0: local | 1: global | 2: region
+                                            c_int(2),                # ordering type 0: peakvalues | 1: area | 2: absolutearea
+                                            c_int(1),                # normalization type 0: local | 1: maxvalue
+                                            c_double(0),             # sensitivity local value
+                                            c_double(0),             # sensitivity region lower value
+                                            c_double(0.005),         # sensitivity region upper value
+                                            byref(coefficients),     # sensitivity coefficients
+                                            byref(reactions),        # reactions indices
+                                            c_int(n))                # sensitivity number of reactions
 
 print (code)
 
