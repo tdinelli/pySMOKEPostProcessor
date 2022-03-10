@@ -36,5 +36,8 @@
 .idea/
 
 # Ignore visual studio stuff
-
 project/
+
+# Ignore python stuff
+__pycache__/
+provette.py
