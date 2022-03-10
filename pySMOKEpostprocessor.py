@@ -35,9 +35,9 @@ class pySMOKEpostproccesor:
                 if (file[0] == b'Sensitivities' and file[1] != b'xml'):
                     print(str(file[1], encoding='utf-8'), end='  ')
 
-    def __init__(self, dllpath:str, kineticmechanismFolder: str, simulationresultsfolder: str):
+    def __init__(self, kineticmechanismFolder: str, simulationresultsfolder: str):
         
-        path = dllpath
+        path = 'C:\\Users\\timot\\Desktop\\GitHub\\pyPostProcessor\\project\\x64\\Debug\\pySMOKEpostprocessor.dll'
         
         self.kineticFolder = bytes(kineticmechanismFolder, 'utf-8')
         self.outputFolder = bytes(simulationresultsfolder, 'utf-8')
