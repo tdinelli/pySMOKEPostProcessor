@@ -36,7 +36,7 @@
 .idea/
 
 # Ignore visual studio stuff
-project/
+project/bin/
 
 # Ignore python stuff
 __pycache__/
