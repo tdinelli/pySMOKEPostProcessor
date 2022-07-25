@@ -32,6 +32,8 @@ public:
 	
 	
 	PostProcessor(std::string postprocessorType, std::string kineticFolder, std::string outputFolder);
+	
+	PostProcessor(std::string kineticFolder);
 
 	void Prepare();
 
@@ -45,6 +47,8 @@ public:
 	int ComputeROPAPython(double* coefficients, int* reactions, int len);
 
 	int ComputeSensitivityPython(double* coefficients, int* reactions, int len);
+
+	std::string GetName(unsigned int reactionIndex);
 
 	void SensitivityAnalysis();
 

@@ -31,6 +31,13 @@ PostProcessor::PostProcessor(std::string postporcessorType, std::string kineticF
 	outputFolder_ = outputFolder;
 }
 
+PostProcessor::PostProcessor(std::string kineticFolder)
+{
+	data_ = new ProfilesDatabase();
+	kineticFolder_ = kineticFolder;
+
+}
+
 int PostProcessor::PrepareROPAPython(std::string specie, int ropa_type, double local_value, double lower_value, double upper_value){
 	if (postprocessorType_ == "ropa"){
 		species_ = specie;
@@ -326,4 +333,19 @@ void PostProcessor::PrintRecap_SENSITIVITY()
 	std::cout << "  *Normalization type: " << normalizationType_ << std::endl;
 	std::cout << "  *Ordering type:      " << orderingType_ << std::endl;
 	std::cout << "-----------------------------------------------------------------------------" << std::endl;
+}
+
+std::string PostProcessor::GetName(unsigned int reactionIndex)
+{
+	unsigned int index = reactionIndex;
+	std::string reaction_name;
+	if (data_->pyReadKineticMechanism(kineticFolder_) != true)
+  	{
+        	return "Error cannot read kinetic folder";
+    	}
+	data_->pyReadKineticMechanism(kineticFolder_);
+	reaction_name = data_->ReactionFromIndex(index);
+//	std::cout << reaction_name << std::endl;
+	return reaction_name;
+
 }

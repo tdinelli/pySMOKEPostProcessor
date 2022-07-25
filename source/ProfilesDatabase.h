@@ -41,9 +41,11 @@ public:
 	~ProfilesDatabase(void);
 
 	bool ReadKineticMechanism(const std::string& folder_name);
+	bool pyReadKineticMechanism(const std::string& folder_name);
 	bool ReadFileResults(const std::string& folder_name);
 	void Prepare();
 	void SpeciesCoarsening(const double threshold);
+	std::string ReactionFromIndex(unsigned int reactionIndex);	
 
 	int number_of_abscissas_;
 	int number_of_ordinates_;
@@ -83,6 +85,7 @@ public:
 
 	void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int>& indices);
 
+	std::string name_reactions_;
 	std::vector<std::string> reaction_strings_;
 };
 
