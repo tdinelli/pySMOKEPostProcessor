@@ -6,17 +6,33 @@
 |   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
 |        |_|                                                              |
 |                                                                         |
-|   Author: Alberto Cuoci <alberto.cuoci@polimi.it>                       |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
+|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>				  |
 |   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
 |   Department of Chemistry, Materials and Chemical Engineering           |
 |   Politecnico di Milano                                                 |
 |   P.zza Leonardo da Vinci 32, 20133 Milano                              |
-|																		  |
-|   This file has been modified from the original OpenSMOKE postprocessor |
-|	to adapt it in python.                                                |
-|																		  |
-|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>                  |
-|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>                  |
+|                                                                         |
+|-------------------------------------------------------------------------|
+|                                                                         |
+|   This file is part of OpenSMOKE++ framework.                           |
+|                                                                         |
+|	License																  |
+|                                                                         |
+|   Copyright(C) 2016-2012  Alberto Cuoci                                 |
+|   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
+|   it under the terms of the GNU General Public License as published by  |
+|   the Free Software Foundation, either version 3 of the License, or     |
+|   (at your option) any later version.                                   |
+|                                                                         |
+|   OpenSMOKE++ is distributed in the hope that it will be useful,        |
+|   but WITHOUT ANY WARRANTY; without even the implied warranty of        |
+|   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         |
+|   GNU General Public License for more details.                          |
+|                                                                         |
+|   You should have received a copy of the GNU General Public License     |
+|   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
+|                                                                         |
 \*-----------------------------------------------------------------------*/
 
 #include "ProfilesDatabase.h"
@@ -393,42 +409,3 @@ void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index, st
 
 	std::sort(indices.begin(), indices.end());
 }
-
-std::string ProfilesDatabase::ReactionFromIndex(unsigned int reactionIndex)
-{
-        int reactionIndex_ = reactionIndex;
-        if (reactionIndex_ + 1 <= kineticsMapXML->NumberOfReactions())
-        {
-                std::stringstream index;
-                index << reactionIndex_ + 1;
-                std::string tmp = "R" + index.str() + ": " + reaction_strings_[reactionIndex_];
-                name_reactions_ = tmp;
-        //        index_reaction_ = stoi(index.str());
-
-        }
-
-        else
-        {
-                unsigned int local_index = reactionIndex + 1 - kineticsMapXML->NumberOfReactions();
-                if (local_index <= kineticsMapXML->NumberOfFallOffReactions())
-                {
-                        unsigned int global_index = kineticsMapXML->IndicesOfFalloffReactions()[local_index-1];
-                        std::stringstream index;
-                        index << global_index;
-                        std::string tmp = "R" + index.str() + "(inf): " + reaction_strings_[global_index-1];
-                        name_reactions_ = tmp;
-          //              index_reaction_ = stoi(index.str());
-                }
-                else
-                {
-                        unsigned int global_index = kineticsMapXML->IndicesOfCabrReactions()[local_index- kineticsMapXML->NumberOfReactions() - 1];
-                        std::stringstream index;
-                        index << global_index;
-                        std::string tmp = "R" + index.str() + "(inf): " + reaction_strings_[global_index-1];
-                        name_reactions_ = tmp;
-            //            index_reaction_ = stoi(index.str());
-                }
-        }
-        return name_reactions_;
-}
-
