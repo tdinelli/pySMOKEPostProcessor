@@ -60,5 +60,6 @@ void MergeBars( const std::vector<unsigned int>& total_indices,
 				std::vector<double>& coefficients, 
 				std::vector<double>& peaks);
 
+#include "Utilities.hpp"
 #endif // UTILITIES_H
 
