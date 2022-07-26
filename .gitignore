@@ -41,3 +41,8 @@ project/bin/
 # Ignore python stuff
 __pycache__/
 provette.py
+project/myLINUX/
+source/.deps/
+source/.dirstamp
+.vscode/
+Test/
