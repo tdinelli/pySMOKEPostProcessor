@@ -35,8 +35,6 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#include "Sensitivities.h"
-
 #include "ProfilesDatabase.h"
 #include "Sensitivities_Database.h"
 #include "Utilities.h"

@@ -37,8 +37,6 @@
 #ifndef POSTPROCESSOR_H
 #define POSTPROCESSOR_H
 
-#include <boost/filesystem.hpp>
-
 #include "ProfilesDatabase.h"
 
 class PostProcessor
@@ -86,4 +84,5 @@ private:
 	ProfilesDatabase *data_;
 };
 
+#include "PostProcessor.hpp"
 #endif // POSTPROCESSOR_H

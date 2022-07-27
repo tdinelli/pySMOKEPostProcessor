@@ -38,18 +38,6 @@
 #ifndef PROFILESDATABASE_H
 #define PROFILESDATABASE_H
 
-#include <iostream>
-
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
-namespace OpenSMOKE
-{
-	class ThermodynamicsMap_CHEMKIN;
-	class KineticsMap_CHEMKIN;
-}
-
 class ProfilesDatabase
 {
 public:
@@ -104,4 +92,5 @@ public:
 	std::vector<std::string> reaction_strings_;
 };
 
+#include "ProfilesDatabase.hpp"
 #endif // PROFILESDATABASE_H

@@ -38,12 +38,8 @@
 #ifndef SENSITIVITIES_DATABASE_H
 #define SENSITIVITIES_DATABASE_H
 
-#include <iostream>
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
 #include "ProfilesDatabase.h"
+#include "Utilities.h"
 
 class Sensitivities_Database
 {
@@ -93,6 +89,7 @@ private:
 	std::vector<unsigned int> current_coarse_index_;
 };
 
+#include "Sensitivities_Database.hpp"
 #endif // SENSITIVITIES_DATABASE_H
 
 

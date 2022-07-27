@@ -38,7 +38,6 @@
 #ifndef ROPA_H
 #define ROPA_H
 
-#include <boost/filesystem.hpp>
 #include "ProfilesDatabase.h"
 
 class ROPA 
@@ -87,4 +86,5 @@ private:
 	bool speciesIsSelected;
 };
 
+#include "ROPA.hpp"
 #endif // ROPA_H

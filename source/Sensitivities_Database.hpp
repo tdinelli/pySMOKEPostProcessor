@@ -35,8 +35,6 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#include "Sensitivities_Database.h"
-
 Sensitivities_Database::Sensitivities_Database(void)
 {
 }

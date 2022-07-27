@@ -35,8 +35,6 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#include "Utilities.h"
-
 void MergePositiveAndNegativeBars
 			(	const std::vector<unsigned int>& positive_indices, 
 				const std::vector<unsigned int>& negative_indices,

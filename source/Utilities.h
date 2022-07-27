@@ -37,9 +37,6 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#include <vector>
-#include <string>
-
 void MergePositiveAndNegativeBars
 			(	const std::vector<unsigned int>& positive_indices, 
 				const std::vector<unsigned int>& negative_indices,

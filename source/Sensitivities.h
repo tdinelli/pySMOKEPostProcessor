@@ -38,10 +38,8 @@
 #ifndef SENSITIVITIES_H
 #define SENSITIVITIES_H
 
-#include <iostream>
 #include "ProfilesDatabase.h"
 #include "Sensitivities_Database.h"
-
 
 class Sensitivities
 {
@@ -83,4 +81,5 @@ private:
 	double upperBound_;
 };
 
+#include "Sensitivities.hpp"
 #endif // SENSITIVITIES_H

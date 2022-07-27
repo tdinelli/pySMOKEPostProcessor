@@ -35,7 +35,6 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#include "ROPA.h"
 #include "math/OpenSMOKEUtilities.h"
 #include <algorithm>
 
