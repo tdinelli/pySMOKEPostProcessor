@@ -4,7 +4,7 @@ Python binder for the OpenSMOKEppPostProcessor developed by Professor [Alberto C
 
 ## External libraries dependencies
 
-- OpenSMOKEpp distibuted under request contact [Alberto Cuoci](mailto:alberto.cuoci@polimi.it)
+- OpenSMOKEpp distibuted under request contact Alberto Cuoci <alberto.cuoci@polimi.it>
 - Eigen (https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - Boost (https://www.boost.org/)
 
