@@ -13,8 +13,8 @@ g++ \
 	-I $OPENSMOKE \
 	-L $BOOST_LIB \
 	-lboost_filesystem \
-	$SOURCE/main.cpp $SOURCE/CollectionOfClasses.cpp $SOURCE/PostProcessor.cpp \
-	-o $TARGETBIN/pyPostProcessor.o \
+	$SOURCE/main.cpp \
+	-o $TARGETBIN/pySMOKEPostProcessor.o \
 	-O3 \
 	-Wall \
 	-DNDEBUG \
