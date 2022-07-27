@@ -12,5 +12,5 @@ AM_LDFLAGS  =
 #List of programs
 bin_PROGRAMS = 	pySMOKEPostProcessor.sh
 
-pySMOKEPostProcessor_sh_SOURCES = ../../source/main.cpp ../../source/CollectionOfClasses.cpp ../../source/PostProcessor.cpp
+pySMOKEPostProcessor_sh_SOURCES = ../../source/main.cpp
 pySMOKEPostProcessor_sh_LDADD = @BOOST_LIBS@ -lgfortran 
