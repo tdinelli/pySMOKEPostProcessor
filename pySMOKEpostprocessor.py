@@ -37,7 +37,7 @@ class pySMOKEpostproccesor:
 
 	def __init__(self, kineticmechanismFolder: str, simulationresultsfolder: str, verbose = False):
         
-		path = '/home/chimica2/tdinelli/GitHub/pySMOKEPostProcessor/project/bin/Linux/pySMOKEPostProcessor.o'
+		path = '/home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/project/myLINUX/pySMOKEPostProcessor.o'
         
 		self.kineticFolder = bytes(kineticmechanismFolder, 'utf-8')
 		self.outputFolder = bytes(simulationresultsfolder, 'utf-8')
@@ -64,6 +64,8 @@ class pySMOKEpostproccesor:
                                           c_char_p, # sepcie
                                           c_int,    # command
                                           c_int,    # ropa type 0: local | 1: global | 2: region
+										  c_int,    # ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
+                                          c_int,    # normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
                                           c_double, # ropa local value
                                           c_double, # ropa region lower value
                                           c_double, # ropa region upper value
@@ -81,6 +83,8 @@ class pySMOKEpostproccesor:
                                             c_char_p(specie),                   # specie
                                             c_int(0),                           # command (to be removed)
                                             c_int(ropa),                        # ropa type 0: local | 1:global | 2: region
+											c_int(0),							# ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
+											c_int(0),							# normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
                                             c_double(ropalocalvalue),           # ropa local value
                                             c_double(roparegionlowervalue),     # ropa region lower value 
                                             c_double(roparegionuppervalue),     # ropa region upper value
