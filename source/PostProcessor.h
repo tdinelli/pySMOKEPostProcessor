@@ -43,32 +43,17 @@ class PostProcessor
 {
 public:
 	
-	
 	PostProcessor(std::string postprocessorType, std::string kineticFolder, std::string outputFolder);
-	
-	PostProcessor(std::string kineticFolder);
 
-	void Prepare();
-
-	int PrepareROPAPython(std::string specie, int ropa_type, double ropa_local_value, double ropa_region_lower_value, double ropa_region_upper_value);
-	
-	int PrepareSensitivityPython(std::string specie, int sensitivity_type, double sensitivity_local_value, double sensitivity_region_lower_value, double sensitivity_region_upper_value,
-								int sensitivity_normalization_type, int sensitivity_ordering_type);
-
-	void ComputeROPA();
+	void Prepare(std::string specie, int type, double local_value, double lower_value, 
+							double upper_value, int sensitivity_normalization_type, 
+							int sensitivity_ordering_type);
 
 	int ComputeROPAPython(double* coefficients, int* reactions, int len);
 
 	int ComputeSensitivityPython(double* coefficients, int* reactions, int len);
 
-	void SensitivityAnalysis();
-
-	void PrintRecap_ROPA();
-
-	void PrintRecap_SENSITIVITY();
-
-	std::string ropaType_;
-	std::string sensitivityType_;
+	std::string Type_;
 	std::string kineticFolder_;
 	std::string outputFolder_;
 	std::string species_;
@@ -79,6 +64,7 @@ public:
 	double localValue_;
 	double lowerBound_;
 	double upperBound_;
+
 private:
 	std::string postprocessorType_;
 	ProfilesDatabase *data_;

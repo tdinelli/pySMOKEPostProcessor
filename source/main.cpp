@@ -66,6 +66,8 @@ int pyROPAPostProcessor(
     char* specie,
     int command,
     int ropa_type,
+	int ordering_type,
+	int normalization_type,
     double ropa_local_value,
     double ropa_region_lower_value,
     double ropa_region_upper_value,
@@ -87,13 +89,13 @@ int pyROPAPostProcessor(
 	
 	PostProcessor PostProcessor(postprocessorType, kineticFolder, outputFolder);
 	
-	int return_value = PostProcessor.PrepareROPAPython(specie, ropa_type, ropa_local_value, ropa_region_lower_value, ropa_region_upper_value);
-	if (return_value != 0)
-	{
-	    return return_value;
-	}
+	PostProcessor.Prepare(specie, ropa_type, ropa_local_value, 
+					ropa_region_lower_value, ropa_region_upper_value,
+					normalization_type, ordering_type);
+
+
 	return PostProcessor.ComputeROPAPython(coefficients, reactions, len);
-	
+
 	return 0;
 }
 
@@ -128,16 +130,11 @@ int pySensitivityPostProcessor(
 	}
 
 	PostProcessor PostProcessor(postprocessorType, kineticFolder, outputFolder);
-	int return_value = PostProcessor.PrepareSensitivityPython(specie, 
-				sensitivity_type, 
-				sensitivity_local_value, 
-				sensitivity_region_lower_value, 
-				sensitivity_region_upper_value, 
-				normalization_type, 
-				ordering_type);
-	if (return_value != 0) {
-		return return_value;
-	}
+	
+	PostProcessor.Prepare(specie, sensitivity_type, sensitivity_local_value, 
+				sensitivity_region_lower_value, sensitivity_region_upper_value, 
+				normalization_type, ordering_type);
+
 	return PostProcessor.ComputeSensitivityPython(coefficients, reactions, len);
 
 	return 0;
@@ -145,5 +142,15 @@ int pySensitivityPostProcessor(
 
 int main() 
 {
+	/*
+		PostProcessor PostProcessor("ropa", "/home/tdinelli/Desktop/kinetics", "/home/tdinelli/Desktop/Output");
+	
+		PostProcessor.Prepare("H2", 0, 0, 0, 0, 0, 0);
+	
+		double* coefficients;
+		int* reactions;
+	
+		return PostProcessor.ComputeROPAPython(coefficients, reactions, 10);
+	*/
 	return 0;
 }

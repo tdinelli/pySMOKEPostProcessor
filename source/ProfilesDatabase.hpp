@@ -71,7 +71,9 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 	}
 
 	if (thermodynamicsMapXML->NumberOfSpecies() == omega.size())
+	{
 		iROPAEnabled_ = true;
+	}
 	else
 	{
 		std::cout << "The rate of production analysis is not available because the Output.xml file contains only a subset of the total number of species in the kinetic mechanism" << std::endl;
