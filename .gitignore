@@ -46,3 +46,4 @@ source/.deps/
 source/.dirstamp
 .vscode/
 Test/
+.ipynb_checkpoints/
