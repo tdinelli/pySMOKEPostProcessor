@@ -1,4 +1,5 @@
-from ctypes import c_float, c_int, c_double, c_void_p, c_char_p, byref, cdll
+from ctypes import c_float, c_int, c_double, c_void_p, c_char_p, byref, cdll, CDLL, util
+from KineticMechanism import *
 import os
 
 """
@@ -91,13 +92,20 @@ class pySMOKEpostproccesor:
                                             byref(coefficients),                # ropa coefficients
                                             byref(reactions),                   # ropa reactions indices
                                             c_int(numberofreactions))           # ropa number of reactions
-                                            
+
+		#  0-based
+		# reaction-names 1-based
+		reaction_names = []
+		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
+		for i in reactions:
+			reaction_names.append(KineticMap.returnNameFromIndex(i))
+
 		if (code == 0):
 			if(self.verbose != False):
 				print ('ROPA successfully executed')
 			coefficients = [c for c in coefficients]
 			reactions = [r for r in reactions]
-			return coefficients, reactions
+			return coefficients, reactions, reaction_names
 		else:
 			raise ValueError('exit code != 0') # TODO
 
@@ -165,22 +173,19 @@ class pySMOKEpostproccesor:
                                                     byref(reactions),                      # reactions indices
                                                     c_int(numberofreactions))              # sensitivity number of reactions
         
+		#  0-based
+		# reaction-names 1-based
+		reaction_names = []
+		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
+		for i in reactions:
+			reaction_names.append(KineticMap.returnNameFromIndex(i))
+
 		if (code == 0):
 			if(self.verbose != False):
 				print('Sensitivity analysis succesfully executed')
 			coefficients = [c for c in coefficients]
 			reactions = [r for r in reactions]
-			return coefficients, reactions
+			return coefficients, reactions, reaction_names
 		else:
 			raise ValueError('exit code != 0') # TODO
 	
-	def GetReactionName(self, reactionIndex: int):
-
-		self.c_library.GetReactionName.argtypes = [c_char_p, # kinetic folder
-						           c_int]    # reaction index
-		self.c_library.GetReactionName.restype = c_char_p
-
-		names = self.c_library.GetReactionName(c_char_p(self.kineticFolder),
-							c_int(reactionIndex))
-
-		return names
