@@ -42,8 +42,8 @@ project/bin/
 __pycache__/
 provette.py
 project/myLINUX/
-source/.deps/
-source/.dirstamp
+pySMOKEPostProcessor/source/.deps/
+pySMOKEPostProcessor/source/.dirstamp
 .vscode/
 Test/
 .ipynb_checkpoints/
