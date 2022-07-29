@@ -8,4 +8,11 @@ Python binder for the OpenSMOKEppPostProcessor developed by Professor [Alberto C
 - Eigen (https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - Boost (https://www.boost.org/)
 
+## Features
+
+- Rate Of Production Analysis: Global, Region, Local
+- Sensitivity Analysis: Global, Region, Local
+- Flux Analysis: WIP
+- Reaction Rates plot: TODO
+
 ## Examples
