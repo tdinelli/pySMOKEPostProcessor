@@ -10,9 +10,9 @@ Python binder for the OpenSMOKEppPostProcessor developed by Professor [Alberto C
 
 ## Features
 
-- ** Rate Of Production Analysis **: Global, Region, Local
-- Sensitivity Analysis: Global, Region, Local
-- Flux Analysis: WIP
-- Reaction Rates plot: TODO
+- **Rate Of Production Analysis**: Global, Region, Local
+- **Sensitivity Analysis**: Global, Region, Local
+- **Flux Analysis**: WIP
+- **Reaction Rates plots**: TODO
 
 ## Examples
