@@ -500,132 +500,145 @@ int ROPA::ROPA_CalculationsPython(double* coefficients, int* reactions, int len)
 
 }
 
-void ROPA::FluxAnalysis()
+int ROPA::FluxAnalysis(std::string element, std::string thickness,
+					std::string type, std::string labeltype, 
+					int depth, int width, double threshold, 
+					bool thicknesslogscale)
 {
-//	// Select y variables among the species
-//	QList<QListWidgetItem*> selected_species = ui.listWidget_ROPA_Species->selectedItems();
-//	if (selected_species.size() == 0)
-//	{
-//		QMessageBox msgBox;
-//		msgBox.setText(QString::fromStdString("You have to select one of the available species"));
-//		msgBox.exec();
-//		return;
-//	}
-//
-//	unsigned int index_of_species;
-//	for (unsigned int j = 0; j < ui.listWidget_ROPA_Species->count(); j++)
-//		if (ui.listWidget_ROPA_Species->item(j)->isSelected() == true)
-//		{
-//			index_of_species = data_->sorted_index[j];
-//			break;
-//		}
-//
-//	const unsigned index_element = ui.comboBox_Elements->currentIndex();
-//	const double n_elements = data_->thermodynamicsMapXML->atomic_composition()(index_of_species, index_element);
-//
-//	if (n_elements == 0.)
-//	{
-//		QMessageBox msgBox;
-//		msgBox.setText(QString::fromStdString("The selected species does not contain the selected element"));
-//		msgBox.exec();
-//		return;
-//	}
-//
-//	const int max_depth = ui.spinBox_MaxDepth->value();
-//	const int max_width = ui.spinBox_MaxWidth->value();
-//	const double min_threshold_percentage = ui.doubleSpinBox_MinThreshold->value();
-//
-//	// Local Analysis
-//	if (ui.radioButton_ROPA_Local->isChecked() == true)
-//	{
-//		unsigned int index = 0;
-//		for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
-//			if (data_->additional[0][j] >= ui.doubleSpinBox_ROPA_Local->value())
-//			{
-//				index = j;
-//				break;
-//			}
-//
-//		OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
-//		OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
-//		OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
-//		OpenSMOKE::OpenSMOKEVectorDouble r(data_->kineticsMapXML->NumberOfReactions());
-//
-//		// Recovers mass fractions
-//		for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
-//			omega[k + 1] = data_->omega[k][index];
-//
-//		// Calculates mole fractions
-//		double MWmix;
-//		data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
-//
-//		// Calculates concentrations
-//		const double P_Pa = data_->additional[data_->index_P][index];
-//		const double T = data_->additional[data_->index_T][index];
-//		const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
-//		Product(cTot, x, &c);
-//
-//		// Calculates formations rates
-//		data_->kineticsMapXML->SetTemperature(T);
-//		data_->kineticsMapXML->SetPressure(P_Pa);
-//		data_->thermodynamicsMapXML->SetTemperature(T);
-//		data_->thermodynamicsMapXML->SetPressure(P_Pa);
-//
-//		data_->kineticsMapXML->KineticConstants();
-//		data_->kineticsMapXML->ReactionRates(c.GetHandle());
-//		data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
-//
-//		OpenSMOKE::FluxAnalysisMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
-//		flux_analysis.SetDestructionAnalysis(ui.radioButton_FluxAnalysis_Destruction->isChecked());
-//		flux_analysis.SetNormalThickness(ui.radioButton_Thickness_Relative->isChecked());
-//		flux_analysis.SetNormalTags(ui.radioButton_Labels_Relative->isChecked());
-//		flux_analysis.SetLogarithmicThickness(ui.checkBox_Thickness_Logarithmic->isChecked());
-//		flux_analysis.SetMaxDepth(max_depth);
-//		flux_analysis.SetMaxWidth(max_width);
-//		flux_analysis.SetMinPercentageThreshold(min_threshold_percentage);
-//		flux_analysis.SetAtom(index_element);
-//		flux_analysis.SetReactionRates(r.Size(), r.GetHandle());
-//
-//		std::vector<unsigned int> important_indices;
-//		important_indices.push_back(index_of_species);
-//		flux_analysis.GloballyAnalyze(important_indices, 0);
-//		flux_analysis.CalculateThickness();
-//
-//		boost::filesystem::path graph_txt = output_folder_ / "graph.txt";
-//		boost::filesystem::path graph_png = output_folder_ / "graph.png";
-//
-//		flux_analysis.Plot(graph_txt.string());
-//
-//#ifdef __linux__
-//
-//		std::string graphviz_command = "dot -Tpng " + graph_txt.string() + " -o " + graph_png.string();
-//		std::string visualizer_command = "eog " + graph_png.string() + " &";
-//
-//		system(graphviz_command.c_str());
-//		system(visualizer_command.c_str());
-//
-//#elif defined __APPLE__
-//
-//		std::string graphviz_command = "dot -Tpng " + graph_txt.string() + " -o " + graph_png.string();
-//		std::string visualizer_command = "open " + graph_png.string() + " &";
-//
-//		system(graphviz_command.c_str());
-//		system(visualizer_command.c_str());
-//
-//#elif defined _WIN32 || defined _WIN64
-//
-//		std::string graph_png_quoted = "\"" + graph_png.string() + "\"";
-//		std::string graph_txt_quoted = "\"" + graph_txt.string() + "\"";
-//
-//		std::string graphviz_command = "dot  -Tpng " + graph_txt_quoted + " -o " + graph_png_quoted;
-//		std::string irfanview_command = "START /MIN i_view64.exe " + graph_png_quoted;
-//
-//		system(graphviz_command.c_str());
-//		system(irfanview_command.c_str());
-//
-//#endif
-//	}
+	// Select y variables among the species
+	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
+	{
+		speciesIsSelected = true;
+	}
+	else
+	{
+		exit(-5);
+	}
+	unsigned int index_of_species;
+	for (unsigned int j = 0; j < data_->thermodynamicsMapXML->NumberOfSpecies(); j++){
+		if (speciesIsSelected == true)
+			if (species_ == data_->string_list_massfractions_sorted[j])
+			{
+				index_of_species = data_->sorted_index[j];
+				break;
+			}
+	}
 
+	unsigned int index_element; // = ui.comboBox_Elements->currentIndex();
+	std::vector<std::string> elements_names = data_->thermodynamicsMapXML->elements();
+	for(unsigned int k = 0; k < elements_names.size(); k++)
+	{
+		if(element == elements_names[k])
+		{
+			index_element = k;	
+			break;		
+		}/*
+		else
+		{
+			exit(-6);
+		}*/
+	}
+	const double n_elements = data_->thermodynamicsMapXML->atomic_composition()(index_of_species, index_element);
+
+	if (n_elements == 0.)
+	{
+		std::cout << "The selected species does not contain the selected element" << std::endl;
+		exit(-7);
+	}
+
+	const int max_depth = depth;
+	const int max_width = width;
+	const double min_threshold_percentage = threshold;
+
+	// Local Analysis (Flux can be done only in when local ropa is available) 
+    unsigned int index = 0;
+    for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
+	{
+        if (data_->additional[0][j] >= localValue_)
+        {
+            index = j;
+            break;
+        }
+	}
+	OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
+	OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
+	OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
+	OpenSMOKE::OpenSMOKEVectorDouble r(data_->kineticsMapXML->NumberOfReactions());
+
+	// Recovers mass fractions
+	for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+	{
+		omega[k + 1] = data_->omega[k][index];
+	}
+	// Calculates mole fractions
+	double MWmix;
+	data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+
+	// Calculates concentrations
+	const double P_Pa = data_->additional[data_->index_P][index];
+	const double T = data_->additional[data_->index_T][index];
+	const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+	Product(cTot, x, &c);
+
+	// Calculates formations rates
+	data_->kineticsMapXML->SetTemperature(T);
+	data_->kineticsMapXML->SetPressure(P_Pa);
+	data_->thermodynamicsMapXML->SetTemperature(T);
+	data_->thermodynamicsMapXML->SetPressure(P_Pa);
+
+	data_->kineticsMapXML->KineticConstants();
+	data_->kineticsMapXML->ReactionRates(c.GetHandle());
+	data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
+
+	OpenSMOKE::FluxAnalysisMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
+
+	bool destruction = false;
+	bool relativethickness = false;
+	bool labelrelative = false;
+
+	if(type == "destruction")
+	{
+		destruction = true;
+	}
+	if(thickness == "relative")
+	{
+		relativethickness = true;
+	}
+	if(labeltype == "relative")
+	{
+		labelrelative = true;
+	}
+	flux_analysis.SetDestructionAnalysis(destruction);
+	flux_analysis.SetNormalThickness(relativethickness);
+	flux_analysis.SetNormalTags(labelrelative);
+	flux_analysis.SetLogarithmicThickness(thicknesslogscale);
+	flux_analysis.SetMaxDepth(max_depth);
+	flux_analysis.SetMaxWidth(max_width);
+	flux_analysis.SetMinPercentageThreshold(min_threshold_percentage);
+	flux_analysis.SetAtom(index_element);
+	flux_analysis.SetReactionRates(r.Size(), r.GetHandle());
+
+	std::vector<unsigned int> important_indices;
+	important_indices.push_back(index_of_species);
+	flux_analysis.GloballyAnalyze(important_indices, 0);
+	flux_analysis.CalculateThickness();
+
+	boost::filesystem::path output_folder_ = outputFolder_;
+	boost::filesystem::path graph_txt = output_folder_ / "graph.txt";
+
+	std::vector<std::vector<unsigned int>> global_important_indices = flux_analysis.global_important_indices_;
+	std::vector<std::vector<double>>		global_important_normal_fluxes = flux_analysis.global_important_normal_fluxes_;
+	std::vector<std::vector<double>>		global_important_fluxes = flux_analysis.global_important_fluxes_;
+	std::vector<std::vector<double>>		global_relative_thickness = flux_analysis.global_relative_thickness_;
+
+	flux_analysis.Plot(graph_txt.string());
+	for(int i = 0; i<global_important_normal_fluxes.size(); i++)
+	{
+		if(global_important_normal_fluxes[i].size() != 0)
+			for(int j = 0; j <global_important_normal_fluxes[0].size(); j++)
+				std::cout << global_important_normal_fluxes[i][j] << std::endl;
+		
+	}
 }
 
 void ROPA::MergePositiveAndNegativeBars (const std::vector<unsigned int>& positive_indices,
@@ -673,3 +686,71 @@ void ROPA::MergePositiveAndNegativeBars (const std::vector<unsigned int>& positi
 		}
 
 }
+/*
+void ROPA::AddSpeciesToGraphFile(const unsigned int index_j, 
+							std::vector<unsigned int>& local_indices,
+							std::vector<double>& local_thickness, 
+							std::vector<double>& local_normal_fluxes, 
+							std::vector<double>& local_fluxes)
+{
+
+	for(unsigned int j=0;j<local_indices.size();j++)
+	{
+		std::string attributes;
+		
+		// Tags
+		if (normal_tags_ == true)
+		{
+			double label;
+			label.setf(std::ios::fixed, std::ios::floatfield);
+
+			if (local_normal_fluxes[j]>10.)		label.precision(1);
+			else if (local_normal_fluxes[j]>1.)	label.precision(2);
+			else if (local_normal_fluxes[j]>0.1)	label.precision(3);
+			else label.precision(3);
+			label << local_normal_fluxes[j];
+			attributes = "[label = \"" + label.str() + "%\", labelfontcolor = red];";
+		}
+		else
+		{
+			std::stringstream label;
+			label.setf(std::ios::scientific);
+			label.precision(2);
+			label << local_fluxes[j];			
+			attributes = "[label = \"" + label.str() + "\", labelfontcolor = red];";
+		}
+
+		// Thickness
+		std::stringstream thickness;
+		if (logarithmic_thickness_ == false)	thickness << 0.5 + 15.*local_thickness[j];	
+		else									thickness << 0.5 + 5.*std::max(0.,3.+log10(local_thickness[j]));
+
+		// Write
+		if (destruction_analysis_ == true)
+		{
+			std::string name1 = thermodynamicsMapXML_.NamesOfSpecies()[index_j];
+			std::string name2 = thermodynamicsMapXML_.NamesOfSpecies()[local_indices[j]];
+			boost::replace_all(name1, "-", "_");
+			boost::replace_all(name1, "(", "_");
+			boost::replace_all(name1, ")", "");
+			boost::replace_all(name2, "-", "_");
+			boost::replace_all(name2, "(", "_");
+			boost::replace_all(name2, ")", "");
+			fOut << "edge [color=red, penwidth = " + thickness.str() << "];" << std::endl;
+			fOut << name1 << "->" << name2 << " " << attributes << std::endl;
+		}
+		else
+		{
+			std::string name1 = thermodynamicsMapXML_.NamesOfSpecies()[local_indices[j]];
+			std::string name2 = thermodynamicsMapXML_.NamesOfSpecies()[index_j];
+			boost::replace_all(name1, "-", "_");
+			boost::replace_all(name1, "(", "_");
+			boost::replace_all(name1, ")", "");
+			boost::replace_all(name2, "-", "_");
+			boost::replace_all(name2, "(", "_");
+			boost::replace_all(name2, ")", "");
+			fOut << "edge [color=blue, penwidth = " + thickness.str() << "];" << std::endl; 
+			fOut << name1 << "->" << name2 << " " << attributes << std::endl;
+		}
+	}
+}*/

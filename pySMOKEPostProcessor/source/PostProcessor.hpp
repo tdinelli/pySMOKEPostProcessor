@@ -96,6 +96,59 @@ void PostProcessor::Prepare(std::string specie, int type, double local_value, do
 	}
 }
 
+void PostProcessor::PrepareFlux(std::string specie, std::string element, int type, double local_value,int thickness, 
+			bool thicknesslogscale, int labeltype, int depth, int width, double threshold)
+{
+	species_ = specie;
+	element_ = element;
+
+	islogscale = thicknesslogscale;
+	depth_ = depth;
+	width_ = width;
+	threshold_ = threshold;
+
+	localValue_ = local_value;
+
+	if(thickness == 0) // absolute
+	{
+		thickness_ = "absolute";
+	}
+	else if(thickness == 1) // relative (%)
+	{
+		thickness_ = "relative";
+	}
+	else
+	{
+		exit(-1);
+	}
+
+	if(labeltype == 0) // absolute
+	{
+		labeltype_ = "absolute";
+	}
+	else if(labeltype == 1) // relative (%) 
+	{
+		labeltype_ = "relative";
+	}
+	else
+	{
+		exit(-1);
+	}
+
+	if(type == 0)
+	{
+		Type_ = "destruction";
+	}
+	else if(type == 1)
+	{
+		Type_ = "production";
+	}
+	else
+	{
+		exit(-1);
+	}
+}
+
 int PostProcessor::ComputeROPAPython(double* coefficients, int* reactions, int len)
 {
     ROPA* widget;
@@ -118,4 +171,14 @@ int PostProcessor::ComputeSensitivityPython(double* coefficients, int* reactions
 	return widget->Sensitivities_Python_PostProcessing(coefficients, reactions, len);
 
 	return 0;
+}
+
+int PostProcessor::ComputeFluxPython()
+{
+	ROPA* widget;
+    widget = new ROPA(kineticFolder_, outputFolder_, "local", species_, localValue_, lowerBound_, upperBound_);
+	data_->ReadFileResults(outputFolder_);
+	data_->ReadKineticMechanism(kineticFolder_);
+	widget->SetDatabase(data_);
+	widget->FluxAnalysis(element_,thickness_, Type_, labeltype_,depth_,width_,threshold_, islogscale);
 }

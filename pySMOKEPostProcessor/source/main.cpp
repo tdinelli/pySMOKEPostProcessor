@@ -42,6 +42,7 @@
 // OpenSMOKEpp library
 #include "OpenSMOKEpp"
 #include "maps/Maps_CHEMKIN"
+#include "maps/FluxAnalysisMap.h"
 #include "math/PhysicalConstants.h"
 #include "kernel/kinetics/KineticsUtilityFunctions.h"
 
@@ -53,9 +54,9 @@
 #include "PostProcessor.h"
 
 bool VERBOSE = false;
-
+/*
 // Windows extern "C" __declspec(dllexport)
-#ifdef _WIN32
+#ifdef _WIN32 || _WIN64
 extern "C" __declspec(dllexport)
 #else
 extern "C"
@@ -76,7 +77,7 @@ int pyROPAPostProcessor(
     int len)
 {
 
-	std::string postprocessorType;
+	std::string postprocessorType = "ropa";
 
 	if (command == 0)
 	{
@@ -99,7 +100,7 @@ int pyROPAPostProcessor(
 	return 0;
 }
 
-#ifdef _WIN32
+#ifdef _WIN32 || _WIN64
 extern "C" __declspec(dllexport)
 #else
 extern "C"
@@ -119,7 +120,7 @@ int pySensitivityPostProcessor(
 	int* reactions,
 	int len) 
 {
-	std::string postprocessorType;
+	std::string postprocessorType = "sensitivity";
 	if (command == 0) 
 	{
 		postprocessorType = "sensitivity";
@@ -140,17 +141,39 @@ int pySensitivityPostProcessor(
 	return 0;
 }
 
+#ifdef _WIN32 || _WIN64
+extern "C" __declspec(dllexport)
+#else
+extern "C"
+#endif
+int FluxAnalysis(char* kineticFolder,
+	char* outputFolder,
+	char* specie,
+	char* element,
+	int command,
+	int type, // 1-production 0-destruction
+	double ropa_local_value,
+	int thickness, // 0-absolute 1-relative(%)
+	bool thicknesslogscale,
+	int labeltype, // 0-absolute 1-relative(%)
+	int depth,
+	int width,
+	double threshold)
+{
+	std::string postprocessorType = "fluxanalysis";
+
+	PostProcessor* pp;
+    pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
+	pp->PrepareFlux(specie, element, type, ropa_local_value, thickness, 
+					thicknesslogscale, labeltype, depth, width, threshold);
+
+}*/
 int main() 
 {
-	/*
-		PostProcessor PostProcessor("ropa", "/home/tdinelli/Desktop/kinetics", "/home/tdinelli/Desktop/Output");
 	
-		PostProcessor.Prepare("H2", 0, 0, 0, 0, 0, 0);
+	PostProcessor PostProcessor("ropa", "/home/tdinelli/Desktop/ROPA/kinetics", "/home/tdinelli/Desktop/ROPA/Output");
 	
-		double* coefficients;
-		int* reactions;
-	
-		return PostProcessor.ComputeROPAPython(coefficients, reactions, 10);
-	*/
+	PostProcessor.PrepareFlux("H2","H",0,0.003258,0,true,1,2,5,0.010);
+	PostProcessor.ComputeFluxPython();
 	return 0;
 }

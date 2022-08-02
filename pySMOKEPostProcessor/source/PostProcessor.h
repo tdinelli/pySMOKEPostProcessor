@@ -49,14 +49,22 @@ public:
 							double upper_value, int sensitivity_normalization_type, 
 							int sensitivity_ordering_type);
 
+	
+	void PrepareFlux(std::string specie, std::string element, int type, double local_value,
+					int thickness, bool thicknesslogscale, int labeltype, int depth, 
+					int width, double threshold);
+
 	int ComputeROPAPython(double* coefficients, int* reactions, int len);
 
 	int ComputeSensitivityPython(double* coefficients, int* reactions, int len);
+
+	int ComputeFluxPython();
 
 	std::string Type_;
 	std::string kineticFolder_;
 	std::string outputFolder_;
 	std::string species_;
+	std::string element_;
 
 	std::string normalizationType_;
 	std::string orderingType_;
@@ -64,6 +72,12 @@ public:
 	double localValue_;
 	double lowerBound_;
 	double upperBound_;
+	std::string thickness_;
+	bool islogscale;
+	std::string labeltype_;
+	int depth_;
+	int width_;
+	double threshold_;
 
 private:
 	std::string postprocessorType_;

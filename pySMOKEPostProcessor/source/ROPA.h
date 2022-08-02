@@ -67,14 +67,17 @@ public:
 		const std::vector<double>& negative_coefficients,
 		std::vector<int>& indices,
 		std::vector<double>& coefficients);
+	
+	int FluxAnalysis(std::string element, std::string thickness,
+					std::string type, std::string labeltype, 
+					int depth, int width, double threshold, 
+					bool thicknesslogscale);
 
 private:
 
 	ProfilesDatabase* data_;
 	std::vector<unsigned int> indices_coarse_reactions_;
 	std::vector<std::string> string_list_reactions;
-	
-	void FluxAnalysis();
 
 	std::string ropaType_;
 	std::string kineticFolder_;
