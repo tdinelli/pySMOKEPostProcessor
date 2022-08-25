@@ -590,8 +590,9 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 	data_->kineticsMapXML->ReactionRates(c.GetHandle());
 	data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 
-	OpenSMOKE::FluxAnalysisMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
-
+	// OpenSMOKE::FluxAnalysisMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
+	pySMOKEPostProcessor::newFluxMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
+	
 	bool destruction = false;
 	bool relativethickness = false;
 	bool labelrelative = false;
@@ -622,23 +623,8 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 	important_indices.push_back(index_of_species);
 	flux_analysis.GloballyAnalyze(important_indices, 0);
 	flux_analysis.CalculateThickness();
-
-	boost::filesystem::path output_folder_ = outputFolder_;
-	boost::filesystem::path graph_txt = output_folder_ / "graph.txt";
-
-	std::vector<std::vector<unsigned int>> global_important_indices = flux_analysis.global_important_indices_;
-	std::vector<std::vector<double>>		global_important_normal_fluxes = flux_analysis.global_important_normal_fluxes_;
-	std::vector<std::vector<double>>		global_important_fluxes = flux_analysis.global_important_fluxes_;
-	std::vector<std::vector<double>>		global_relative_thickness = flux_analysis.global_relative_thickness_;
-
-	flux_analysis.Plot(graph_txt.string());
-	for(int i = 0; i<global_important_normal_fluxes.size(); i++)
-	{
-		if(global_important_normal_fluxes[i].size() != 0)
-			for(int j = 0; j <global_important_normal_fluxes[0].size(); j++)
-				std::cout << global_important_normal_fluxes[i][j] << std::endl;
-		
-	}
+	
+	flux_analysis.ComputeFluxAnalysis();
 }
 
 void ROPA::MergePositiveAndNegativeBars (const std::vector<unsigned int>& positive_indices,
