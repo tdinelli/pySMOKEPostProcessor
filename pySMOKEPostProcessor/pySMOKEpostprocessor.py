@@ -2,7 +2,6 @@ from ctypes import c_bool, c_float, c_int, c_double, c_void_p, c_char_p, byref, 
 from operator import length_hint
 from KineticMechanism import *
 from GraphWriter import GrapWirter
-import networkx as nx
 import os
 
 """
@@ -284,7 +283,4 @@ class pySMOKEpostproccesor:
 		Graph = GrapWirter()
 		Graph = Graph.CreateGraph(self.firstNames, self.secondNames, computedThickness, computedLabel)
 
-		widths = nx.get_edge_attributes(Graph, 'label')
-		print(widths)
-
-		return indexFirstName, indexSecondName, computedThickness, computedLabel
+		return Graph
