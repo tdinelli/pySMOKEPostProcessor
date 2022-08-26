@@ -18,6 +18,9 @@ class KineticMechanism:
         self.reaction_strings_ = root_names.find("reaction-names")
         self.reaction_strings_ = (self.reaction_strings_.text).split()
 
+        specie = root_kinetics.find("NamesOfSpecies")
+        self.specieNames = (specie.text).split()
+
         kinetics = root_kinetics.find("Kinetics")
         self.nr = int( (kinetics.find('NumberOfReactions')).text )
         
@@ -32,7 +35,7 @@ class KineticMechanism:
         self.IndicesOfCabrReactions = [int(i) for i in listIndicesOfCabrReactions] 
         
     
-    def returnNameFromIndex(self, reactionIndex: int):
+    def returnReactionNameFromIndex(self, reactionIndex: int):
         # reactionIndex 0-based
         if(reactionIndex + 1 <= self.nr):
 
@@ -51,3 +54,6 @@ class KineticMechanism:
                 global_index = self.IndicesOfCabrReactions[local_index- self.nr - 1]
                 name = "R" + str(global_index) + "(inf): " + self.reaction_strings_[global_index-1]
                 return name
+    
+    def returnSpecieNameFromIndex(self, specieIndex: int):
+        return self.specieNames[specieIndex]
