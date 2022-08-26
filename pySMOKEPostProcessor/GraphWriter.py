@@ -3,40 +3,32 @@ import matplotlib.pyplot as plt
 
 class GrapWirter:
 
-    def __init__(self, firstNames, secondNames, thickness, label):
+    def __init__(self):
         
         self.G = nx.DiGraph()
-        self.NodesNames = []
-        [self.NodesNames.append(x) for x in firstNames if x not in self.NodesNames]
         
-        self.edgeStart = firstNames
-        self.edgeEnd = secondNames
-        self.tck = thickness
-        self.edgeLabel = label
+    def CreateGraph(self, edgeStart, edgeEnd, thickness, label):
+        
+        NodesNames = []
+        [NodesNames.append(x) for x in edgeStart if x not in NodesNames]
+        
+        self.AddNodes(NodesNames)
+        self.AddEdges(edgeStart, edgeEnd, thickness, label)
+ 
+        return self.G
 
-        self.AddEdges()
-        widths = nx.get_edge_attributes(self.G, 'label')
-        print(widths)
-        """
-        self.AddNodes()
-
-        nodelist = self.G.nodes()
-        print(nodelist)
-        """
-    def CreateGraph(self):
-        pass
-
-    def AddNodes(self):
-        for name in self.NodesNames:
+    def AddNodes(self, NodesNames):
+        for name in NodesNames:
             self.G.add_nodes_from([
                 (name,{"color": "green"})
             ])
 
-    def AddEdges(self):
+    def AddEdges(self, edgeStart, edgeEnd, tck, edgeLabel):
     
-        for j in range(len(self.edgeStart)):
+        for j in range(len(edgeStart)):
             self.G.add_edges_from([
-                (self.edgeStart[j], self.edgeEnd[j], {"color": "blue", 
-                                                    "weight": self.tck[j], 
-                                                    "label": str(round(self.edgeLabel[j],3)) + " %"})
+                    (edgeStart[j], 
+                    edgeEnd[j], {"color": "blue", 
+                                "weight": tck[j], 
+                                "label": str(round(edgeLabel[j],3)) + " %"})
             ])
