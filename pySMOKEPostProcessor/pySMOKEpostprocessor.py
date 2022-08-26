@@ -1,6 +1,8 @@
 from ctypes import c_bool, c_float, c_int, c_double, c_void_p, c_char_p, byref, cdll, CDLL, util
 from operator import length_hint
 from KineticMechanism import *
+from GraphWriter import GrapWirter
+import networkx as nx
 import os
 
 """
@@ -269,5 +271,20 @@ class pySMOKEpostproccesor:
 		indexSecondName = [i for i in indexSecondName][:length]
 		computedThickness = [t for t in computedThickness][:length]
 		computedLabel = [l for l in computedLabel][:length]
+
+		self.firstNames = []
+		self.secondNames = []
+		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
+
+		for j in range(len(indexFirstName)):
+			self.firstNames.append(KineticMap.returnSpecieNameFromIndex(indexFirstName[j]))
+			self.secondNames.append(KineticMap.returnSpecieNameFromIndex(indexSecondName[j]))
+
+		#print(self.firstNames)
+		Graph = GrapWirter()
+		Graph = Graph.CreateGraph(self.firstNames, self.secondNames, computedThickness, computedLabel)
+
+		widths = nx.get_edge_attributes(Graph, 'label')
+		print(widths)
 
 		return indexFirstName, indexSecondName, computedThickness, computedLabel
