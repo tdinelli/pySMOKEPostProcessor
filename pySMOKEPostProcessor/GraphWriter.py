@@ -14,7 +14,7 @@ class GrapWirter:
         
         self.AddNodes(NodesNames)
         self.AddEdges(edgeStart, edgeEnd, thickness, label)
- 
+        
         return self.G
 
     def AddNodes(self, NodesNames):
