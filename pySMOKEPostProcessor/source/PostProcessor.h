@@ -58,7 +58,7 @@ public:
 
 	int ComputeSensitivityPython(double* coefficients, int* reactions, int len);
 
-	int ComputeFluxPython();
+	int ComputeFluxPython(int* indexFirstName, int* indexSecondName, double* computedThickness, double* computedLabel, int* lenght);
 
 	std::string Type_;
 	std::string kineticFolder_;

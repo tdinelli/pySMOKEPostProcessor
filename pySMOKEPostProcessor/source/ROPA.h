@@ -71,7 +71,9 @@ public:
 	int FluxAnalysis(std::string element, std::string thickness,
 					std::string type, std::string labeltype, 
 					int depth, int width, double threshold, 
-					bool thicknesslogscale);
+					bool thicknesslogscale,int* indexFirstName, 
+					int* indexSecondName, double* computedThickness, 
+					double* computedLabel, int* lenght);
 
 private:
 

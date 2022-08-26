@@ -108,6 +108,8 @@ void PostProcessor::PrepareFlux(std::string specie, std::string element, int typ
 	threshold_ = threshold;
 
 	localValue_ = local_value;
+    lowerBound_ = 0;
+    upperBound_ = 0;
 
 	if(thickness == 0) // absolute
 	{
@@ -173,12 +175,15 @@ int PostProcessor::ComputeSensitivityPython(double* coefficients, int* reactions
 	return 0;
 }
 
-int PostProcessor::ComputeFluxPython()
+int PostProcessor::ComputeFluxPython(int* indexFirstName, int* indexSecondName, double* computedThickness, double* computedLabel, int* lenght)
 {
 	ROPA* widget;
     widget = new ROPA(kineticFolder_, outputFolder_, "local", species_, localValue_, lowerBound_, upperBound_);
 	data_->ReadFileResults(outputFolder_);
 	data_->ReadKineticMechanism(kineticFolder_);
 	widget->SetDatabase(data_);
-	widget->FluxAnalysis(element_,thickness_, Type_, labeltype_,depth_,width_,threshold_, islogscale);
+	return widget->FluxAnalysis(element_,thickness_, Type_, labeltype_,depth_,width_,threshold_, islogscale, 
+						indexFirstName, indexSecondName, computedThickness, computedLabel, lenght);
+	
+	
 }

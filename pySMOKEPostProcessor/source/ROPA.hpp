@@ -503,7 +503,9 @@ int ROPA::ROPA_CalculationsPython(double* coefficients, int* reactions, int len)
 int ROPA::FluxAnalysis(std::string element, std::string thickness,
 					std::string type, std::string labeltype, 
 					int depth, int width, double threshold, 
-					bool thicknesslogscale)
+					bool thicknesslogscale, int* indexFirstName, 
+					int* indexSecondName, double* computedThickness, 
+					double* computedLabel, int* lenght)
 {
 	// Select y variables among the species
 	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
@@ -517,11 +519,13 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 	unsigned int index_of_species;
 	for (unsigned int j = 0; j < data_->thermodynamicsMapXML->NumberOfSpecies(); j++){
 		if (speciesIsSelected == true)
+		{
 			if (species_ == data_->string_list_massfractions_sorted[j])
 			{
 				index_of_species = data_->sorted_index[j];
 				break;
 			}
+		}
 	}
 
 	unsigned int index_element; // = ui.comboBox_Elements->currentIndex();
@@ -532,11 +536,7 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 		{
 			index_element = k;	
 			break;		
-		}/*
-		else
-		{
-			exit(-6);
-		}*/
+		}
 	}
 	const double n_elements = data_->thermodynamicsMapXML->atomic_composition()(index_of_species, index_element);
 
@@ -625,6 +625,21 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 	flux_analysis.CalculateThickness();
 	
 	flux_analysis.ComputeFluxAnalysis();
+	
+	std::vector<int> firstName = flux_analysis.IndexFirstName;
+	std::vector<int> secondName = flux_analysis.IndexSecondName;
+	std::vector<double> thicknessValues = flux_analysis.ComputedThicknessValue;
+	std::vector<double> labelValues = flux_analysis.ComputedLabelValue;
+
+	for(int i = 0; i <= std::min<int>(firstName.size(), 1000); i++){
+		indexFirstName[i] = firstName[i];
+		indexSecondName[i] = secondName[i];
+		computedThickness[i] = thicknessValues[i];
+		computedLabel[i] = labelValues[i];
+		lenght[i] = std::min<int>(firstName.size(), 1000);
+	}
+
+	return 0;
 }
 
 void ROPA::MergePositiveAndNegativeBars (const std::vector<unsigned int>& positive_indices,
@@ -672,71 +687,3 @@ void ROPA::MergePositiveAndNegativeBars (const std::vector<unsigned int>& positi
 		}
 
 }
-/*
-void ROPA::AddSpeciesToGraphFile(const unsigned int index_j, 
-							std::vector<unsigned int>& local_indices,
-							std::vector<double>& local_thickness, 
-							std::vector<double>& local_normal_fluxes, 
-							std::vector<double>& local_fluxes)
-{
-
-	for(unsigned int j=0;j<local_indices.size();j++)
-	{
-		std::string attributes;
-		
-		// Tags
-		if (normal_tags_ == true)
-		{
-			double label;
-			label.setf(std::ios::fixed, std::ios::floatfield);
-
-			if (local_normal_fluxes[j]>10.)		label.precision(1);
-			else if (local_normal_fluxes[j]>1.)	label.precision(2);
-			else if (local_normal_fluxes[j]>0.1)	label.precision(3);
-			else label.precision(3);
-			label << local_normal_fluxes[j];
-			attributes = "[label = \"" + label.str() + "%\", labelfontcolor = red];";
-		}
-		else
-		{
-			std::stringstream label;
-			label.setf(std::ios::scientific);
-			label.precision(2);
-			label << local_fluxes[j];			
-			attributes = "[label = \"" + label.str() + "\", labelfontcolor = red];";
-		}
-
-		// Thickness
-		std::stringstream thickness;
-		if (logarithmic_thickness_ == false)	thickness << 0.5 + 15.*local_thickness[j];	
-		else									thickness << 0.5 + 5.*std::max(0.,3.+log10(local_thickness[j]));
-
-		// Write
-		if (destruction_analysis_ == true)
-		{
-			std::string name1 = thermodynamicsMapXML_.NamesOfSpecies()[index_j];
-			std::string name2 = thermodynamicsMapXML_.NamesOfSpecies()[local_indices[j]];
-			boost::replace_all(name1, "-", "_");
-			boost::replace_all(name1, "(", "_");
-			boost::replace_all(name1, ")", "");
-			boost::replace_all(name2, "-", "_");
-			boost::replace_all(name2, "(", "_");
-			boost::replace_all(name2, ")", "");
-			fOut << "edge [color=red, penwidth = " + thickness.str() << "];" << std::endl;
-			fOut << name1 << "->" << name2 << " " << attributes << std::endl;
-		}
-		else
-		{
-			std::string name1 = thermodynamicsMapXML_.NamesOfSpecies()[local_indices[j]];
-			std::string name2 = thermodynamicsMapXML_.NamesOfSpecies()[index_j];
-			boost::replace_all(name1, "-", "_");
-			boost::replace_all(name1, "(", "_");
-			boost::replace_all(name1, ")", "");
-			boost::replace_all(name2, "-", "_");
-			boost::replace_all(name2, "(", "_");
-			boost::replace_all(name2, ")", "");
-			fOut << "edge [color=blue, penwidth = " + thickness.str() << "];" << std::endl; 
-			fOut << name1 << "->" << name2 << " " << attributes << std::endl;
-		}
-	}
-}*/
