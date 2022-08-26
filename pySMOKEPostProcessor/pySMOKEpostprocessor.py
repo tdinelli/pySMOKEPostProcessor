@@ -1,4 +1,5 @@
-from ctypes import c_float, c_int, c_double, c_void_p, c_char_p, byref, cdll, CDLL, util
+from ctypes import c_bool, c_float, c_int, c_double, c_void_p, c_char_p, byref, cdll, CDLL, util
+from operator import length_hint
 from KineticMechanism import *
 import os
 
@@ -142,7 +143,7 @@ class pySMOKEpostproccesor:
 		self.c_library.pySensitivityPostProcessor.argtypes = [c_char_p, # kinetic folder
                                                 c_char_p,  # output folder
                                                 c_char_p,  # specie
-                                                c_int,     # command
+                                                c_int,     # command (to be remove)
                                                 c_int,     # sensitivity type 0: local | 1: global | 2: region
                                                 c_int,     # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                 c_int,     # normalization type 0: local | 1: maxvalue
@@ -162,7 +163,7 @@ class pySMOKEpostproccesor:
 		code = self.c_library.pySensitivityPostProcessor(c_char_p(self.kineticFolder), # kinetic folder
                                                     c_char_p(self.outputFolder),       # output folder
                                                     c_char_p(specie),                  # specie
-                                                    c_int(0),                          # command
+                                                    c_int(0),                          # command (to be remove)
                                                     c_int(sensitivity),                # sensitivity type 0: local | 1: global | 2: region
                                                     c_int(ordering),                   # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                     c_int(normalization),              # normalization type 0: local | 1: maxvalue
@@ -178,7 +179,7 @@ class pySMOKEpostproccesor:
 		reaction_names = []
 		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
 		for i in reactions:
-			reaction_names.append(KineticMap.returnNameFromIndex(i))
+			reaction_names.append(KineticMap.returnReactionNameFromIndex(i))
 
 		if (code == 0):
 			if(self.verbose != False):
@@ -189,3 +190,84 @@ class pySMOKEpostproccesor:
 		else:
 			raise ValueError('exit code != 0') # TODO
 	
+	def FluxAnalysis(self, specie: str, element: str, fluxanalysistype: str, 
+						thickness: str, thicknesslogscale: bool, 
+						labeltype: str, depth: int = 0, width: int = 0, 
+						thresold: float = 0, ropalocalvalue: float = 0):
+		specie = bytes(specie, 'utf-8')
+		element = bytes(element, 'utf-8')
+		
+		if(fluxanalysistype == 'production'):
+			flux = 1
+		elif(fluxanalysistype == 'destruction'):
+			flux = 0
+		else:
+			raise ValueError("The available type for the flux analysis are production | destruction")
+		
+		if(thickness == 'absolute'):
+			thick = 0
+		elif(thickness == 'relative'):
+			thick = 1
+		else:
+			raise ValueError("The available type for the caluclation of the thicknsss are absolute | relative(%)")
+	
+		if(labeltype == 'absolute'):
+			label = 0
+		elif(labeltype == 'relative'):
+			label = 1
+		else:
+			raise ValueError("The available type for the labeling are absolute | relative(%)")
+
+		self.c_library.FluxAnalysis.argtypes = [c_char_p, # kinetic folder
+												c_char_p, # output folder
+												c_char_p, # specie
+												c_char_p, # element
+												c_int,    # command (to be remove)
+												c_int,    # flux analysis type
+												c_double, # ropa local value
+												c_int,    # thickness 0 absolute | 1 relative(%)
+												c_bool,   # thickness log scale
+												c_int,    # labeling type 0 absolute | 1 relative(%)
+												c_int,    # depth
+												c_int,    # width
+												c_double, # thresold
+												c_void_p, # indexes of the first name
+												c_void_p, # indexes of the second name
+												c_void_p, # computed thicknes value
+												c_void_p, # computed label value
+												c_void_p] # lenght of the vector to adjust (boring ctype stuff)
+
+		self.c_library.FluxAnalysis.restype = c_int
+
+		indexFirstName = (c_int * 1000)()
+		indexSecondName = (c_int * 1000)()
+		computedThickness = (c_double * 1000)()
+		computedLabel = (c_double * 1000)()
+		length = (c_int*1000)()
+		
+		code = self.c_library.FluxAnalysis(c_char_p(self.kineticFolder), # kinetic folder
+											c_char_p(self.outputFolder), # output folder
+											c_char_p(specie),			 # specie
+											c_char_p(element),			 # element
+											c_int(0),					 # command (to be remove)
+											c_int(flux),				 # flux analysis type
+											c_double(ropalocalvalue),	 # ropa local value
+											c_int(thick),				 # thickness 0 absolute | 1 relative(%)
+											c_bool(thicknesslogscale),   # thickness log scale
+											c_int(label),				 # labeling type 0 absolute | 1 relative(%)
+											c_int(depth),				 # depth
+											c_int(width),				 # width
+											c_double(thresold),			 # thresold
+											byref(indexFirstName),		 # indexes of the first name
+											byref(indexSecondName),		 # indexes of the second name
+											byref(computedThickness),	 # computed thicknes value
+											byref(computedLabel),		 # computed label value
+											byref(length))				 # lenght of the vector to adjust (boring ctype stuff)
+
+		length = [l for l in length][0]
+		indexFirstName = [i for i in indexFirstName][:length]
+		indexSecondName = [i for i in indexSecondName][:length]
+		computedThickness = [t for t in computedThickness][:length]
+		computedLabel = [l for l in computedLabel][:length]
+
+		return indexFirstName, indexSecondName, computedThickness, computedLabel
