@@ -55,14 +55,9 @@
 #include "PostProcessor.h"
 
 bool VERBOSE = false;
-/*
+
 // Windows extern "C" __declspec(dllexport)
-#ifdef _WIN32 || _WIN64
-extern "C" __declspec(dllexport)
-#else
-extern "C"
-#endif
-int pyROPAPostProcessor(
+extern "C" int pyROPAPostProcessor(
     char* kineticFolder,
     char* outputFolder,
     char* specie,
@@ -101,12 +96,7 @@ int pyROPAPostProcessor(
 	return 0;
 }
 
-#ifdef _WIN32 || _WIN64
-extern "C" __declspec(dllexport)
-#else
-extern "C"
-#endif
-int pySensitivityPostProcessor(
+extern "C" int pySensitivityPostProcessor(
 	char* kineticFolder,
 	char* outputFolder,
 	char* specie,
@@ -142,12 +132,7 @@ int pySensitivityPostProcessor(
 	return 0;
 }
 
-#ifdef _WIN32 || _WIN64
-extern "C" __declspec(dllexport)
-#else
-extern "C"
-#endif
-int FluxAnalysis(char* kineticFolder,
+extern "C" int FluxAnalysis(char* kineticFolder,
 	char* outputFolder,
 	char* specie,
 	char* element,
@@ -159,22 +144,42 @@ int FluxAnalysis(char* kineticFolder,
 	int labeltype, // 0-absolute 1-relative(%)
 	int depth,
 	int width,
-	double threshold)
+	double threshold,
+	int* indexFirstName,
+	int* indexSecondName,
+	double* computedThickness,
+	double* computedLabel,
+	int* lenght)
 {
 	std::string postprocessorType = "fluxanalysis";
 
 	PostProcessor* pp;
-    pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
+	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
 	pp->PrepareFlux(specie, element, type, ropa_local_value, thickness, 
 					thicknesslogscale, labeltype, depth, width, threshold);
+	pp->ComputeFluxPython(indexFirstName, indexSecondName, computedThickness, computedLabel, lenght);
+	
+	return 0;
+}
 
-}*/
 int main() 
 {
-	
+	/*
 	PostProcessor PostProcessor("ropa", "/home/tdinelli/Desktop/ROPA/kinetics", "/home/tdinelli/Desktop/ROPA/Output");
 	
+	int* indexFirstName;
+	int* indexSecondName;
+	double* computedThickness;
+	double* computedLabel;
 	PostProcessor.PrepareFlux("H2","H",0,0.003258,0,true,1,2,5,0.010);
-	PostProcessor.ComputeFluxPython();
+	PostProcessor.ComputeFluxPython(indexFirstName, indexSecondName, computedThickness, computedLabel);*/
+	/*PostProcessor.Prepare("H2", 0, 0.00325, 
+					0, 0,
+					0, 0);
+
+	int len = 100;
+	double* coefficients;
+	int* reactions;
+	return PostProcessor.ComputeROPAPython(coefficients, reactions, len);*/
 	return 0;
 }
