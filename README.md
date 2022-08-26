@@ -1,6 +1,6 @@
 # pySMOKEPostProcessor
 
-Python binder for the OpenSMOKEppPostProcessor developed by Professor [Alberto Cuoci](http://creckmodeling.chem.polimi.it/menu-people/menu-people-faculty/menu-people-alberto-cuoci). You can find the original repository of the OpenSMOKEPostProcessor at this link (https://github.com/acuoci/OpenSMOKEppPostProcessor).
+Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor [Alberto Cuoci](http://creckmodeling.chem.polimi.it/menu-people/menu-people-faculty/menu-people-alberto-cuoci). You can find the original repository of the OpenSMOKE PostProcessor at this link (https://github.com/acuoci/OpenSMOKEppPostProcessor).
 
 ## External libraries dependencies
 
