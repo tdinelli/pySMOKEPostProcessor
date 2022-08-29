@@ -67,6 +67,7 @@ void PostProcessor::Prepare(std::string specie, int type, double local_value, do
 	    Type_ = "region";
 	}
 	else {
+		std::cout << "Wrong type of postprocessing. Avaialble are: Global | Local | Region" << std::endl;
 	    exit(-1);
 	}
 
@@ -81,6 +82,7 @@ void PostProcessor::Prepare(std::string specie, int type, double local_value, do
 			orderingType_ = "absolutearea";
 		}
 		else {
+			std::cout << "Wrong ordering type. Avaialble are: PeakValues | Area | Absolute Area" << std::endl;
 			exit(-1);
 		}
 
@@ -91,6 +93,7 @@ void PostProcessor::Prepare(std::string specie, int type, double local_value, do
 			normalizationType_ = "maxvalue";
 		}
 		else {
+			std::cout << "Wrong normalization type. Avaialble are: Local | Max Value" << std::endl;
 			exit(-1);
 		}
 	}
@@ -121,6 +124,7 @@ void PostProcessor::PrepareFlux(std::string specie, std::string element, int typ
 	}
 	else
 	{
+		std::cout << "Wrong thickness type. Avaialble are: Absolute | Relative(%)" << std::endl;
 		exit(-1);
 	}
 
@@ -134,6 +138,7 @@ void PostProcessor::PrepareFlux(std::string specie, std::string element, int typ
 	}
 	else
 	{
+		std::cout << "Wrong labelling type. Avaialble are: Absolute | Relative(%)" << std::endl;
 		exit(-1);
 	}
 
@@ -147,6 +152,7 @@ void PostProcessor::PrepareFlux(std::string specie, std::string element, int typ
 	}
 	else
 	{
+		std::cout << "Wrong FluxAnalysis type. Avaialble are: Production | Destruction" << std::endl;
 		exit(-1);
 	}
 }

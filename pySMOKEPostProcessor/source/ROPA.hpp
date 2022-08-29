@@ -484,7 +484,8 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 	}
 	else
 	{
-		exit(-5);
+		std::cout << "The selcted specie is not present inside the kinetic mechanism." << std::endl;
+		exit(-1);
 	}
 	unsigned int index_of_species;
 	for (unsigned int j = 0; j < data_->thermodynamicsMapXML->NumberOfSpecies(); j++){
@@ -513,7 +514,7 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 	if (n_elements == 0.)
 	{
 		std::cout << "The selected species does not contain the selected element" << std::endl;
-		exit(-7);
+		exit(-1);
 	}
 
 	const int max_depth = depth;
