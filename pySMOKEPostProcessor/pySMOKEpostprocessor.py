@@ -1,6 +1,5 @@
-from ctypes import c_bool, c_float, c_int, c_double, c_void_p, c_char_p, byref, cdll, CDLL, util
-from operator import length_hint
-from KineticMechanism import *
+from ctypes import c_bool, c_int, c_double, c_void_p, c_char_p, byref, cdll
+from KineticMechanism import KineticMechanism
 from GraphWriter import GrapWirter
 import os
 

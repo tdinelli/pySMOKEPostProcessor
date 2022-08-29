@@ -2,6 +2,10 @@
 import xml.etree.ElementTree as ET
 import os
 
+"""
+DESCRIPTION: TODO
+"""
+
 class KineticMechanism:
 
     def __init__(self, kineticmechanismFolder: str):

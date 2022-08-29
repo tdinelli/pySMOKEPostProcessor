@@ -1,5 +1,8 @@
 import networkx as nx
-import matplotlib.pyplot as plt
+
+"""
+DESCRIPTION: TODO
+"""
 
 class GrapWirter:
 
