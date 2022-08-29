@@ -46,13 +46,9 @@ class Sensitivities
 	
 
 public:
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie);
 
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue);
-
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double lowerBound, double upperBound);
-
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue, double lowerBound, double upperBound);
+	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, 
+					std::string specie, double localValue, double lowerBound, double upperBound);
 
 	~Sensitivities();
 

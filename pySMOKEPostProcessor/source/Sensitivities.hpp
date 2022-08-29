@@ -39,33 +39,6 @@
 #include "Sensitivities_Database.h"
 #include "Utilities.h"
 
-Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie)
-{
-	normalizationType_ = normalizationType;
-	sensitivityType_ = sensitivityType;
-	orderingType_ = orderingType;
-	specie_ = specie;
-}
-
-Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue)
-{
-	normalizationType_ = normalizationType;
-	sensitivityType_ = sensitivityType;
-	orderingType_ = orderingType;
-	localValue_ = localValue;
-	specie_ = specie;
-}
-
-Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie,double lowerBound, double upperBound)
-{
-	normalizationType_ = normalizationType;
-	sensitivityType_ = sensitivityType;
-	orderingType_ = orderingType;
-	lowerBound_ = lowerBound;
-	upperBound_ = upperBound;
-	specie_ = specie;
-}
-
 Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue, double lowerBound, double upperBound)
 {
 	normalizationType_ = normalizationType;
@@ -349,10 +322,12 @@ int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coeff
 
 			if (index_min == index_max)
 			{
-				if (index_max == data_->number_of_abscissas_ - 1)
+				if (index_max == data_->number_of_abscissas_ - 1){
 					index_min = index_max - 1;
-				else
+				}
+				else{
 					index_max = index_min + 1;
+				}
 			}
 		}
 
