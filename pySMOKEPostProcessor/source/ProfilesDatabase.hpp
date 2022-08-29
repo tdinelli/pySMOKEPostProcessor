@@ -118,64 +118,6 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 	return true;
 }
 
-bool ProfilesDatabase::pyReadKineticMechanism(const std::string& folder_name)
-{
-	path_folder_mechanism_ = folder_name;
-	boost::filesystem::path path_mechanism = path_folder_mechanism_ / "kinetics.xml";
-
-	if (!boost::filesystem::exists(path_mechanism))
-	{
-		std::cout << "The provided folder directory does not contain the kinetics.xml file" << std::endl;
-		return false;
-	}
-
-	// Read from file 
-	{
-		boost::property_tree::ptree ptree;
-		boost::property_tree::read_xml((path_mechanism).string(), ptree);
-
-		thermodynamicsMapXML = new OpenSMOKE::ThermodynamicsMap_CHEMKIN(ptree, false);
-		kineticsMapXML = new OpenSMOKE::KineticsMap_CHEMKIN(*thermodynamicsMapXML, ptree, false);
-	}
-
-	// Read the reaction strings 
-	{
-		std::string local_name = "reaction_names.xml";
-		boost::filesystem::path path_reaction_names = path_folder_mechanism_ / local_name;
-
-		if (!boost::filesystem::exists(path_reaction_names))
-		{
-			std::cout << " The provided folder directory does not contain the reaction_names.xml file" << std::endl;
-			return false;
-		}
-
-		{
-			boost::property_tree::ptree ptree;
-			boost::property_tree::read_xml((path_reaction_names).string(), ptree);
-
-			// Names of reactions
-			{
-
-				std::stringstream stream;
-				stream.str(ptree.get< std::string >("opensmoke.reaction-names"));
-
-				reaction_strings_.reserve(kineticsMapXML->NumberOfReactions());
-				for (unsigned int j = 0; j < kineticsMapXML->NumberOfReactions(); j++)
-				{
-					std::string reaction_string;
-					stream >> reaction_string;
-					// std::cout << "Ecco la reazione: " << reaction_string << std::endl;
-					reaction_strings_.push_back(reaction_string);
-				}
-			}
-		}
-	}
-
-	is_kinetics_available_ = true;
-
-	return true;
-}
-
 bool ProfilesDatabase::ReadFileResults(const std::string& folder_name)
 {
 	path_folder_results_ = folder_name;

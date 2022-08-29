@@ -45,9 +45,11 @@ public:
 	~ProfilesDatabase(void);
 
 	bool ReadKineticMechanism(const std::string& folder_name);
-	bool pyReadKineticMechanism(const std::string& folder_name);
+	
 	bool ReadFileResults(const std::string& folder_name);
+	
 	void Prepare();
+	
 	void SpeciesCoarsening(const double threshold);
 
 	int number_of_abscissas_;
