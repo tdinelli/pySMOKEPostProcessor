@@ -64,7 +64,6 @@ class pySMOKEpostproccesor:
 		self.c_library.pyROPAPostProcessor.argtypes = [c_char_p, # kinetic folder
                                           c_char_p, # output folder
                                           c_char_p, # sepcie
-                                          c_int,    # command
                                           c_int,    # ropa type 0: local | 1: global | 2: region
 										  c_int,    # ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
                                           c_int,    # normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
@@ -83,7 +82,6 @@ class pySMOKEpostproccesor:
 		code = self.c_library.pyROPAPostProcessor(c_char_p(self.kineticFolder), # kinetic folder
                                             c_char_p(self.outputFolder),        # output folder
                                             c_char_p(specie),                   # specie
-                                            c_int(0),                           # command (to be removed)
                                             c_int(ropa),                        # ropa type 0: local | 1:global | 2: region
 											c_int(0),							# ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
 											c_int(0),							# normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
@@ -143,7 +141,6 @@ class pySMOKEpostproccesor:
 		self.c_library.pySensitivityPostProcessor.argtypes = [c_char_p, # kinetic folder
                                                 c_char_p,  # output folder
                                                 c_char_p,  # specie
-                                                c_int,     # command (to be remove)
                                                 c_int,     # sensitivity type 0: local | 1: global | 2: region
                                                 c_int,     # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                 c_int,     # normalization type 0: local | 1: maxvalue
@@ -163,7 +160,6 @@ class pySMOKEpostproccesor:
 		code = self.c_library.pySensitivityPostProcessor(c_char_p(self.kineticFolder), # kinetic folder
                                                     c_char_p(self.outputFolder),       # output folder
                                                     c_char_p(specie),                  # specie
-                                                    c_int(0),                          # command (to be remove)
                                                     c_int(sensitivity),                # sensitivity type 0: local | 1: global | 2: region
                                                     c_int(ordering),                   # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                     c_int(normalization),              # normalization type 0: local | 1: maxvalue
@@ -222,7 +218,6 @@ class pySMOKEpostproccesor:
 												c_char_p, # output folder
 												c_char_p, # specie
 												c_char_p, # element
-												c_int,    # command (to be remove)
 												c_int,    # flux analysis type
 												c_double, # ropa local value
 												c_int,    # thickness 0 absolute | 1 relative(%)
@@ -249,7 +244,6 @@ class pySMOKEpostproccesor:
 											c_char_p(self.outputFolder), # output folder
 											c_char_p(specie),			 # specie
 											c_char_p(element),			 # element
-											c_int(0),					 # command (to be remove)
 											c_int(flux),				 # flux analysis type
 											c_double(ropalocalvalue),	 # ropa local value
 											c_int(thick),				 # thickness 0 absolute | 1 relative(%)
