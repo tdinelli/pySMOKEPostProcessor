@@ -54,8 +54,6 @@
 
 #include "PostProcessor.h"
 
-bool VERBOSE = false;
-
 // Windows extern "C" __declspec(dllexport)
 extern "C" int pyROPAPostProcessor(
     char* kineticFolder,
