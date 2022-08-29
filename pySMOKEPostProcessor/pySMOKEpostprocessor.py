@@ -97,7 +97,7 @@ class pySMOKEpostproccesor:
 		reaction_names = []
 		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
 		for i in reactions:
-			reaction_names.append(KineticMap.returnNameFromIndex(i))
+			reaction_names.append(KineticMap.returnReactionNameFromIndex(i))
 
 		if (code == 0):
 			if(self.verbose != False):
