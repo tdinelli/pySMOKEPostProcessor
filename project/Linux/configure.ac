@@ -6,8 +6,8 @@ AM_INIT_AUTOMAKE
 AC_PROG_CC
 AC_PROG_CXX
 
-AC_PROG_CC([gcc icc])
-AC_PROG_CXX([g++ icpc])
+AC_PROG_CC([gcc-9 icc])
+AC_PROG_CXX([g++-9 icpc])
 
 CXXFLAGS=''
 
@@ -74,7 +74,7 @@ AS_IF([test "$SYSTEM_BOOST" = "yes"], [
 	AC_CHECK_HEADERS([regex.h], [], [Include file regex.h not found. Try downloading the Boost C++ libraries from http://www.boost.org], [])
 
 	BOOST_INCLUDE_DIR=""
-	BOOST_LIBS="-lboost_regex -lboost_timer -lboost_chrono -lboost_date_time -lboost_program_options -lboost_filesystem -lboost_system -lboost_atomic -lboost_container";
+	BOOST_LIBS="-lboost_regex -lboost_timer -lboost_chrono -lboost_date_time -lboost_program_options -lboost_filesystem -lboost_system";
 ])
 
 
@@ -112,11 +112,11 @@ AS_IF([test "$SYSTEM_BOOST" = "no"], [
 		       AC_MSG_ERROR([Library file libboost_chrono.a or libboost_chrono.so not found. Try downloading the Boost C++ libraries from http://www.boost.org])))
 
 	AC_CHECK_FILE([${with_boost_lib_path}/libboost_graph.a], [], 
-		       AC_CHECK_FILE([${with_boost_lib_path}/libboost_graph.so], [], 
-		       AC_MSG_ERROR([Library file libboost_graph.a or libboost_graph.so not found. Try downloading the Boost C++ libraries from http://www.boost.org])))
+		       AC_CHECK_FILE([${with_boost_lib_path}/libboost_chrono.so], [], 
+		       AC_MSG_ERROR([Library file libboost_chrono.a or libboost_chrono.so not found. Try downloading the Boost C++ libraries from http://www.boost.org])))
 
-	BOOST_INCLUDE_DIR="-I$with_boost_include_path"
-	BOOST_LIBS="-L$with_boost_lib_path -lboost_filesystem -lboost_system -lboost_regex -lboost_date_time -lboost_program_options -lboost_atomic -lboost_container"
+	BOOST_INCLUDE_DIR="-I $with_boost_include_path"
+	BOOST_LIBS="-L $with_boost_lib_path -lboost_regex -lboost_timer -lboost_chrono -lboost_date_time -lboost_program_options -lboost_filesystem -lboost_system"
 ])
 
 #Compulsory libraries
