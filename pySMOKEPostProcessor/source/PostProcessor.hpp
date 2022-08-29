@@ -158,7 +158,7 @@ int PostProcessor::ComputeROPAPython(double* coefficients, int* reactions, int l
 	data_->ReadFileResults(outputFolder_);
 	data_->ReadKineticMechanism(kineticFolder_);
 	widget->SetDatabase(data_);
-    return widget->ROPA_CalculationsPython(coefficients, reactions, len);
+    return widget->ROPA_Calculations_Python(coefficients, reactions, len);
 }
 
 int PostProcessor::ComputeSensitivityPython(double* coefficients, int* reactions, int len) 
@@ -184,6 +184,5 @@ int PostProcessor::ComputeFluxPython(int* indexFirstName, int* indexSecondName, 
 	widget->SetDatabase(data_);
 	return widget->FluxAnalysis(element_,thickness_, Type_, labeltype_,depth_,width_,threshold_, islogscale, 
 						indexFirstName, indexSecondName, computedThickness, computedLabel, lenght);
-	
 	
 }

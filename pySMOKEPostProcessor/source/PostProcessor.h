@@ -49,7 +49,6 @@ public:
 							double upper_value, int sensitivity_normalization_type, 
 							int sensitivity_ordering_type);
 
-	
 	void PrepareFlux(std::string specie, std::string element, int type, double local_value,
 					int thickness, bool thicknesslogscale, int labeltype, int depth, 
 					int width, double threshold);
