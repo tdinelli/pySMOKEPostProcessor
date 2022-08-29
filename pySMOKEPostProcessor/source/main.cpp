@@ -59,7 +59,6 @@ extern "C" int pyROPAPostProcessor(
     char* kineticFolder,
     char* outputFolder,
     char* specie,
-    int command,
     int ropa_type,
 	int ordering_type,
 	int normalization_type,
@@ -72,24 +71,16 @@ extern "C" int pyROPAPostProcessor(
 {
 
 	std::string postprocessorType = "ropa";
-
-	if (command == 0)
-	{
-		postprocessorType = "ropa";
-	}
-	else
-	{
-		return -1;
-	}
 	
-	PostProcessor PostProcessor(postprocessorType, kineticFolder, outputFolder);
+	PostProcessor* pp;
+	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
 	
-	PostProcessor.Prepare(specie, ropa_type, ropa_local_value, 
-					ropa_region_lower_value, ropa_region_upper_value,
-					normalization_type, ordering_type);
+	pp->Prepare(specie, ropa_type, ropa_local_value, 
+				ropa_region_lower_value, ropa_region_upper_value,
+				normalization_type, ordering_type);
 
 
-	return PostProcessor.ComputeROPAPython(coefficients, reactions, len);
+	pp->ComputeROPAPython(coefficients, reactions, len);
 
 	return 0;
 }
@@ -98,7 +89,6 @@ extern "C" int pySensitivityPostProcessor(
 	char* kineticFolder,
 	char* outputFolder,
 	char* specie,
-	int command,
 	int sensitivity_type,
 	int ordering_type,
 	int normalization_type,
@@ -110,22 +100,15 @@ extern "C" int pySensitivityPostProcessor(
 	int len) 
 {
 	std::string postprocessorType = "sensitivity";
-	if (command == 0) 
-	{
-		postprocessorType = "sensitivity";
-	}
-	else 
-	{
-		return -1;
-	}
 
-	PostProcessor PostProcessor(postprocessorType, kineticFolder, outputFolder);
+	PostProcessor* pp;
+	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
 	
-	PostProcessor.Prepare(specie, sensitivity_type, sensitivity_local_value, 
+	pp->Prepare(specie, sensitivity_type, sensitivity_local_value, 
 				sensitivity_region_lower_value, sensitivity_region_upper_value, 
 				normalization_type, ordering_type);
 
-	return PostProcessor.ComputeSensitivityPython(coefficients, reactions, len);
+	pp->ComputeSensitivityPython(coefficients, reactions, len);
 
 	return 0;
 }
@@ -134,7 +117,6 @@ extern "C" int FluxAnalysis(char* kineticFolder,
 	char* outputFolder,
 	char* specie,
 	char* element,
-	int command,
 	int type, // 1-production 0-destruction
 	double ropa_local_value,
 	int thickness, // 0-absolute 1-relative(%)
