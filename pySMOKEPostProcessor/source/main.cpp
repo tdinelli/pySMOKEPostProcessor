@@ -43,7 +43,7 @@
 #include "OpenSMOKEpp"
 #include "maps/Maps_CHEMKIN"
 #include "maps/FluxAnalysisMap.h"
-#include "newFluxMap.h"
+#include "PostProcessorFluxMap.h"
 #include "math/PhysicalConstants.h"
 #include "kernel/kinetics/KineticsUtilityFunctions.h"
 

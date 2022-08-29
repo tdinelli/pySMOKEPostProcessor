@@ -561,7 +561,7 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 	data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 
 	// OpenSMOKE::FluxAnalysisMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
-	pySMOKEPostProcessor::newFluxMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
+	pySMOKEPostProcessor::PostProcessorFluxMap flux_analysis(*data_->thermodynamicsMapXML, *data_->kineticsMapXML);
 	
 	bool destruction = false;
 	bool relativethickness = false;
