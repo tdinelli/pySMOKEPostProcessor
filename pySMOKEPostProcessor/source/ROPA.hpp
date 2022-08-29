@@ -38,36 +38,6 @@
 #include "math/OpenSMOKEUtilities.h"
 #include <algorithm>
 
-ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType, std::string species)
-{
-	ropaType_ = ropaType;
-	kineticFolder_ = kineticFolder;
-	outputFolder_ = outputFolder;
-	species_ = species;
-}
-
-ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType,	std::string species, double localValue)
-{
-	ropaType_ = ropaType;
-	kineticFolder_ = kineticFolder;
-	outputFolder_ = outputFolder;
-	species_ = species;
-
-	localValue_ = localValue;
-}
-
-ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType,	std::string species, double lowerBound, double upperBound)
-{
-	ropaType_ = ropaType;
-	kineticFolder_ = kineticFolder;
-	outputFolder_ = outputFolder;
-	species_ = species;
-
-	upperBound_ = upperBound;
-	lowerBound_ = lowerBound;
-
-}
-
 ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType,	std::string species, double localValue, double lowerBound, double upperBound)
 {
 	ropaType_ = ropaType;
@@ -300,7 +270,7 @@ void ROPA::ROPA_Calculations()
 
 }
 
-int ROPA::ROPA_CalculationsPython(double* coefficients, int* reactions, int len)
+int ROPA::ROPA_Calculations_Python(double* coefficients, int* reactions, int len)
 {
 	// Select y variables among the species
 	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
