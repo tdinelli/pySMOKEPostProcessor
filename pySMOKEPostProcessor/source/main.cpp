@@ -144,22 +144,5 @@ extern "C" int FluxAnalysis(char* kineticFolder,
 
 int main() 
 {
-	/*
-	PostProcessor PostProcessor("ropa", "/home/tdinelli/Desktop/ROPA/kinetics", "/home/tdinelli/Desktop/ROPA/Output");
-	
-	int* indexFirstName;
-	int* indexSecondName;
-	double* computedThickness;
-	double* computedLabel;
-	PostProcessor.PrepareFlux("H2","H",0,0.003258,0,true,1,2,5,0.010);
-	PostProcessor.ComputeFluxPython(indexFirstName, indexSecondName, computedThickness, computedLabel);*/
-	/*PostProcessor.Prepare("H2", 0, 0.00325, 
-					0, 0,
-					0, 0);
-
-	int len = 100;
-	double* coefficients;
-	int* reactions;
-	return PostProcessor.ComputeROPAPython(coefficients, reactions, len);*/
 	return 0;
 }
