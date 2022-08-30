@@ -32,17 +32,18 @@ class pySMOKEpostproccesor:
 			print('ROPA available')
 		if (os.path.isfile(kin) and os.path.isfile(names) and os.path.isfile(output) and os.path.isfile(outputsens) and self.verbose != False):
 			print('Sensitivity analysis available on: ', end='')
-		for i in  os.listdir(self.outputFolder):
-			file = i.split(b'.')
-			if (file[0] == b'Sensitivities' and file[1] != b'xml' and self.verbose != False):
-				print(str(file[1], encoding='utf-8'), end='  ')
+			for i in  os.listdir(self.outputFolder):
+				file = i.split(b'.')
+				if (file[0] == b'Sensitivities' and file[1] != b'xml' and self.verbose != False):
+					print(str(file[1], encoding='utf-8'), end='  ')
+			print(end="\n")
 
-	def __init__(self, kineticmechanismFolder: str, simulationresultsfolder: str, verbose = False):
+	def __init__(self, kineticmechanismFolder: str, simulationresultsFolder: str, verbose = False):
         
 		path = '/home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/project/myLINUX/pySMOKEPostProcessor.o'
         
 		self.kineticFolder = bytes(kineticmechanismFolder, 'utf-8')
-		self.outputFolder = bytes(simulationresultsfolder, 'utf-8')
+		self.outputFolder = bytes(simulationresultsFolder, 'utf-8')
 		self.verbose = verbose
 		self.CheckInputSettings()
 
@@ -101,7 +102,7 @@ class pySMOKEpostproccesor:
 
 		if (code == 0):
 			if(self.verbose != False):
-				print ('ROPA successfully executed')
+				print ('ROPA successfully executed!')
 			coefficients = [c for c in coefficients]
 			reactions = [r for r in reactions]
 			return coefficients, reactions, reaction_names
@@ -179,7 +180,7 @@ class pySMOKEpostproccesor:
 
 		if (code == 0):
 			if(self.verbose != False):
-				print('Sensitivity analysis succesfully executed')
+				print('Sensitivity analysis succesfully executed!')
 			coefficients = [c for c in coefficients]
 			reactions = [r for r in reactions]
 			return coefficients, reactions, reaction_names
@@ -272,8 +273,7 @@ class pySMOKEpostproccesor:
 			self.firstNames.append(KineticMap.returnSpecieNameFromIndex(indexFirstName[j]))
 			self.secondNames.append(KineticMap.returnSpecieNameFromIndex(indexSecondName[j]))
 
-		#print(self.firstNames)
-		Graph = GrapWirter()
+		Graph = GrapWirter(fluxanalysistype)
 		Graph = Graph.CreateGraph(self.firstNames, self.secondNames, computedThickness, computedLabel)
 
 		return Graph
