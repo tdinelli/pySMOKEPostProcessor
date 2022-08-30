@@ -37,7 +37,6 @@ class KineticMechanism:
         self.NumberOfCabrReactions = int(Cabr[0])
         listIndicesOfCabrReactions = Cabr[1:]
         self.IndicesOfCabrReactions = [int(i) for i in listIndicesOfCabrReactions] 
-        
     
     def returnReactionNameFromIndex(self, reactionIndex: int):
         # reactionIndex 0-based
