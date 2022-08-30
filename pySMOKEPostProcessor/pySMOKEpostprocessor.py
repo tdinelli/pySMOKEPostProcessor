@@ -38,26 +38,26 @@ class pySMOKEpostproccesor:
 					print(str(file[1], encoding='utf-8'), end='  ')
 			print(end="\n")
 
-	def __init__(self, kineticmechanismFolder: str, simulationresultsFolder: str, verbose = False):
+	def __init__(self, kinetic_mechanism: str, results_folder: str, verbose = False):
         
 		path = '/home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/project/myLINUX/pySMOKEPostProcessor.o'
         
-		self.kineticFolder = bytes(kineticmechanismFolder, 'utf-8')
-		self.outputFolder = bytes(simulationresultsFolder, 'utf-8')
+		self.kineticFolder = bytes(kinetic_mechanism, 'utf-8')
+		self.outputFolder = bytes(results_folder, 'utf-8')
 		self.verbose = verbose
 		self.CheckInputSettings()
 
 		self.c_library = cdll.LoadLibrary(path)
 
-	def RateOfProductionAnalysis(self, specie: str, ropatype: str, ropalocalvalue: float = 0, 
-                                roparegionlowervalue: float = 0, roparegionuppervalue: float = 0, 
-                                numberofreactions: int = 10):
+	def RateOfProductionAnalysis(self, specie: str, ropa_type: str, local_value: float = 0, 
+                                lower_value: float = 0, upper_value: float = 0, 
+                                number_of_reactions: int = 10):
 		specie = bytes(specie, 'utf-8')
-		if (ropatype == 'global'):
+		if (ropa_type == 'global'):
 			ropa = 1
-		elif (ropatype == "local"):
+		elif (ropa_type == "local"):
 			ropa = 0
-		elif (ropatype == "region"):
+		elif (ropa_type == "region"):
 			ropa = 2
 		else:
 			raise ValueError('Please select one of the available ROPA type: global | local | region')
@@ -77,8 +77,8 @@ class pySMOKEpostproccesor:
 
 		self.c_library.pyROPAPostProcessor.restype = c_int
 
-		coefficients = (c_double * numberofreactions)()
-		reactions = (c_int * numberofreactions)()
+		coefficients = (c_double * number_of_reactions)()
+		reactions = (c_int * number_of_reactions)()
 
 		code = self.c_library.pyROPAPostProcessor(c_char_p(self.kineticFolder), # kinetic folder
                                             c_char_p(self.outputFolder),        # output folder
@@ -86,12 +86,12 @@ class pySMOKEpostproccesor:
                                             c_int(ropa),                        # ropa type 0: local | 1:global | 2: region
 											c_int(0),							# ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
 											c_int(0),							# normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
-                                            c_double(ropalocalvalue),           # ropa local value
-                                            c_double(roparegionlowervalue),     # ropa region lower value 
-                                            c_double(roparegionuppervalue),     # ropa region upper value
+                                            c_double(local_value),				# ropa local value
+                                            c_double(lower_value),				# ropa region lower value 
+                                            c_double(upper_value),				# ropa region upper value
                                             byref(coefficients),                # ropa coefficients
                                             byref(reactions),                   # ropa reactions indices
-                                            c_int(numberofreactions))           # ropa number of reactions
+                                            c_int(number_of_reactions))			# ropa number of reactions
 
 		#  0-based
 		# reaction-names 1-based
@@ -109,35 +109,35 @@ class pySMOKEpostproccesor:
 		else:
 			raise ValueError('exit code != 0') # TODO
 
-	def SensitivityAnalysis(self, specie: str, sensitivitytype: str, orderingtype:str,
-                            normalizationtype:str, sensitivitylocalvalue: float = 0, 
-                            sensitivityregionlowervalue: float = 0, sensitivityregionuppervalue: float = 0, 
-                            numberofreactions: int = 10):
+	def SensitivityAnalysis(self, specie: str, sensitivity_type: str, ordering_type:str,
+                            normalization_type:str, local_value: float = 0, 
+                            lower_value: float = 0, upper_value: float = 0, 
+                            number_of_reactions: int = 10):
 		specie = bytes(specie, 'utf-8')
-		if (sensitivitytype == 'global'):
+		if (sensitivity_type == 'global'):
 			sensitivity = 1
-		elif (sensitivitytype == "local"):
+		elif (sensitivity_type == "local"):
 			sensitivity = 0
-		elif (sensitivitytype == "region"):
+		elif (sensitivity_type == "region"):
 			sensitivity = 2
 		else:
 			raise ValueError('Please select one of the available Sensitivity analysis type global | local | region')
         
-		if (orderingtype == 'peakvalues'):
+		if (ordering_type == 'peak_value'):
 			ordering = 0
-		elif (orderingtype == "area"):
+		elif (ordering_type == "area"):
 			ordering = 1
-		elif (orderingtype == "absolutearea"):
+		elif (ordering_type == "absolute_area"):
 			ordering = 2
 		else: 
-			raise ValueError('Please select one of the available ordering type: peakvalues | area | absolutearea')
+			raise ValueError('Please select one of the available ordering type: peak_value | area | absolute_area')
         
-		if (normalizationtype == 'local'):
+		if (normalization_type == 'local'):
 			normalization = 0
-		elif (normalizationtype == 'maxvalue'):
+		elif (normalization_type == 'max_value'):
 			normalization = 1
 		else:
-			raise ValueError('Please select one of the available normalization: local | maxvalue')
+			raise ValueError('Please select one of the available normalization: local | max_value')
 
 		self.c_library.pySensitivityPostProcessor.argtypes = [c_char_p, # kinetic folder
                                                 c_char_p,  # output folder
@@ -154,8 +154,8 @@ class pySMOKEpostproccesor:
 
 		self.c_library.pySensitivityPostProcessor.restype = c_int
 
-		coefficients = (c_double * numberofreactions)()
-		reactions = (c_int * numberofreactions)()
+		coefficients = (c_double * number_of_reactions)()
+		reactions = (c_int * number_of_reactions)()
 
 
 		code = self.c_library.pySensitivityPostProcessor(c_char_p(self.kineticFolder), # kinetic folder
@@ -164,12 +164,12 @@ class pySMOKEpostproccesor:
                                                     c_int(sensitivity),                # sensitivity type 0: local | 1: global | 2: region
                                                     c_int(ordering),                   # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                     c_int(normalization),              # normalization type 0: local | 1: maxvalue
-                                                    c_double(sensitivitylocalvalue),       # sensitivity local value
-                                                    c_double(sensitivityregionlowervalue), # sensitivity region lower value
-                                                    c_double(sensitivityregionuppervalue), # sensitivity region upper value
-                                                    byref(coefficients),                   # sensitivity coefficients
-                                                    byref(reactions),                      # reactions indices
-                                                    c_int(numberofreactions))              # sensitivity number of reactions
+                                                    c_double(local_value),			   # sensitivity local value
+                                                    c_double(lower_value),			   # sensitivity region lower value
+                                                    c_double(upper_value),			   # sensitivity region upper value
+                                                    byref(coefficients),			   # sensitivity coefficients
+                                                    byref(reactions),				   # reactions indices
+                                                    c_int(number_of_reactions))		   # sensitivity number of reactions
         
 		#  0-based
 		# reaction-names 1-based
@@ -187,16 +187,16 @@ class pySMOKEpostproccesor:
 		else:
 			raise ValueError('exit code != 0') # TODO
 	
-	def FluxAnalysis(self, specie: str, element: str, fluxanalysistype: str, 
-						thickness: str, thicknesslogscale: bool, 
-						labeltype: str, depth: int = 0, width: int = 0, 
-						thresold: float = 0, ropalocalvalue: float = 0):
+	def FluxAnalysis(self, specie: str, element: str, flux_analysis_type: str, 
+						thickness: str, thickness_log_scale: bool, 
+						label_type: str, depth: int = 2, width: int = 5, 
+						threshold: float = 0, local_value: float = 0.01):
 		specie = bytes(specie, 'utf-8')
 		element = bytes(element, 'utf-8')
 		
-		if(fluxanalysistype == 'production'):
+		if(flux_analysis_type == 'production'):
 			flux = 1
-		elif(fluxanalysistype == 'destruction'):
+		elif(flux_analysis_type == 'destruction'):
 			flux = 0
 		else:
 			raise ValueError("The available type for the flux analysis are production | destruction")
@@ -208,9 +208,9 @@ class pySMOKEpostproccesor:
 		else:
 			raise ValueError("The available type for the caluclation of the thicknsss are absolute | relative(%)")
 	
-		if(labeltype == 'absolute'):
+		if(label_type == 'absolute'):
 			label = 0
-		elif(labeltype == 'relative'):
+		elif(label_type == 'relative'):
 			label = 1
 		else:
 			raise ValueError("The available type for the labeling are absolute | relative(%)")
@@ -246,13 +246,13 @@ class pySMOKEpostproccesor:
 											c_char_p(specie),			 # specie
 											c_char_p(element),			 # element
 											c_int(flux),				 # flux analysis type
-											c_double(ropalocalvalue),	 # ropa local value
+											c_double(local_value),		 # ropa local value
 											c_int(thick),				 # thickness 0 absolute | 1 relative(%)
-											c_bool(thicknesslogscale),   # thickness log scale
+											c_bool(thickness_log_scale), # thickness log scale
 											c_int(label),				 # labeling type 0 absolute | 1 relative(%)
 											c_int(depth),				 # depth
 											c_int(width),				 # width
-											c_double(thresold),			 # thresold
+											c_double(threshold),		 # threshold
 											byref(indexFirstName),		 # indexes of the first name
 											byref(indexSecondName),		 # indexes of the second name
 											byref(computedThickness),	 # computed thicknes value
@@ -273,7 +273,7 @@ class pySMOKEpostproccesor:
 			self.firstNames.append(KineticMap.returnSpecieNameFromIndex(indexFirstName[j]))
 			self.secondNames.append(KineticMap.returnSpecieNameFromIndex(indexSecondName[j]))
 
-		Graph = GrapWirter(fluxanalysistype)
+		Graph = GrapWirter(flux_analysis_type)
 		Graph = Graph.CreateGraph(self.firstNames, self.secondNames, computedThickness, computedLabel)
 
 		return Graph
