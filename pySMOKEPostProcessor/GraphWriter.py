@@ -6,10 +6,15 @@ DESCRIPTION: TODO
 
 class GrapWirter:
 
-    def __init__(self):
+    def __init__(self, fluxanalysistype: str):
         
         self.G = nx.DiGraph()
         
+        if(fluxanalysistype == 'production'):
+            self.color = "blue"
+        elif(fluxanalysistype == 'destruction'):
+            self.color = "red"
+
     def CreateGraph(self, edgeStart, edgeEnd, thickness, label):
         
         NodesNames = []
@@ -17,13 +22,16 @@ class GrapWirter:
         
         self.AddNodes(NodesNames)
         self.AddEdges(edgeStart, edgeEnd, thickness, label)
+
+        self.G.graph['graph'] = {"overlap": "false", "fontsize":14} # settings just for Graphviz style visualization
+        self.G.graph['node'] = {"shape": "circle"} # settings just for Graphviz style visualization
         
         return self.G
 
     def AddNodes(self, NodesNames):
         for name in NodesNames:
             self.G.add_nodes_from([
-                (name,{"color": "green"})
+                (name,{"color": "black"})
             ])
 
     def AddEdges(self, edgeStart, edgeEnd, tck, edgeLabel):
@@ -31,7 +39,10 @@ class GrapWirter:
         for j in range(len(edgeStart)):
             self.G.add_edges_from([
                     (edgeStart[j], 
-                    edgeEnd[j], {"color": "blue", 
+                    edgeEnd[j], {"color": self.color, 
                                 "weight": tck[j], 
-                                "label": str(round(edgeLabel[j],3)) + " %"})
+                                "label": "   " + str(round(edgeLabel[j],3)) + " %",
+                                "penwidth": tck[j]})
             ])
+
+        
