@@ -35,13 +35,25 @@ class GrapWirter:
             ])
 
     def AddEdges(self, edgeStart, edgeEnd, tck, edgeLabel):
-    
+        
         for j in range(len(edgeStart)):
+            
+            if(edgeLabel[j] > 10):
+                label_str = "   " + str(round(edgeLabel[j],1)) + " %"
+            elif(edgeLabel[j]>1):
+                label_str = "   " + str(round(edgeLabel[j],2)) + " %"
+            elif(edgeLabel[j]>0.1):
+                label_str = "   " + str(round(edgeLabel[j],3)) + " %"
+            elif(edgeLabel[j]>0.01):
+                label_str = "   " + str(round(edgeLabel[j],4)) + " %"
+            else:
+                label_str = "   " + str(format(edgeLabel[j],'.2E')) + " %"
+
             self.G.add_edges_from([
                     (edgeStart[j], 
                     edgeEnd[j], {"color": self.color, 
                                 "weight": tck[j], 
-                                "label": "   " + str(round(edgeLabel[j],3)) + " %",
+                                "label": label_str,
                                 "penwidth": tck[j]})
             ])
 
