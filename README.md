@@ -10,9 +10,10 @@ Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor
 
 ## Features
 
-- **Rate Of Production Analysis**: Global, Region, Local
-- **Sensitivity Analysis**: Global, Region, Local
+- **Rate Of Production Analysis**
+- **Sensitivity Analysis**
 - **Flux Analysis**
 - **Reaction Rates plots**: TODO
+- **Sensitivity Coefficients plots**: TODO
 
 ## Examples
