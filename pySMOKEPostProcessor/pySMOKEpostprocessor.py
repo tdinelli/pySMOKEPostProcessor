@@ -109,11 +109,11 @@ class pySMOKEpostproccesor:
 		else:
 			raise ValueError('exit code != 0') # TODO
 
-	def SensitivityAnalysis(self, specie: str, sensitivity_type: str, ordering_type:str,
+	def SensitivityAnalysis(self, target: str, sensitivity_type: str, ordering_type:str,
                             normalization_type:str, local_value: float = 0, 
                             lower_value: float = 0, upper_value: float = 0, 
                             number_of_reactions: int = 10):
-		specie = bytes(specie, 'utf-8')
+		target = bytes(target, 'utf-8')
 		if (sensitivity_type == 'global'):
 			sensitivity = 1
 		elif (sensitivity_type == "local"):
@@ -141,7 +141,7 @@ class pySMOKEpostproccesor:
 
 		self.c_library.pySensitivityPostProcessor.argtypes = [c_char_p, # kinetic folder
                                                 c_char_p,  # output folder
-                                                c_char_p,  # specie
+                                                c_char_p,  # target
                                                 c_int,     # sensitivity type 0: local | 1: global | 2: region
                                                 c_int,     # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                 c_int,     # normalization type 0: local | 1: maxvalue
@@ -160,7 +160,7 @@ class pySMOKEpostproccesor:
 
 		code = self.c_library.pySensitivityPostProcessor(c_char_p(self.kineticFolder), # kinetic folder
                                                     c_char_p(self.outputFolder),       # output folder
-                                                    c_char_p(specie),                  # specie
+                                                    c_char_p(target),                  # target
                                                     c_int(sensitivity),                # sensitivity type 0: local | 1: global | 2: region
                                                     c_int(ordering),                   # ordering type 0: peakvalues | 1: area | 2: absolutearea
                                                     c_int(normalization),              # normalization type 0: local | 1: maxvalue

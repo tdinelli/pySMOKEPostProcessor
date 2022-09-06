@@ -46,12 +46,12 @@ PostProcessor::PostProcessor(std::string postporcessorType, std::string kineticF
 	outputFolder_ = outputFolder;
 }
 
-void PostProcessor::Prepare(std::string specie, int type, double local_value, double lower_value, 
+void PostProcessor::Prepare(std::string target, int type, double local_value, double lower_value, 
 							double upper_value, int sensitivity_normalization_type, 
 							int sensitivity_ordering_type)
 {
 		
-	species_ = specie;
+	target_ = target;
 		
 	localValue_ = local_value;
     lowerBound_ = lower_value;
@@ -160,7 +160,7 @@ void PostProcessor::PrepareFlux(std::string specie, std::string element, int typ
 int PostProcessor::ComputeROPAPython(double* coefficients, int* reactions, int len)
 {
     ROPA* widget;
-    widget = new ROPA(kineticFolder_, outputFolder_, Type_, species_, localValue_, lowerBound_, upperBound_);
+    widget = new ROPA(kineticFolder_, outputFolder_, Type_, target_, localValue_, lowerBound_, upperBound_);
 	data_->ReadFileResults(outputFolder_);
 	data_->ReadKineticMechanism(kineticFolder_);
 	widget->SetDatabase(data_);
@@ -170,7 +170,7 @@ int PostProcessor::ComputeROPAPython(double* coefficients, int* reactions, int l
 int PostProcessor::ComputeSensitivityPython(double* coefficients, int* reactions, int len) 
 {
 	Sensitivities* widget;
-	widget = new Sensitivities(normalizationType_, Type_, orderingType_, species_, localValue_, lowerBound_, upperBound_);
+	widget = new Sensitivities(normalizationType_, Type_, orderingType_, target_, localValue_, lowerBound_, upperBound_);
 	data_->ReadFileResults(outputFolder_);
 	data_->ReadKineticMechanism(kineticFolder_);
 	widget->SetDatabase(data_);

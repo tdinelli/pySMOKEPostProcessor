@@ -39,7 +39,7 @@
 #include "Sensitivities_Database.h"
 #include "Utilities.h"
 
-Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string specie, double localValue, double lowerBound, double upperBound)
+Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string target, double localValue, double lowerBound, double upperBound)
 {
 	normalizationType_ = normalizationType;
 	sensitivityType_ = sensitivityType;
@@ -49,7 +49,7 @@ Sensitivities::Sensitivities(std::string normalizationType, std::string sensitiv
 	lowerBound_ = lowerBound;
 	upperBound_ = upperBound;
 
-	specie_ = specie;
+	target_ = target;
 }
 
 Sensitivities::~Sensitivities()
@@ -425,10 +425,10 @@ int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coeff
 
 int Sensitivities::ReadSensitvityCoefficients()
 {
-	if (specie_.size() == 0)
+	if (target_.size() == 0)
 		return -5;
 
-	sensitivities->ReadFromChildFile(specie_);
+	sensitivities->ReadFromChildFile(target_);
 
 	return 0;
 }

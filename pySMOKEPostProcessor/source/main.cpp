@@ -88,7 +88,7 @@ extern "C" int pyROPAPostProcessor(
 extern "C" int pySensitivityPostProcessor(
 	char* kineticFolder,
 	char* outputFolder,
-	char* specie,
+	char* target,
 	int sensitivity_type,
 	int ordering_type,
 	int normalization_type,
@@ -104,7 +104,7 @@ extern "C" int pySensitivityPostProcessor(
 	PostProcessor* pp;
 	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
 	
-	pp->Prepare(specie, sensitivity_type, sensitivity_local_value, 
+	pp->Prepare(target, sensitivity_type, sensitivity_local_value, 
 				sensitivity_region_lower_value, sensitivity_region_upper_value, 
 				normalization_type, ordering_type);
 

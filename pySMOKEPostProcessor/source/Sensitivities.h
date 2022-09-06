@@ -70,7 +70,7 @@ private:
 	std::string normalizationType_;
 	std::string sensitivityType_;
 	std::string orderingType_;
-	std::string specie_;
+	std::string target_;
 
 	double localValue_;
 	double lowerBound_;

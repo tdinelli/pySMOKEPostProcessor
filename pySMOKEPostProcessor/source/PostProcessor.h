@@ -62,7 +62,8 @@ public:
 	std::string Type_;
 	std::string kineticFolder_;
 	std::string outputFolder_;
-	std::string species_;
+	std::string target_; // this could be a specie or a target like temperature
+	std::string species_; // this is ONLY for the flux analysis
 	std::string element_;
 
 	std::string normalizationType_;
