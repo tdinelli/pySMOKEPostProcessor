@@ -8,6 +8,22 @@ Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor
 - Eigen (https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - Boost (https://www.boost.org/)
 
+## Installing 
+
+**N.B.** At the moment the package is tested only in Linux however soon there will be also a detailed procedure also for Windows and MacOS.
+
+Clone this repository into your system
+```bash
+$ git clone https://github.com/Titodinelli/pySMOKEPostProcessor
+```
+After the cloning edit the file named preconfigure.sh inside the folder [**project/Linux**](project/Linux/) adding the required paths to the necessary libraries. And run the following commands paying attention to remain into the same folder:
+
+```bash
+$ sh preconfigure.sh
+$ make
+$ make install
+```
+
 ## Features
 
 - **Rate Of Production Analysis**
