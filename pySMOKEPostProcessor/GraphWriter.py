@@ -9,7 +9,7 @@ class GrapWirter:
     def __init__(self, fluxanalysistype: str):
         
         self.G = nx.DiGraph()
-        
+        self.fluxanalysistype_ = fluxanalysistype
         if(fluxanalysistype == 'production'):
             self.color = "blue"
         elif(fluxanalysistype == 'destruction'):
@@ -49,12 +49,22 @@ class GrapWirter:
             else:
                 label_str = "   " + str(format(edgeLabel[j],'.2E')) + " %"
 
-            self.G.add_edges_from([
-                    (edgeStart[j], 
-                    edgeEnd[j], {"color": self.color, 
-                                "weight": tck[j], 
-                                "label": label_str,
-                                "penwidth": tck[j]})
-            ])
+            if(self.fluxanalysistype_ == 'destruction'):
+                self.G.add_edges_from([
+                        (edgeStart[j], 
+                        edgeEnd[j], {"color": self.color, 
+                                    "weight": tck[j], 
+                                    "label": label_str,
+                                    "penwidth": tck[j]})
+                ])
+            elif(self.fluxanalysistype_ == 'production'):
+                # Arrows have to point the opposite direction
+                self.G.add_edges_from([
+                        (edgeEnd[j], 
+                        edgeStart[j], {"color": self.color, 
+                                    "weight": tck[j], 
+                                    "label": label_str,
+                                    "penwidth": tck[j]})
+                ])    
 
         
