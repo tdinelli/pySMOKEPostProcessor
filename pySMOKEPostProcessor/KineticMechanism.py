@@ -40,13 +40,13 @@ class KineticMechanism:
     
     def returnReactionNameFromIndex(self, reactionIndex: int):
         # reactionIndex 0-based
-        if(reactionIndex + 1 <= self.nr):
+        if(reactionIndex <= self.nr):
 
-            name = "R" + str(reactionIndex + 1) + ": " + self.reaction_strings_[reactionIndex]
+            name = "R" + str(reactionIndex) + ": " + self.reaction_strings_[reactionIndex-1]
             return name
         else:
 
-            local_index = reactionIndex + 1 - self.nr
+            local_index = reactionIndex - self.nr
             if(local_index <= self.NumberOfFallOffReactions):
 
                 global_index = self.IndicesOfFallOffReactions[local_index-1]
