@@ -40,8 +40,9 @@ class pySMOKEpostproccesor:
 
 	def __init__(self, kinetic_mechanism: str, results_folder: str, verbose = False):
         
-		path = '/home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/project/myLINUX/pySMOKEPostProcessor.o'
-        
+		path = '../project/myLINUX/pySMOKEPostProcessor.o'
+        # /home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/
+
 		self.kineticFolder = bytes(kinetic_mechanism, 'utf-8')
 		self.outputFolder = bytes(results_folder, 'utf-8')
 		self.verbose = verbose
@@ -93,7 +94,7 @@ class pySMOKEpostproccesor:
                                             byref(reactions),                   # ropa reactions indices
                                             c_int(number_of_reactions))			# ropa number of reactions
 
-		#  0-based
+		# 0-based
 		# reaction-names 1-based
 		reaction_names = []
 		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
@@ -171,7 +172,7 @@ class pySMOKEpostproccesor:
                                                     byref(reactions),				   # reactions indices
                                                     c_int(number_of_reactions))		   # sensitivity number of reactions
         
-		#  0-based
+		# 0-based
 		# reaction-names 1-based
 		reaction_names = []
 		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))

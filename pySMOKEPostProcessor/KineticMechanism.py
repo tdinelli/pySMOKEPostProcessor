@@ -37,25 +37,26 @@ class KineticMechanism:
         self.NumberOfCabrReactions = int(Cabr[0])
         listIndicesOfCabrReactions = Cabr[1:]
         self.IndicesOfCabrReactions = [int(i) for i in listIndicesOfCabrReactions] 
-    
+        
     def returnReactionNameFromIndex(self, reactionIndex: int):
         # reactionIndex 0-based
-        if(reactionIndex <= self.nr):
 
-            name = "R" + str(reactionIndex) + ": " + self.reaction_strings_[reactionIndex-1]
+        if(reactionIndex + 1 <= self.nr):
+
+            name = "R" + str(reactionIndex + 1) + ": " + self.reaction_strings_[reactionIndex]
             return name
         else:
 
-            local_index = reactionIndex - self.nr
+            local_index = reactionIndex + 1 - self.nr
             if(local_index <= self.NumberOfFallOffReactions):
 
-                global_index = self.IndicesOfFallOffReactions[local_index-1]
-                name = "R" + str(global_index) + "(inf): " + self.reaction_strings_[global_index-1]
+                global_index = self.IndicesOfFallOffReactions[local_index - 1]
+                name = "R" + str(global_index) + "(inf): " + self.reaction_strings_[global_index - 1]
                 return name
             else:
 
-                global_index = self.IndicesOfCabrReactions[local_index- self.nr - 1]
-                name = "R" + str(global_index) + "(inf): " + self.reaction_strings_[global_index-1]
+                global_index = self.IndicesOfCabrReactions[local_index - self.nr - 1]
+                name = "R" + str(global_index) + "(inf): " + self.reaction_strings_[global_index - 1]
                 return name
     
     def returnSpecieNameFromIndex(self, specieIndex: int):

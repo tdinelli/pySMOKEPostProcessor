@@ -416,9 +416,10 @@ int Sensitivities::Sensitivities_Python_PostProcessing(double* sensitivity_coeff
 			//}
 		//}
 	}
+	// indices it's 1-based since we have to postprocess here it is returned 0-based
 	for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
 		sensitivity_coefficients[i] = coefficients[i];
-		reactions[i] = indices[i];
+		reactions[i] = indices[i] - 1;
 	}
 	return 0;
 }
