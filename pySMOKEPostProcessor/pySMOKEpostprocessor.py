@@ -40,8 +40,8 @@ class pySMOKEpostproccesor:
 
 	def __init__(self, kinetic_mechanism: str, results_folder: str, verbose = False):
         
-		path = '../project/myLINUX/pySMOKEPostProcessor.o'
-        # /home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/
+		path = '../project/lib/bin/pySMOKEPostProcessor.o'
+                # /home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/
 
 		self.kineticFolder = bytes(kinetic_mechanism, 'utf-8')
 		self.outputFolder = bytes(results_folder, 'utf-8')
