@@ -14,14 +14,14 @@ Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor
 
 Clone this repository into your system
 ```bash
-$ git clone https://github.com/Titodinelli/pySMOKEPostProcessor
+git clone https://github.com/Titodinelli/pySMOKEPostProcessor
 ```
 After the cloning edit the file named preconfigure.sh inside the folder [**project/Linux**](project/Linux/) adding the required paths to the necessary libraries. And run the following commands paying attention to remain into the same folder:
 
 ```bash
-$ sh preconfigure.sh
-$ make
-$ make install
+sh preconfigure.sh
+make
+make install
 ```
 
 ## Features
