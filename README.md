@@ -8,6 +8,19 @@ Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor
 - Eigen (https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - Boost (https://www.boost.org/)
 
+## External python packages dependencies
+
+- pydot
+- graphviz 
+- ctypes
+- Element Tree
+- networkx
+
+Just to run the [examples](examples/)
+
+- pandas
+- numpy
+- matplotlib
 ## Installing 
 
 **N.B.** At the moment the package is tested only in Linux however soon there will be also a detailed procedure also for Windows and MacOS.
@@ -31,5 +44,9 @@ make install
 - **Flux Analysis**
 - **Reaction Rates plots**: TODO
 - **Sensitivity Coefficients plots**: TODO
+- **Adaption to reaction class ROPA**: TODO
+- **Stoichiometric map**: TODO
+- **Enabling PostProcessing after @OnTheFlyPostProcessing**: TODO
+- **Association between reaction name and index inside the kinetic scheme**: TODO
 
 ## Examples
