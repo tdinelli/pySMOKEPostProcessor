@@ -1,0 +1,70 @@
+//-----------------------------------------------------------------//
+//     ____                    ______ __  __  ____  _  ________    //
+//    / __ \                  /  ___ |  \/  |/ __ \| |/ /  ____|   //
+//   | |  | |_ __   ___ _ __ |  (___ | \  / | |  | | ' /| |__      //
+//   | |  | | '_ \ / _ \ '_ \ \___  \| |\/| | |  | |  < |  __|     //
+//   | |__| | |_) |  __/ | | |____)  | |  | | |__| | . \| |____    //
+//    \____/| .__/ \___|_| |_|______/|_|  |_|\____/|_|\_\______|   //
+//         | |                                                     //
+//         |_|                                                     //
+//                                                                 //
+//                http://www.opensmoke.polimi.it/                  //
+//             http://creckmodeling.chem.polimi.it/                //
+//-----------------------------------------------------------------//
+
+Dictionary BatchReactor
+{
+		@KineticsFolder                    /home/chimica2/tdinelli/4pp/skeletalv0.2/kinetics;
+		@Type                              NonIsothermal-ConstantVolume;
+		@InitialStatus                     initial-mixture;
+		@EndTime                           0.1   s;
+		@OdeParameters                     ode-parameters;
+		@IgnitionDelayTimes                ignition-delay-times;
+		@Options                           output-options;
+        @OnTheFlyPostProcessing            onthefly-post-processing;
+}
+
+Dictionary initial-mixture
+{
+		@Temperature                       1350     K;
+		@Pressure                          1   atm;
+		@MoleFractions                     DMM   0.01   O2   0.08   AR   0.91;
+
+}
+
+Dictionary ignition-delay-times
+{
+		@Temperature                       true;
+		@Pressure                          true;
+		@Species                           OH   CH;
+		@SpeciesMaxIntercept               OH   CH;
+		@SpeciesThreshold                  1e-12;
+		@MinimumTime                       1e-9   s;
+		@MinimumTimeInterval               1e-10   s;
+
+}
+
+Dictionary ode-parameters
+{
+		@OdeSolver                         OpenSMOKE;
+		@AbsoluteTolerance                 1e-16;
+		@RelativeTolerance                 1e-9;
+
+}
+
+Dictionary output-options
+{
+		@StepsFile                         1;
+		@StepsVideo                        50;
+		@VerboseASCIIFile                  true;
+		@VerboseVideo                      true;
+		@OutputSpecies                     OH   CH;
+		@OutputFolder                      Output;
+
+}
+
+Dictionary onthefly-post-processing
+{
+        @FormationRates     ALL;
+        @ReactionRates      ALL;
+}
