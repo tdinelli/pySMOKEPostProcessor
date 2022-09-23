@@ -44,9 +44,9 @@ make install
 - **Flux Analysis**
 - **Reaction Rates plots**: TODO
 - **Sensitivity Coefficients plots**: TODO
-- **Adaption to reaction class ROPA**: TODO
-- **Stoichiometric map**: TODO
-- **Enabling PostProcessing after @OnTheFlyPostProcessing**: TODO
-- **Association between reaction name and index inside the kinetic scheme**: TODO
+- **Adaption to ROPA reaction class post processing**: TODO
+- **Stoichiometric map**: WIP
+- **Enabling PostProcessing after @OnTheFlyPostProcessing**
+- **Association between reaction name and index inside the kinetic scheme**
 
 ## Examples
