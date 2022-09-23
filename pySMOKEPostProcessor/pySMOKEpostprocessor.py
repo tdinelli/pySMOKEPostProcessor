@@ -1,5 +1,5 @@
 from ctypes import c_bool, c_int, c_double, c_void_p, c_char_p, byref, cdll
-from KineticMechanism import KineticMechanism
+from maps.KineticMap import KineticMap
 from GraphWriter import GrapWirter
 import os
 
@@ -97,9 +97,9 @@ class pySMOKEpostproccesor:
 		# 0-based
 		# reaction-names 1-based
 		reaction_names = []
-		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
+		KineticMap_ = KineticMap(self.kineticFolder.decode("utf-8"))
 		for i in reactions:
-			reaction_names.append(KineticMap.returnReactionNameFromIndex(i))
+			reaction_names.append(KineticMap_.ReactionNameFromIndex(i))
 
 		if (code == 0):
 			if(self.verbose != False):
@@ -175,9 +175,9 @@ class pySMOKEpostproccesor:
 		# 0-based
 		# reaction-names 1-based
 		reaction_names = []
-		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
+		KineticMap_ = KineticMap(self.kineticFolder.decode("utf-8"))
 		for i in reactions:
-			reaction_names.append(KineticMap.returnReactionNameFromIndex(i))
+			reaction_names.append(KineticMap_.ReactionNameFromIndex(i))
 
 		if (code == 0):
 			if(self.verbose != False):
@@ -268,11 +268,11 @@ class pySMOKEpostproccesor:
 
 		self.firstNames = []
 		self.secondNames = []
-		KineticMap = KineticMechanism(self.kineticFolder.decode("utf-8"))
+		KineticMap_ = KineticMap(self.kineticFolder.decode("utf-8"))
 
 		for j in range(len(indexFirstName)):
-			self.firstNames.append(KineticMap.returnSpecieNameFromIndex(indexFirstName[j]))
-			self.secondNames.append(KineticMap.returnSpecieNameFromIndex(indexSecondName[j]))
+			self.firstNames.append(KineticMap_.SpecieNameFromIndex(indexFirstName[j]))
+			self.secondNames.append(KineticMap_.SpecieNameFromIndex(indexSecondName[j]))
 
 		Graph = GrapWirter(flux_analysis_type)
 		Graph = Graph.CreateGraph(self.firstNames, self.secondNames, computedThickness, computedLabel)
