@@ -19,7 +19,7 @@ import sys
 import os
 
 # Import internal modules
-from KineticMap import KineticMap
+from maps.KineticMap import KineticMap
 
 class StoichiometricMap:
 

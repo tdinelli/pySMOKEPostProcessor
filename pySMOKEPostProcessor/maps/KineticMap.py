@@ -160,12 +160,19 @@ class KineticMap:
                 name = "R" + str(global_index) + "(inf): " + self.reaction_names[global_index - 1]
                 return name
     
-    def SpecieNameFromIndex(self, specieIndex: int):
-        return self.species[specieIndex]
-    
     def ReactionIndexFromName(self, name: str):
         for i in range(0, len(self.reaction_names)):
             if(name == self.reaction_names[i]):
                 return i # this is the index of the reaction 0-based 
                          # pay attention to cabr and falloff reactions 
+        
+    
+    def SpecieNameFromIndex(self, specieIndex: int):
+        return self.species[specieIndex]
+    
+    def IndexFromSpecieName(self, specieName: str):
+        
+        for i in range(0, self.NumberOfSpecies):
+            if(specieName == self.species[i]):
+                return i
 
