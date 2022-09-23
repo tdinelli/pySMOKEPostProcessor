@@ -54,3 +54,4 @@ examples/Sensitivity/Output-02/Sensitivities.temperature.xml
 examples/roba/
 project/MyMac/
 project/lib/
+pySMOKEPostProcessor/maps/prova_kinMAP.py
