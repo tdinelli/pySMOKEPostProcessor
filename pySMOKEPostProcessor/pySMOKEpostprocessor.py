@@ -7,7 +7,7 @@ import os
 DESCRIPTION: TODO
 """
 
-class pySMOKEpostproccesor:
+class pySMOKEpostprocessor:
     
 	def CheckInputSettings(self):
 
