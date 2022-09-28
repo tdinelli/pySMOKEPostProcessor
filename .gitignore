@@ -55,3 +55,6 @@ examples/roba/
 project/MyMac/
 project/lib/
 pySMOKEPostProcessor/maps/prova_kinMAP.py
+dist/
+build/
+pySMOKEPostProcessor.egg-info/
