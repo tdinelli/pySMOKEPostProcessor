@@ -36,6 +36,14 @@ sh preconfigure.sh
 make
 make install
 ```
+## Install with pip
+
+```bash
+python setup.py bdist_wheel
+```
+```bash
+pip install dist/pySMOKEPostProcessor-0.1.0-py3-none-any.whl
+```
 
 ## Features
 
