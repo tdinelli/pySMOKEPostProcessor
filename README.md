@@ -21,9 +21,9 @@ Just to run the [examples](examples/)
 - pandas
 - numpy
 - matplotlib
-## Installing 
+## Compile
 
-**N.B.** At the moment the package is tested only in Linux however soon there will be also a detailed procedure also for Windows and MacOS.
+**N.B.** At the moment the package is tested only in Linux and MacOS however soon there will be also a detailed procedure also for Windows.
 
 Clone this repository into your system
 ```bash
@@ -36,7 +36,7 @@ sh preconfigure.sh
 make
 make install
 ```
-## Install with pip
+## Install with 'pip'
 
 ```bash
 python setup.py bdist_wheel
@@ -54,7 +54,7 @@ pip install dist/pySMOKEPostProcessor-0.1.0-py3-none-any.whl
 - **Sensitivity Coefficients plots**: TODO
 - **Adaption to ROPA reaction class post processing**: TODO
 - **Stoichiometric map**: WIP
-- **Enabling PostProcessing after @OnTheFlyPostProcessing**
+- **Enabling PostProcessing after "@OnTheFlyPostProcessing"**
 - **Association between reaction name and index inside the kinetic scheme**
 
 ## Examples
