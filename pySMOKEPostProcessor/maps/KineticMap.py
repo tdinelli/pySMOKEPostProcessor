@@ -56,22 +56,22 @@ class KineticMap:
         mwe = []
         for elem in elements:
             if (elem == 'C'): 
-                iC = elements.index('C')
+                self.iC = elements.index('C')
                 mwe.append(12.010999679565430)
             if (elem == 'H'): 
-                iH = elements.index('H')
+                self.iH = elements.index('H')
                 mwe.append(1.008000016212463)
             if (elem == 'O'): 
-                iO = elements.index('O')
+                self.iO = elements.index('O')
                 mwe.append(15.998999595642090)
             if (elem == 'N'): 
-                iN = elements.index('N')
+                self.iN = elements.index('N')
                 mwe.append(14.0069999694824)
             if (elem == 'HE'): 
-                iHE = elements.index('HE')
+                self.iHE = elements.index('HE')
                 mwe.append(4.002999782562256)
             if (elem == 'AR'): 
-                iAR = elements.index('AR')
+                self.iAR = elements.index('AR')
                 mwe.append(39.948001861572270)
         mwe = np.array(mwe)
         
@@ -128,11 +128,6 @@ class KineticMap:
         self.NumberOfElements = NumberOfElements 
         self.NumberOfSpecies = NumberOfSpecies
         self.NumberOfReactions = NumberOfReactions
-        
-        self.iC = iC
-        self.iH = iH
-        self.iO = iO
-        self.iN = iN
         
         self.mwe = mwe
         self.mws = mws
