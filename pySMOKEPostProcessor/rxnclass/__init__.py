@@ -1,0 +1,3 @@
+from pySMOKEPostProcessor.rxnclass import rxnclass
+from pySMOKEPostProcessor.rxnclass import RxnClassGroups
+
