@@ -80,9 +80,9 @@ class KineticMap:
                 
         # Soot classes (if they exists)
         # This is for postprocessing soot (currently not implemented)
-        reaction_class_name = []
-        reaction_class_size = []
-        reaction_class_indices = []
+        # reaction_class_name = []
+        # reaction_class_size = []
+        # reaction_class_indices = []
         
         # Reading kinetics
         kinetics = root.find('Kinetics')
@@ -128,6 +128,7 @@ class KineticMap:
         self.NumberOfElements = NumberOfElements 
         self.NumberOfSpecies = NumberOfSpecies
         self.NumberOfReactions = NumberOfReactions
+        self.kinetics = kinetics
         
         self.mwe = mwe
         self.mws = mws
@@ -140,6 +141,40 @@ class KineticMap:
         
         self.reactions = []
 
+    def Classes(self):
+        """ read reaction classes if present
+        """
+        reaction_classes = self.kinetics.find('ReactionClasses')
+        self.rxnclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
+        self.rxnsubclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
+        
+        if (reaction_classes != None):
+            # classes: {mainclass: {subclass: [indices]}}
+            classes = {}
+            for child in reaction_classes:
+                if (child.tag == 'MainClass'):
+                    classname = child.attrib['name']
+                    if classname not in list(classes.keys()):
+                        # initialize
+                        classes[classname] = {}
+                    for subclass in child:
+                        #if (subclass.tag == 'SubClass'): # should only contain subclass type
+                        subclassname = subclass.attrib['name']
+                        if subclassname not in list(classes[classname].keys()):
+                            classes[classname][subclassname] = []
+                        for subsec in subclass:
+                            if (subsec.tag == 'ReactionIndices'):
+                                dummy = (subsec.text).split()
+                                
+                                for i in dummy: # assign rxn indices
+                                    i = int(i) +1
+                                    classes[classname][subclassname].append(i)
+                                    self.rxnclass[i] = classname
+                                    self.rxnsubclass[i] = subclassname
+
+            # print(classes)
+            self.classes = classes
+            
     def ReactionNameFromIndex(self, reactionIndex: int):
         # reactionIndex 0-based
 

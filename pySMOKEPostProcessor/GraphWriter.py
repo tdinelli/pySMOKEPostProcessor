@@ -4,7 +4,7 @@ import networkx as nx
 DESCRIPTION: TODO
 """
 
-class GrapWirter:
+class GraphWriter:
 
     def __init__(self, fluxanalysistype: str):
         

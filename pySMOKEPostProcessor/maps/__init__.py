@@ -1,2 +1,2 @@
-#from .KineticMap import KineticMap
-#from .StoichiometricMap import StoichiometricMap
+from pySMOKEPostProcessor.maps.KineticMap import KineticMap
+from pySMOKEPostProcessor.maps.StoichiometricMap import StoichiometricMap
