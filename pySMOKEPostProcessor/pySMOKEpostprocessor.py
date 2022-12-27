@@ -1,7 +1,7 @@
 from ctypes import c_bool, c_int, c_double, c_void_p, c_char_p, byref, cdll
 import os
 from pySMOKEPostProcessor.maps.KineticMap import KineticMap
-from pySMOKEPostProcessor.plots.GraphWriter import GraphWriter
+from pySMOKEPostProcessor.GraphWriter import GraphWriter
 
 """
 DESCRIPTION: TODO
@@ -46,7 +46,7 @@ class pySMOKEpostprocessor:
 
     def __init__(self, kinetic_mechanism: str, results_folder: str, verbose=False):
 
-        path = os.path.join('/home/chimica2/lpratali/OS_POSTPROC/pySMOKEPostProcessor/project', 'lib', 'bin', 'pySMOKEPostProcessor.o')
+        path = os.path.join('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/project', 'lib', 'bin', 'pySMOKEPostProcessor.o')
         # /home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/
 
         self.kineticFolder = bytes(kinetic_mechanism, 'utf-8')
