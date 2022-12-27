@@ -36,13 +36,10 @@ sh preconfigure.sh
 make
 make install
 ```
-## Install with 'pip'
+## Installing
 
 ```bash
-python setup.py bdist_wheel
-```
-```bash
-pip install dist/pySMOKEPostProcessor-0.1.0-py3-none-any.whl
+python setup.py install
 ```
 
 ## Features
@@ -52,9 +49,7 @@ pip install dist/pySMOKEPostProcessor-0.1.0-py3-none-any.whl
 - **Flux Analysis**
 - **Reaction Rates plots**: TODO
 - **Sensitivity Coefficients plots**: TODO
-- **Adaption to ROPA reaction class post processing**: TODO
+- **Adaption to ROPA reaction class post processing**: (ALMOST)
 - **Stoichiometric map**: WIP
-- **Enabling PostProcessing after "@OnTheFlyPostProcessing"**
-- **Association between reaction name and index inside the kinetic scheme**
 
 ## Examples
