@@ -10,12 +10,11 @@ from pySMOKEPostProcessor.rxnclass.rxnclass import rxnclass
 from pySMOKEPostProcessor.rxnclass.rxnclass import rxnflux
 from pySMOKEPostProcessor.plots.heatmaps import plot_heatmap
 
-
 ###################################################################################################
-##################################################################################################
 
 class FluxByClass:
-    def __init__(self, kin_xml_fld, class_groups_fld):
+    
+    def __init__(self, kin_xml_fld, class_groups_fld, verbose: bool):
         """ read the kinetic mechanism and assign classes if available"""
 
         kinetics = KineticMap(kin_xml_fld)
@@ -33,16 +32,24 @@ class FluxByClass:
             class_groups_fld, 'rxn_class_groups.txt')
         
         # sort
-        rxns_sorted = rxnclass(reactions_all)
+        rxns_sorted = rxnclass(reactions_all, verbose=False)
         rxns_sorted.assign_class_grp(subcl_grp_dct)
         
         # assign to self
-        self.flux_sorted = rxnflux(rxns_sorted.rxn_class_df)
+        self.flux_sorted = rxnflux(rxns_sorted.rxn_class_df, verbose)
         self.kin_xml_fld = kin_xml_fld
         self.class_groups_fld = class_groups_fld
+        self.verbose = verbose
 
-    def process_flux(self, species_list, simul_name, simul_fld, n_of_rxns = 100, ropa_type = 'global'):
-        print('processing simul {}'.format(simul_fld))
+    def process_flux(self, 
+                    species_list, 
+                    simul_name, 
+                    simul_fld, 
+                    n_of_rxns = 100,
+                    ropa_type = 'global'):
+        
+        if self.verbose:
+            print('processing simul {}'.format(simul_fld))
 
         # simul output
         for sp in species_list:
@@ -77,5 +84,9 @@ class FluxByClass:
                 criteria_str = '-'.join(sortlist)
             else:
                 criteria_str = sortlist[0]
+
+            # TODO
+            # Plot utility should be separated
+            # sarebbe meglio far ritornare datframe e liste altrimenti diventa un casino
             plotpath = os.path.join(plt_fld, '{}_{}.png'.format(self.simul_name, criteria_str))
             plot_heatmap(sortdf, plotpath)

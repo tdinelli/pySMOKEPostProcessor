@@ -54,7 +54,7 @@ def check_bimol_type(speciestype, subclass):
 
 class rxnclass:
 
-    def __init__(self, reactions):
+    def __init__(self, reactions, verbose: bool):
         """ allocate dataframe 
         """
 
@@ -63,7 +63,7 @@ class rxnclass:
         self.rxn_class_df = pd.DataFrame(index=np.arange(1, len(
             reactions)+1), columns=['name', 'classgroup', 'speciestype', 'subclass', 'bimoltype'], dtype=object)
         self.reactions = reactions
-
+        self.verbose = verbose
         """ assign class and sublcass
         """
         for rxn in self.reactions:
@@ -95,9 +95,10 @@ class rxnclass:
                 continue
 
 class rxnflux:
-    def __init__(self, rxn_class_df):
+    def __init__(self, rxn_class_df, verbose: bool):
         """ initialize rxn class dataframe"""
         self.rxn_class_df = rxn_class_df
+        self.verbose = verbose
         
     def assign_flux(self, tot_rop_df):
         """ assign flux from the flux analysis
@@ -162,7 +163,8 @@ class rxnflux:
                     maxfl = max([fl0, fl1])
                     idxkeep = [idx0, idx1][[fl0, fl1].index(maxfl)]
                     idxrem = [idx0, idx1][1-[idx0, idx1].index(idxkeep)]
-                print('merging flux {} and removing {}'.format(self.rxn_class_df['name'][idxkeep], self.rxn_class_df['name'][idxrem]))
+                if self.verbose:
+                    print('merging flux {} and removing {}'.format(self.rxn_class_df['name'][idxkeep], self.rxn_class_df['name'][idxrem]))
                 self.rxn_class_df.loc[idxkeep, self.flux_cols] += self.rxn_class_df.loc[idxrem, self.flux_cols]
                 self.rxn_class_df = self.rxn_class_df.drop(idxrem, axis = 0)
                 rxns_irrev_series = rxns_irrev_series.drop(idxrem, axis = 0)
@@ -206,7 +208,8 @@ class rxnflux:
                 name = grp_idx
             else:
                 name = '['+']['.join(grp_idx)+']'
-            print(grp_idx, '\n', grp_df, '\n')
+            if self.verbose:
+                print(grp_idx, '\n', grp_df, '\n')
             new_sort_df[name] = grp_df[self.flux_cols].sum()
 
         # renormalize by species
@@ -216,8 +219,9 @@ class rxnflux:
             weight_factor = sum(abs(self.rxn_class_df[flux_sp_name]))/sum(abs(self.rxn_class_df_all[flux_sp_name]))
             #new_sort_df.loc[flux_sp_name] /= renorm_factor
             new_sort_df.loc[flux_sp_name] *= (weight_factor/renorm_factor)
-        
-        print(new_sort_df)
+
+        if self.verbose:
+            print(new_sort_df)
 
         return new_sort_df
 
