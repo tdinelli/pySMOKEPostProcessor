@@ -8,7 +8,7 @@ from pySMOKEPostProcessor.maps.KineticMap import KineticMap
 from pySMOKEPostProcessor.rxnclass.RxnClassGroups import ReadRxnGroups
 from pySMOKEPostProcessor.rxnclass.rxnclass import rxnclass
 from pySMOKEPostProcessor.rxnclass.rxnclass import rxnflux
-from pySMOKEPostProcessor.plots.heatmaps import plot_heatmap
+
 
 ###################################################################################################
 
@@ -23,7 +23,7 @@ class FluxByClass:
         for i in range(kinetics.NumberOfReactions):
 
             reaction = {    'index': i+1, 'name': kinetics.reaction_names[i], \
-                            'class': kinetics.rxnclass[i+1], 'subclass': kinetics.rxnsubclass[i+1]
+                            'class': kinetics.rxnclass[i+1], 'reactiontype': kinetics.rxnsubclass[i+1]
                     }
             reactions_all.append(reaction)
 
@@ -42,8 +42,7 @@ class FluxByClass:
         self.verbose = verbose
 
     def process_flux(self, 
-                    species_list, 
-                    simul_name, 
+                    species_list,
                     simul_fld, 
                     n_of_rxns = 100,
                     ropa_type = 'global'):
@@ -61,32 +60,22 @@ class FluxByClass:
             self.flux_sorted.assign_flux(tot_rop_df)
 
         self.flux_sorted.sum_fwbw()
-        self.simul_name = simul_name
         
-    def sort_and_filter(self, sortlists, filter_dcts, threshs, plt_fld):
-        # filter rxns
-        for i, sortlist in enumerate(sortlists):
-            filter_dct = filter_dcts[i]
-            rxns_sorted_i = copy.deepcopy(self.flux_sorted)
-            THRESH = threshs[i]
-            if filter_dct:
-                rxns_sorted_i.filter_class(filter_dct)
-            # filter flux
-            rxns_sorted_i.filter_flux(threshold=THRESH)
-            # sum same speciestype-classgroup-subclass together
-            sortdf = rxns_sorted_i.sortby(sortlist)
-            # drop unsorted cols
-            col_names = sortdf.columns
-            for col in col_names:
-                if 'UNSORTED' in col:
-                    sortdf = sortdf.drop(col, axis=1)
-            if len(sortlist) > 1:
-                criteria_str = '-'.join(sortlist)
-            else:
-                criteria_str = sortlist[0]
+    def sort_and_filter(self, sortlist, filter_dct, thresh):
+    # filter rxns
+        rxns_sorted = copy.deepcopy(self.flux_sorted)
+        if filter_dct:
+            rxns_sorted.filter_class(filter_dct)
+        # filter flux
+        rxns_sorted.filter_flux(threshold=thresh)
+        # sum same speciestype-classgroup-reactiontype together
+        sortdf = rxns_sorted.sortby(sortlist)
+        # drop unsorted cols
+        col_names = sortdf.columns
+        for col in col_names:
+            if 'UNSORTED' in col:
+                sortdf = sortdf.drop(col, axis=1)
 
-            # TODO
-            # Plot utility should be separated
-            # sarebbe meglio far ritornare datframe e liste altrimenti diventa un casino
-            plotpath = os.path.join(plt_fld, '{}_{}.png'.format(self.simul_name, criteria_str))
-            plot_heatmap(sortdf, plotpath)
+        return sortdf
+            
+            
