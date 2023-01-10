@@ -15,10 +15,10 @@ Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor
 - ctypes
 - Element Tree
 - networkx
+- pandas
 
 Just to run the [examples](examples/)
 
-- pandas
 - numpy
 - matplotlib
 ## Compile
@@ -29,13 +29,20 @@ Clone this repository into your system
 ```bash
 git clone https://github.com/Titodinelli/pySMOKEPostProcessor
 ```
-After the cloning edit the file named preconfigure.sh inside the folder [**project/Linux**](project/Linux/) adding the required paths to the necessary libraries. And run the following commands paying attention to remain into the same folder:
+Inside the base path of the repository (the one that contains the CMakeLists.txt file) run the following commands (note that they can change depending on the operative system): 
 
 ```bash
-sh preconfigure.sh
+mkdir build
+cd build
+cmake ..
 make
 make install
 ```
+In order to make CMAKE able to find the necessary libraries it is recommended to set the following environment variables:
+
+- export Boost_ROOT  = $ PATH_TO_YOUR_BOOST_INSTALLATION
+- export Eigen3_ROOT = $ PATH_TO_YOUR_EIGEN_INSTALLATION
+- export OpenSMOKEpp_ROOT = $ PATH_TO_YOUR_OPENSMOKE_INSTALLATION
 ## Installing
 
 ```bash
@@ -50,6 +57,5 @@ python setup.py install
 - **Reaction Rates plots**: TODO
 - **Sensitivity Coefficients plots**: TODO
 - **Adaption to ROPA reaction class post processing**: (ALMOST)
-- **Stoichiometric map**: WIP
 
 ## Examples
