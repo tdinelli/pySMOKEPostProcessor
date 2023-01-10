@@ -38,7 +38,13 @@
 #include "math/OpenSMOKEUtilities.h"
 #include <algorithm>
 
-ROPA::ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType,	std::string species, double localValue, double lowerBound, double upperBound)
+ROPA::ROPA(const std::string kineticFolder, 
+			std::string outputFolder, 
+			std::string ropaType, 
+			std::string species, 
+			double localValue, 
+			double lowerBound, 
+			double upperBound)
 {
 	ropaType_ = ropaType;
 	kineticFolder_ = kineticFolder;
