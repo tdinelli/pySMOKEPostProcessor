@@ -45,7 +45,7 @@ class pySMOKEpostprocessor:
 
     def __init__(self, kinetic_mechanism: str, results_folder: str, verbose=False):
 
-        path = os.path.join('/home/chimica2/lpratali/OS_POSTPROC/pySMOKEPostProcessor/project', 'lib', 'bin', 'pySMOKEPostProcessor.o')
+        path = os.path.join(os.getcwd(), '..', 'build', 'pySMOKEPostProcessor.o')
         self.kineticFolder = bytes(kinetic_mechanism, 'utf-8')
         self.outputFolder = bytes(results_folder, 'utf-8')
         self.verbose = verbose
