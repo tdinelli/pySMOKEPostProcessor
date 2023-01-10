@@ -7,7 +7,6 @@ from pySMOKEPostProcessor.GraphWriter import GraphWriter
 DESCRIPTION: TODO
 """
 
-
 class pySMOKEpostprocessor:
 
     def CheckInputSettings(self):
@@ -73,45 +72,33 @@ class pySMOKEpostprocessor:
         self.c_library.pyROPAPostProcessor.argtypes = [c_char_p,  # kinetic folder
                                                        c_char_p,  # output folder
                                                        c_char_p,  # sepcie
-                                                       c_int,    # ropa type 0: local | 1: global | 2: region
-                                                       # ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
-                                                       c_int,
-                                                       # normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
-                                                       c_int,
+                                                       c_int,     # ropa type 0: local | 1: global | 2: region
+                                                       c_int,     # ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
+                                                       c_int,     # normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
                                                        c_double,  # ropa local value
                                                        c_double,  # ropa region lower value
                                                        c_double,  # ropa region upper value
                                                        c_void_p,  # ropa coefficients
                                                        c_void_p,  # ropa reactions indices
-                                                       c_int]    # ropa number of reactions
+                                                       c_int]     # ropa number of reactions
 
         self.c_library.pyROPAPostProcessor.restype = c_int
 
         coefficients = (c_double * number_of_reactions)()
         reactions = (c_int * number_of_reactions)()
 
-        code = self.c_library.pyROPAPostProcessor(c_char_p(self.kineticFolder),  # kinetic folder
-                                                  # output folder
-                                                  c_char_p(self.outputFolder),
-                                                  # specie
-                                                  c_char_p(specie),
-                                                  # ropa type 0: local | 1:global | 2: region
-                                                  c_int(ropa),
-                                                  # ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
-                                                  c_int(0),
-                                                  # normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
-                                                  c_int(0),
-                                                  # ropa local value
-                                                  c_double(local_value),
-                                                  # ropa region lower value
-                                                  c_double(lower_value),
-                                                  # ropa region upper value
-                                                  c_double(upper_value),
-                                                  # ropa coefficients
-                                                  byref(coefficients),
-                                                  # ropa reactions indices
-                                                  byref(reactions),
-                                                  c_int(number_of_reactions))			# ropa number of reactions
+        code = self.c_library.pyROPAPostProcessor(c_char_p(self.kineticFolder), # kinetic folder
+                                                  c_char_p(self.outputFolder),  # output folder
+                                                  c_char_p(specie),             # specie
+                                                  c_int(ropa),                  # ropa type 0: local | 1:global | 2: region
+                                                  c_int(0),                     # ordering type 0: peakvalues | 1: area | 2: absolutearea (it is not needed for ROPA just to have a single function in cpp)
+                                                  c_int(0),                     # normalization type 0: local | 1: maxvalue (it is not needed for ROPA just to have a single function in cpp)
+                                                  c_double(local_value),        # ropa local value
+                                                  c_double(lower_value),        # ropa region lower value
+                                                  c_double(upper_value),        # ropa region upper value
+                                                  byref(coefficients),          # ropa coefficients
+                                                  byref(reactions),             # ropa reactions indices
+                                                  c_int(number_of_reactions))   # ropa number of reactions
 
         # 0-based
         # reaction-names 1-based
@@ -181,28 +168,17 @@ class pySMOKEpostprocessor:
         reactions = (c_int * number_of_reactions)()
 
         code = self.c_library.pySensitivityPostProcessor(c_char_p(self.kineticFolder),  # kinetic folder
-                                                         # output folder
-                                                         c_char_p(
-                                                             self.outputFolder),
-                                                         # target
-                                                         c_char_p(target),
-                                                         # sensitivity type 0: local | 1: global | 2: region
-                                                         c_int(sensitivity),
-                                                         # ordering type 0: peakvalues | 1: area | 2: absolutearea
-                                                         c_int(ordering),
-                                                         # normalization type 0: local | 1: maxvalue
-                                                         c_int(normalization),
-                                                         # sensitivity local value
-                                                         c_double(local_value),
-                                                         # sensitivity region lower value
-                                                         c_double(lower_value),
-                                                         # sensitivity region upper value
-                                                         c_double(upper_value),
-                                                         # sensitivity coefficients
-                                                         byref(coefficients),
-                                                         # reactions indices
-                                                         byref(reactions),
-                                                         c_int(number_of_reactions))		   # sensitivity number of reactions
+                                                        c_char_p(self.outputFolder), # output folder
+                                                        c_char_p(target), # target
+                                                        c_int(sensitivity), # sensitivity type 0: local | 1: global | 2: region
+                                                        c_int(ordering), # ordering type 0: peakvalues | 1: area | 2: absolutearea
+                                                        c_int(normalization), # normalization type 0: local | 1: maxvalue
+                                                        c_double(local_value), # sensitivity local value
+                                                        c_double(lower_value), # sensitivity region lower value
+                                                        c_double(upper_value), # sensitivity region upper value
+                                                        byref(coefficients), # sensitivity coefficients
+                                                        byref(reactions), # reactions indices
+                                                        c_int(number_of_reactions)) # sensitivity number of reactions
 
         # 0-based
         # reaction-names 1-based
@@ -255,15 +231,13 @@ class pySMOKEpostprocessor:
                                                 c_char_p,  # output folder
                                                 c_char_p,  # specie
                                                 c_char_p,  # element
-                                                c_int,    # flux analysis type
+                                                c_int,     # flux analysis type
                                                 c_double,  # ropa local value
-                                                # thickness 0 absolute | 1 relative(%)
-                                                c_int,
-                                                c_bool,   # thickness log scale
-                                                # labeling type 0 absolute | 1 relative(%)
-                                                c_int,
-                                                c_int,    # depth
-                                                c_int,    # width
+                                                c_int,     # thickness 0 absolute | 1 relative(%)
+                                                c_bool,    # thickness log scale
+                                                c_int,     # labeling type 0 absolute | 1 relative(%)
+                                                c_int,     # depth
+                                                c_int,     # width
                                                 c_double,  # thresold
                                                 c_void_p,  # indexes of the first name
                                                 c_void_p,  # indexes of the second name
@@ -279,33 +253,23 @@ class pySMOKEpostprocessor:
         computedLabel = (c_double * 1000)()
         length = (c_int*1000)()
 
-        code = self.c_library.FluxAnalysis(c_char_p(self.kineticFolder),  # kinetic folder
-                                           # output folder
-                                           c_char_p(self.outputFolder),
-                                           c_char_p(specie),			 # specie
-                                           c_char_p(element),			 # element
-                                           # flux analysis type
-                                           c_int(flux),
-                                           # ropa local value
-                                           c_double(local_value),
-                                           # thickness 0 absolute | 1 relative(%)
-                                           c_int(thick),
-                                           # thickness log scale
-                                           c_bool(thickness_log_scale),
-                                           # labeling type 0 absolute | 1 relative(%)
-                                           c_int(label),
-                                           c_int(depth),				 # depth
-                                           c_int(width),				 # width
-                                           c_double(threshold),		 # threshold
-                                           # indexes of the first name
-                                           byref(indexFirstName),
-                                           # indexes of the second name
-                                           byref(indexSecondName),
-                                           # computed thicknes value
-                                           byref(computedThickness),
-                                           # computed label value
-                                           byref(computedLabel),
-                                           byref(length))				 # lenght of the vector to adjust (boring ctype stuff)
+        code = self.c_library.FluxAnalysis(c_char_p(self.kineticFolder), # kinetic folder
+                                            c_char_p(self.outputFolder), # output folder
+                                            c_char_p(specie),			 # specie
+                                            c_char_p(element),			 # element
+                                            c_int(flux), # flux analysis type
+                                            c_double(local_value), # ropa local value
+                                            c_int(thick), # thickness 0 absolute | 1 relative(%)
+                                            c_bool(thickness_log_scale), # thickness log scale
+                                            c_int(label), # labeling type 0 absolute | 1 relative(%)
+                                            c_int(depth), # depth
+                                            c_int(width), # width
+                                            c_double(threshold), # threshold
+                                            byref(indexFirstName), # indexes of the first name
+                                            byref(indexSecondName), # indexes of the second name
+                                            byref(computedThickness), # computed thicknes value
+                                            byref(computedLabel), # computed label value
+                                            byref(length)) # lenght of the vector to adjust (boring ctype stuff)
 
         length = [l for l in length][0]
         indexFirstName = [i for i in indexFirstName][:length]
