@@ -46,15 +46,39 @@ class pySMOKEpostprocessor:
     def __init__(self, kinetic_mechanism: str, results_folder: str, verbose=False):
 
         path = os.path.join('/home/chimica2/lpratali/OS_POSTPROC/pySMOKEPostProcessor/project', 'lib', 'bin', 'pySMOKEPostProcessor.o')
-        # /home/tdinelli/Documents/GitHub/pySMOKEPostProcessor/
-
         self.kineticFolder = bytes(kinetic_mechanism, 'utf-8')
         self.outputFolder = bytes(results_folder, 'utf-8')
         self.verbose = verbose
         self.CheckInputSettings()
 
         self.c_library = cdll.LoadLibrary(path)
+        if self.verbose:
 
+            self.c_library.getBoundary.argtypes = [c_char_p,  # kinetic folder
+                                                    c_char_p, # output folder
+                                                    c_void_p, # domain max
+                                                    c_void_p, # domain minimum
+                                                    c_void_p] # domain middle point
+
+            self.c_library.getBoundary.restype = c_int
+
+            domain_maximum = (c_double*1)()
+            domain_minimum = (c_double*1)()
+            domain_middle = (c_double*1)()
+
+            code = self.c_library.getBoundary ( c_char_p(self.kineticFolder), # kinetic folder
+                                                c_char_p(self.outputFolder),  # output folder
+                                                byref(domain_maximum),        # domain max
+                                                byref(domain_minimum),        # domain minimum
+                                                byref(domain_middle))         # domain middle point
+
+            domain_maximum = [i for i in domain_maximum][0]          
+            domain_minimum = [i for i in domain_minimum][0]
+            domain_middle = [i for i in domain_middle][0]
+
+            print(f"Computational domain: \n * Lower Bound: {domain_minimum}   Upper Bound: {domain_maximum}")
+            print(f" * Middle value: {domain_middle}")
+    
     def RateOfProductionAnalysis(self, specie: str, ropa_type: str, local_value: float = 0,
                                  lower_value: float = 0, upper_value: float = 0,
                                  number_of_reactions: int = 10):
@@ -66,8 +90,7 @@ class pySMOKEpostprocessor:
         elif (ropa_type == "region"):
             ropa = 2
         else:
-            raise ValueError(
-                'Please select one of the available ROPA type: global | local | region')
+            raise ValueError('Please select one of the available ROPA type: global | local | region')
 
         self.c_library.pyROPAPostProcessor.argtypes = [c_char_p,  # kinetic folder
                                                        c_char_p,  # output folder
