@@ -72,7 +72,7 @@ class pySMOKEpostprocessor:
                                                 byref(domain_minimum),        # domain minimum
                                                 byref(domain_middle))         # domain middle point
 
-            domain_maximum = [i for i in domain_maximum][0]          
+            domain_maximum = [i for i in domain_maximum][0]
             domain_minimum = [i for i in domain_minimum][0]
             domain_middle = [i for i in domain_middle][0]
 
@@ -151,8 +151,7 @@ class pySMOKEpostprocessor:
         elif (sensitivity_type == "region"):
             sensitivity = 2
         else:
-            raise ValueError(
-                'Please select one of the available Sensitivity analysis type global | local | region')
+            raise ValueError('Please select one of the available Sensitivity analysis type global | local | region')
 
         if (ordering_type == 'peak_value'):
             ordering = 0
@@ -161,16 +160,14 @@ class pySMOKEpostprocessor:
         elif (ordering_type == "absolute_area"):
             ordering = 2
         else:
-            raise ValueError(
-                'Please select one of the available ordering type: peak_value | area | absolute_area')
+            raise ValueError('Please select one of the available ordering type: peak_value | area | absolute_area')
 
         if (normalization_type == 'local'):
             normalization = 0
         elif (normalization_type == 'max_value'):
             normalization = 1
         else:
-            raise ValueError(
-                'Please select one of the available normalization: local | max_value')
+            raise ValueError('Please select one of the available normalization: local | max_value')
 
         self.c_library.pySensitivityPostProcessor.argtypes = [c_char_p,  # kinetic folder
                                                               c_char_p,  # output folder
@@ -231,24 +228,21 @@ class pySMOKEpostprocessor:
         elif(flux_analysis_type == 'destruction'):
             flux = 0
         else:
-            raise ValueError(
-                "The available type for the flux analysis are production | destruction")
+            raise ValueError("The available type for the flux analysis are production | destruction")
 
         if(thickness == 'absolute'):
             thick = 0
         elif(thickness == 'relative'):
             thick = 1
         else:
-            raise ValueError(
-                "The available type for the caluclation of the thicknsss are absolute | relative(%)")
+            raise ValueError("The available type for the caluclation of the thicknsss are absolute | relative(%)")
 
         if(label_type == 'absolute'):
             label = 0
         elif(label_type == 'relative'):
             label = 1
         else:
-            raise ValueError(
-                "The available type for the labeling are absolute | relative(%)")
+            raise ValueError("The available type for the labeling are absolute | relative(%)")
 
         self.c_library.FluxAnalysis.argtypes = [c_char_p,  # kinetic folder
                                                 c_char_p,  # output folder
@@ -305,13 +299,10 @@ class pySMOKEpostprocessor:
         KineticMap_ = KineticMap(self.kineticFolder.decode("utf-8"))
 
         for j in range(len(indexFirstName)):
-            self.firstNames.append(
-                KineticMap_.SpecieNameFromIndex(indexFirstName[j]))
-            self.secondNames.append(
-                KineticMap_.SpecieNameFromIndex(indexSecondName[j]))
+            self.firstNames.append( KineticMap_.SpecieNameFromIndex(indexFirstName[j]))
+            self.secondNames.append(KineticMap_.SpecieNameFromIndex(indexSecondName[j]))
 
         Graph = GraphWriter(flux_analysis_type)
-        Graph = Graph.CreateGraph(
-            self.firstNames, self.secondNames, computedThickness, computedLabel)
+        Graph = Graph.CreateGraph(self.firstNames, self.secondNames, computedThickness, computedLabel)
 
         return Graph
