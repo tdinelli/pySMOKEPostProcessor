@@ -13,7 +13,6 @@ SCRIPT: rxnclasses
 # Import main libraries
 import pandas as pd
 import sys
-import os
 import numpy as np
 import copy
 
@@ -90,8 +89,7 @@ class rxnclass:
                 self.rxn_class_df['classtype'][rxns] = subcl_grp_dct[subcl]
             except KeyError:
                 self.rxn_class_df['classtype'][rxns] = 'UNSORTED'
-                print(
-                    '*Warning: reactiontype {} not found in class groups'.format(subcl))
+                print('*Warning: reactiontype {} not found in class groups'.format(subcl))
                 continue
 
 class rxnflux:
@@ -128,8 +126,7 @@ class rxnflux:
             # self.rxn_class_df = self.rxn_class_df.drop(idx1, axis = 0)
         """ 
         #######################
-        self.flux_cols = [
-            col for col in self.rxn_class_df.columns if 'flux' in col]
+        self.flux_cols = [col for col in self.rxn_class_df.columns if 'flux' in col]
         # delete row if flux is 0, much faster :)
         rows_todel = [idx for idx in self.rxn_class_df.index if all(self.rxn_class_df.loc[idx][self.flux_cols] == 0)]
         self.rxn_class_df = self.rxn_class_df.drop(rows_todel)
@@ -199,7 +196,7 @@ class rxnflux:
         # check that all criteria are columns
         if not all(criterion in self.rxn_class_df.columns for criterion in sortlist):
             print('*Error: criteria not all present in dataframe columns - exiting')
-            sys.exit()
+            sys.exit() # Don't know if the way is sys.exit() to be checked
 
         # group and sum
         new_sort_df = pd.DataFrame(index=self.flux_cols)
@@ -211,8 +208,10 @@ class rxnflux:
                 name = grp_idx
             else:
                 name = '['+']['.join(grp_idx)+']'
+
             if self.verbose:
                 print(grp_idx, '\n', grp_df, '\n')
+            
             new_sort_df[name] = grp_df[self.flux_cols].sum()
 
         # renormalize by species
@@ -224,7 +223,8 @@ class rxnflux:
             new_sort_df.loc[flux_sp_name] *= (weight_factor/renorm_factor)
 
         if self.verbose:
-            print(new_sort_df)
+            print(new_sort_df) # questo print e probabilmente anche alcuni di quelli sopra forse hanno poco
+                               # senso e magari potremmo dare la possibilità di stampare su file?
 
         return new_sort_df
 
