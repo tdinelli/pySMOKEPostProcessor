@@ -1,23 +1,23 @@
 import os
 import xml.etree.ElementTree as ET
 import numpy as np
-from scipy import sparse
-import sys
 
 '''
 MODULE: KineticMechanism
 @Authors:
-    Alberto Cuoci [1], Timoteo Dinelli [1]
+    Alberto Cuoci [1], Timoteo Dinelli [1], Luna Pratali Maffei[1]
     [1]: CRECK Modeling Lab, Department of Chemistry, Materials, and Chemical Engineering, Politecnico di Milano
 @Contacts:
     alberto.cuoci@polimi.it
     timoteo.dinelli@polimi.it
+    luna.pratalimaffei@polimi.it
 @Additional notes:
     - This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
       Please report any bug to: alberto.cuoci@polimi.it
     - This is a modified class frome the original one KineticMechanism.py inside PyTools4OpenSMOKE 
       modified by Timoteo Dinelli to handle gas-phase only to post-process data in order to perform 
       Rate Of Production Analysis
+    - Luna Pratali Maffei add utilities to perform post processing of reaction classes
 '''
 
 class KineticMap:
@@ -172,7 +172,6 @@ class KineticMap:
                                     self.rxnclass[i] = classname
                                     self.rxnsubclass[i] = subclassname
 
-            # print(classes)
             self.classes = classes
             
     def ReactionNameFromIndex(self, reactionIndex: int):
@@ -202,12 +201,10 @@ class KineticMap:
                 return i # this is the index of the reaction 0-based 
                          # pay attention to cabr and falloff reactions 
         
-    
     def SpecieNameFromIndex(self, specieIndex: int):
         return self.species[specieIndex]
     
     def IndexFromSpecieName(self, specieName: str):
-        
         for i in range(0, self.NumberOfSpecies):
             if(specieName == self.species[i]):
                 return i

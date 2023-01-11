@@ -118,31 +118,31 @@ class StoichiometricMap:
         # Elementary reactions only
         if (explicit_reaction_orders == 0):
             
-            lambda_numDir1 = numDir1;
-            lambda_numDir2 = numDir2;
-            lambda_numDir3 = numDir3;
-            lambda_numDir4 = numDir4;
-            lambda_numDir5 = numDir5;
+            lambda_numDir1 = numDir1
+            lambda_numDir2 = numDir2
+            lambda_numDir3 = numDir3
+            lambda_numDir4 = numDir4
+            lambda_numDir5 = numDir5
 
-            lambda_numRevEq1 = numRevEq1;
-            lambda_numRevEq2 = numRevEq2;
-            lambda_numRevEq3 = numRevEq3;
-            lambda_numRevEq4 = numRevEq4;
-            lambda_numRevEq5 = numRevEq5;
+            lambda_numRevEq1 = numRevEq1
+            lambda_numRevEq2 = numRevEq2
+            lambda_numRevEq3 = numRevEq3
+            lambda_numRevEq4 = numRevEq4
+            lambda_numRevEq5 = numRevEq5
 
-            lambda_jDir1 = jDir1;
-            lambda_jDir2 = jDir2;
-            lambda_jDir3 = jDir3;
-            lambda_jDir4 = jDir4;
-            lambda_jDir5 = jDir5;
-            lambda_valueDir5 = valueDir5;
+            lambda_jDir1 = jDir1
+            lambda_jDir2 = jDir2
+            lambda_jDir3 = jDir3
+            lambda_jDir4 = jDir4
+            lambda_jDir5 = jDir5
+            lambda_valueDir5 = valueDir5
 
-            lambda_jRevEq1 = jRevEq1;
-            lambda_jRevEq2 = jRevEq2;
-            lambda_jRevEq3 = jRevEq3;
-            lambda_jRevEq4 = jRevEq4;
-            lambda_jRevEq5 = jRevEq5;
-            lambda_valueRevEq5 = valueRevEq5;
+            lambda_jRevEq1 = jRevEq1
+            lambda_jRevEq2 = jRevEq2
+            lambda_jRevEq3 = jRevEq3
+            lambda_jRevEq4 = jRevEq4
+            lambda_jRevEq5 = jRevEq5
+            lambda_valueRevEq5 = valueRevEq5
             
         else:
 
