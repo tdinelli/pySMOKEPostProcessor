@@ -183,9 +183,22 @@ extern "C" int GetReactionRates (
 	return 0;
 }
 
-extern "C" int GetFormationRates () 
+extern "C" int GetFormationRates (
+	char* kineticFolder, 
+	char* outputFolder,
+	char* specie,
+	char* units,
+	char* type,
+	double* formation_rate
+) 
 {
-	//TODO
+	std::string postprocessorType = "ropa";
+	PostProcessor* pp;
+	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
+
+	pp->GiveMeFormationRate(specie, units, type, formation_rate);
+
+	return 0;
 }
 
 int main() 

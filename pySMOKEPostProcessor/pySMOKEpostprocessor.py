@@ -352,3 +352,62 @@ class pySMOKEpostprocessor:
         else:
             rr = [i for i in reaction_rate]
             return x_axis, rr
+
+    def FormationRate(self, specie: str, abscissae_name: str, units: str, formation_rate_type: str):
+        
+        out = OpenSMOKEppXMLFile(kineticFolder = self.kineticFolder.decode("utf-8"),
+                                OutputFolder = self.outputFolder.decode("utf-8"))
+        
+        valid_x_name = out.additional_variable
+        number_of_abscissae = out.npts
+        x_axis_name = ''
+
+        for i in valid_x_name:
+            if abscissae_name in i:
+                x_axis_name = bytes(i, 'utf-8')
+        
+        if (x_axis_name == ''): raise Exception('The provided name for the x axis is not valid')
+
+        x_axis = out.getProfile(name = x_axis_name.decode('utf-8'))
+
+        if units == 'mole':
+            units_ = 0
+        elif units == 'mass':
+            units_ = 1
+        else:
+            raise ValueError('Available units are: mole | mass')
+
+        if formation_rate_type == 'net':
+            type_ = 0
+        elif formation_rate_type == 'production':
+            type_ = 1
+        elif formation_rate_type == 'destruction':
+            type_ = 2
+        elif formation_rate_type == 'characteristic-time':
+            type_ = 3
+        else:
+            raise ValueError('Available types for the formation rate are net | production | destruction | characteristic-time')
+        
+        self.c_library.GetFormationRates.argtypes = [c_char_p, # kinetic folder
+                                                    c_char_p,  # output folder
+                                                    c_char_p,  # specie
+                                                    c_char_p,  # units
+                                                    c_char_p,  # formation_rate_type
+                                                    c_void_p]  # formation_rate
+
+        self.c_library.GetFormationRates.restype = c_int
+
+        formation_rate = (c_double * number_of_abscissae)()
+
+        code = self.c_library.GetFormationRates(c_char_p(self.kineticFolder),  # kinetic folder
+                                                c_char_p(self.outputFolder),   # output folder
+                                                c_char_p(bytes(specie, 'utf-8')),              # specie
+                                                c_char_p(bytes(units, 'utf-8')),               # units
+                                                c_char_p(bytes(formation_rate_type, 'utf-8')), # formation_rate_type
+                                                byref(formation_rate))                         # formation_rate
+
+        if code != 0:
+            raise ValueError('Exit code != 0')
+        else:
+            fr = [i for i in formation_rate]
+            return x_axis, fr

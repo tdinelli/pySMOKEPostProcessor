@@ -68,6 +68,8 @@ public:
 
 	int GetReactionRates(int index, double* reaction_rate);
 
+	int GetFormationRates(std::string specie, std::string units, std::string type, double* rate);
+
 private:
 
 	ProfilesDatabase* data_;
