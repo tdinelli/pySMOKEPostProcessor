@@ -36,12 +36,11 @@ mkdir build
 cd build
 cmake ..
 make
-make install
 ```
 In order to make CMAKE able to find the necessary libraries it is recommended to set the following environment variables:
 
 - export Boost_ROOT  = $ PATH_TO_YOUR_BOOST_INSTALLATION
-- export Eigen3_ROOT = $ PATH_TO_YOUR_EIGEN_INSTALLATION
+- export EIGEN3_ROOT = $ PATH_TO_YOUR_EIGEN_INSTALLATION
 - export OpenSMOKEpp_ROOT = $ PATH_TO_YOUR_OPENSMOKE_INSTALLATION
 ## Installing
 

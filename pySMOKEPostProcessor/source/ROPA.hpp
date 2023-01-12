@@ -664,3 +664,58 @@ void ROPA::MergePositiveAndNegativeBars (const std::vector<unsigned int>& positi
 		}
 
 }
+
+int ROPA::GetReactionRates(int index, double* reaction_rate)
+{
+	// Select the appropriate reaction
+
+	unsigned int selected_reaction_indices = index; // In principle you can query more than once reaction at the time but keep it simple
+	
+	// Calculates the formation rates
+	{
+		std::vector<double> tmp;
+		tmp.resize(data_->number_of_abscissas_);
+
+		OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
+		OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
+		OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
+		OpenSMOKE::OpenSMOKEVectorDouble r(data_->kineticsMapXML->NumberOfReactions());
+		
+		for (unsigned int i=0;i<data_->number_of_abscissas_;i++)
+		{
+			// Recovers mass fractions
+			for (unsigned int k=0;k<data_->thermodynamicsMapXML->NumberOfSpecies();k++)
+				omega[k+1] = data_->omega[k][i];
+			
+			// Calculates mole fractions
+			double MWmix;
+			data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+
+			// Calculates concentrations
+			const double P_Pa = data_->additional[data_->index_P][i];
+			const double T = data_->additional[data_->index_T][i];
+			const double cTot = P_Pa/PhysicalConstants::R_J_kmol/T;
+			Product(cTot, x, &c);
+
+			// Calculates formations rates
+			data_->kineticsMapXML->SetTemperature(T);
+			data_->kineticsMapXML->SetPressure(P_Pa);
+			data_->thermodynamicsMapXML->SetTemperature(T);
+			data_->thermodynamicsMapXML->SetPressure(P_Pa);
+
+			data_->kineticsMapXML->KineticConstants();
+			data_->kineticsMapXML->ReactionRates(c.GetHandle());
+			data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
+			
+			const unsigned k = selected_reaction_indices + 1;
+			tmp[i] = r[k];	
+		}	
+
+		for(unsigned int i = 0; i<tmp.size(); i++)
+		{
+			reaction_rate[i] = tmp[i];
+		}
+	}
+
+	return 0;
+}

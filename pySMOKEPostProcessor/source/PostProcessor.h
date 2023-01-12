@@ -46,8 +46,8 @@ public:
 	PostProcessor(std::string postprocessorType, std::string kineticFolder, std::string outputFolder);
 
 	void Prepare(std::string specie, int type, double local_value, double lower_value, 
-							double upper_value, int sensitivity_normalization_type, 
-							int sensitivity_ordering_type);
+				double upper_value, int sensitivity_normalization_type, 
+				int sensitivity_ordering_type);
 
 	void PrepareFlux(std::string specie, std::string element, int type, double local_value,
 					int thickness, bool thicknesslogscale, int labeltype, int depth, 
@@ -58,6 +58,8 @@ public:
 	int ComputeSensitivityPython(double* coefficients, int* reactions, int len);
 
 	int ComputeFluxPython(int* indexFirstName, int* indexSecondName, double* computedThickness, double* computedLabel, int* lenght);
+
+	int GiveMeReactionRate(int reaction_index, double* reaction_rate);
 
 	std::string Type_;
 	std::string kineticFolder_;
