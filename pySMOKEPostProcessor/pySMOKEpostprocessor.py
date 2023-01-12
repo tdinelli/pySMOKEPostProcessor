@@ -1,6 +1,7 @@
-from ctypes import c_bool, c_int, c_double, c_void_p, c_char_p, byref, cdll
 import os
+from ctypes import c_bool, c_int, c_double, c_void_p, c_char_p, byref, cdll
 from pySMOKEPostProcessor.maps.KineticMap import KineticMap
+from pySMOKEPostProcessor.maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
 from pySMOKEPostProcessor.GraphWriter import GraphWriter
 
 """
@@ -76,8 +77,14 @@ class pySMOKEpostprocessor:
             domain_minimum = [i for i in domain_minimum][0]
             domain_middle = [i for i in domain_middle][0]
 
-            print(f"Computational domain: \n * Lower Bound: {domain_minimum}   Upper Bound: {domain_maximum}")
-            print(f" * Middle value: {domain_middle}")
+            print(f"Computational domain: \n * Lower Bound: {round(domain_minimum,6)}   Upper Bound: {round(domain_maximum, 6)}")
+            print(f" * Middle value: {round(domain_middle)}")
+            out = OpenSMOKEppXMLFile(kineticFolder = self.kineticFolder.decode("utf-8"),
+                                    OutputFolder = self.outputFolder.decode("utf-8"))
+            print("Available quantities for the abscissae variable:")
+            for i in out.additional_variable:
+                print(f" * {i}")
+            print(" * All the mass fraction of the species inside the scheme (e.g. H2 or O2)")
     
     def RateOfProductionAnalysis(self, specie: str, ropa_type: str, local_value: float = 0,
                                  lower_value: float = 0, upper_value: float = 0,
@@ -306,3 +313,42 @@ class pySMOKEpostprocessor:
         Graph = Graph.CreateGraph(self.firstNames, self.secondNames, computedThickness, computedLabel)
 
         return Graph
+
+    def ReactionRates(self, abscissae_name: str, reaction_name: str):
+        
+        kin = KineticMap(self.kineticFolder.decode("utf-8"))
+        out = OpenSMOKEppXMLFile(kineticFolder = self.kineticFolder.decode("utf-8"), 
+                                OutputFolder = self.outputFolder.decode("utf-8"))
+        
+        valid_x_name = out.additional_variable
+        number_of_abscissae = out.npts
+
+        x_axis_name = ''
+        for i in valid_x_name:
+            if abscissae_name in i:
+                x_axis_name = bytes(i, 'utf-8')
+        
+        if (x_axis_name == ''): raise Exception('The provided name for the x axis is not valid')
+
+        x_axis = out.getProfile(name = x_axis_name.decode('utf-8'))
+
+        reaction_index = kin.ReactionIndexFromName(name = reaction_name)
+
+        self.c_library.GetReactionRates.argtypes = [c_char_p, # kinetic folder
+                                                    c_char_p, # output folder
+                                                    c_int,    # reaction index
+                                                    c_void_p] # reaction rate [kmol/m3/s]
+
+        reaction_rate = (c_double * number_of_abscissae)()
+        self.c_library.GetReactionRates.restype = c_int
+
+        code = self.c_library.GetReactionRates(c_char_p(self.kineticFolder), # kinetic folder
+                                                c_char_p(self.outputFolder), # output folder
+                                                c_int(reaction_index),       # reaction index
+                                                byref(reaction_rate))        # reaction rate
+
+        if code != 0:
+            raise ValueError('Exit code != 0')
+        else:
+            rr = [i for i in reaction_rate]
+            return x_axis, rr
