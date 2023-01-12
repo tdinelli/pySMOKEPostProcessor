@@ -167,6 +167,27 @@ extern "C" int FluxAnalysis(char* kineticFolder,
 	return 0;
 }
 
+extern "C" int GetReactionRates ( 
+	char* kineticFolder, 
+	char* outputFolder,
+	int reaction_index,
+	double* reaction_rate) 
+{
+	std::string postprocessorType = "ropa";
+	
+	PostProcessor* pp;
+	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
+	
+	pp->GiveMeReactionRate(reaction_index, reaction_rate);
+
+	return 0;
+}
+
+extern "C" int GetFormationRates () 
+{
+	//TODO
+}
+
 int main() 
 {
 	return 0;

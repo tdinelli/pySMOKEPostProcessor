@@ -66,6 +66,8 @@ public:
 					int* indexSecondName, double* computedThickness, 
 					double* computedLabel, int* lenght);
 
+	int GetReactionRates(int index, double* reaction_rate);
+
 private:
 
 	ProfilesDatabase* data_;

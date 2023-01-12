@@ -192,3 +192,15 @@ int PostProcessor::ComputeFluxPython(int* indexFirstName, int* indexSecondName, 
 						indexFirstName, indexSecondName, computedThickness, computedLabel, lenght);
 	
 }
+
+int PostProcessor::GiveMeReactionRate(int reaction_index, double* reaction_rate)
+{
+	ROPA* widget;
+    widget = new ROPA(kineticFolder_, outputFolder_, "global", "H2", 0, 0, 0);
+	
+	data_->ReadFileResults(outputFolder_);
+	data_->ReadKineticMechanism(kineticFolder_);
+	widget->SetDatabase(data_);
+
+	return widget->GetReactionRates(reaction_index, reaction_rate);
+}
