@@ -78,7 +78,7 @@ class pySMOKEpostprocessor:
             domain_middle = [i for i in domain_middle][0]
 
             print(f"Computational domain: \n * Lower Bound: {round(domain_minimum,6)}   Upper Bound: {round(domain_maximum, 6)}")
-            print(f" * Middle value: {round(domain_middle)}")
+            print(f" * Middle value: {round(domain_middle, 6)}")
             out = OpenSMOKEppXMLFile(kineticFolder = self.kineticFolder.decode("utf-8"),
                                     OutputFolder = self.outputFolder.decode("utf-8"))
             print("Available quantities for the abscissae variable:")
@@ -353,7 +353,7 @@ class pySMOKEpostprocessor:
             rr = [i for i in reaction_rate]
             return x_axis, rr
 
-    def FormationRate(self, specie: str, abscissae_name: str, units: str, formation_rate_type: str):
+    def FormationRates(self, specie: str, abscissae_name: str, units: str, formation_rate_type: str):
         
         out = OpenSMOKEppXMLFile(kineticFolder = self.kineticFolder.decode("utf-8"),
                                 OutputFolder = self.outputFolder.decode("utf-8"))
@@ -370,22 +370,10 @@ class pySMOKEpostprocessor:
 
         x_axis = out.getProfile(name = x_axis_name.decode('utf-8'))
 
-        if units == 'mole':
-            units_ = 0
-        elif units == 'mass':
-            units_ = 1
-        else:
+        if units != 'mole' and units != 'mass':
             raise ValueError('Available units are: mole | mass')
 
-        if formation_rate_type == 'net':
-            type_ = 0
-        elif formation_rate_type == 'production':
-            type_ = 1
-        elif formation_rate_type == 'destruction':
-            type_ = 2
-        elif formation_rate_type == 'characteristic-time':
-            type_ = 3
-        else:
+        if formation_rate_type != 'net' and formation_rate_type != 'production' and formation_rate_type != 'destruction' and formation_rate_type != 'characteristic-time':
             raise ValueError('Available types for the formation rate are net | production | destruction | characteristic-time')
         
         self.c_library.GetFormationRates.argtypes = [c_char_p, # kinetic folder
