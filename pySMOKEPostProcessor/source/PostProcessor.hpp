@@ -217,3 +217,25 @@ int PostProcessor::GiveMeFormationRate(std::string specie, std::string units,
 
 	return widget->GetFormationRates(specie, units, type, formation_rate);
 }
+
+int PostProcessor::GiveMeSensitivityCoefficient(std::string normalization_type, std::string target, double* coefficient, int reaction_index)
+{
+	Type_ = "global";
+	orderingType_ = "peakvalues";
+	normalizationType_ = normalization_type;
+	target_ = target;
+	localValue_ = 0;
+	lowerBound_ = 0;
+	upperBound_ = 0;
+	
+	Sensitivities* widget;
+	widget = new Sensitivities(normalizationType_, Type_, orderingType_, target_, localValue_, lowerBound_, upperBound_);
+	
+	data_->ReadFileResults(outputFolder_);
+	data_->ReadKineticMechanism(kineticFolder_);
+	widget->SetDatabase(data_);
+	widget->Prepare();
+	// widget->ReadSensitvityCoefficients();
+
+	return widget->GetSensitivityProfile(reaction_index, coefficient);
+}

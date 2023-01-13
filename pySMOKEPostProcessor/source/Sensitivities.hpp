@@ -434,3 +434,35 @@ int Sensitivities::ReadSensitvityCoefficients()
 	return 0;
 }
 
+int Sensitivities::GetSensitivityProfile(int reaction_index, double* coefficient) 
+{
+	bool iLocalNormalization = true;
+	if(normalizationType_ == "max-value")
+		iLocalNormalization = false;
+
+	std::string selected_y = target_;
+	/*if (selected_y.size() == 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText(QString::fromStdString("You have to select one of the available Y variables"));
+		msgBox.exec();
+		return;
+	}*/
+
+	// la reazione gliela sto passando come indiceeeeee
+
+	unsigned int selected_reaction_indices = reaction_index;
+	std::cout << "ciao" << std::endl;
+	std::cout << selected_reaction_indices << std::endl;
+	std::cout << sensitivities->current_coarse_index().size() << std::endl;
+	std::vector<double> senscoeff = sensitivities->NormalizedProfile(sensitivities->current_coarse_index()[selected_reaction_indices], iLocalNormalization);
+	std::cout << "ciao" << std::endl;
+	
+	for(unsigned int i = 0; i < senscoeff.size(); i++)
+	{
+		coefficient[i] = senscoeff[i];
+	}
+
+	return 0;
+
+}

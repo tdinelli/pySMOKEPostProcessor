@@ -16,8 +16,7 @@ class pySMOKEpostprocessor:
             raise ValueError(
                 'The folder for the kinetic mechanism does not exist')
         if not (os.path.isdir(self.outputFolder)):
-            raise ValueError(
-                'The folder for the simulation\'s results does not exist')
+            raise ValueError('The folder for the simulation\'s results does not exist')
 
         kin = os.path.join(self.kineticFolder, b'kinetics.xml')
         names = os.path.join(self.kineticFolder, b'reaction_names.xml')
@@ -25,14 +24,11 @@ class pySMOKEpostprocessor:
         outputsens = os.path.join(self.outputFolder, b'Sensitivities.xml')
 
         if not(os.path.isfile(kin)):
-            raise ValueError(
-                'The folder for the kinetic mechanism does not contains kinetics.xml file')
+            raise ValueError('The folder for the kinetic mechanism does not contains kinetics.xml file')
         if not(os.path.isfile(names)):
-            raise ValueError(
-                'The folder for the kinetic mechanism does not contains reaction-names.xml file')
+            raise ValueError('The folder for the kinetic mechanism does not contains reaction-names.xml file')
         if not(os.path.isfile(output)):
-            raise ValueError(
-                'The folder for the simulation results does not contains Output.xml file')
+            raise ValueError('The folder for the simulation results does not contains Output.xml file')
 
         if (os.path.isfile(kin) and os.path.isfile(names) and os.path.isfile(output) and self.verbose != False):
             print('ROPA available')
@@ -374,7 +370,7 @@ class pySMOKEpostprocessor:
             raise ValueError('Available units are: mole | mass')
 
         if formation_rate_type != 'net' and formation_rate_type != 'production' and formation_rate_type != 'destruction' and formation_rate_type != 'characteristic-time':
-            raise ValueError('Available types for the formation rate are net | production | destruction | characteristic-time')
+            raise ValueError('Available types for the formation rate are: net | production | destruction | characteristic-time')
         
         self.c_library.GetFormationRates.argtypes = [c_char_p, # kinetic folder
                                                     c_char_p,  # output folder
@@ -399,3 +395,47 @@ class pySMOKEpostprocessor:
         else:
             fr = [i for i in formation_rate]
             return x_axis, fr
+    
+    def SensitivityCoefficients(self, target: str, reaction_name: str, normalization_type: str):
+        
+        target = bytes(target, 'utf-8')
+
+        kin = KineticMap(self.kineticFolder.decode("utf-8"))
+        out = OpenSMOKEppXMLFile(kineticFolder = self.kineticFolder.decode("utf-8"),
+                                OutputFolder = self.outputFolder.decode("utf-8"))
+
+        reaction_index = kin.ReactionIndexFromName(name = reaction_name)
+        x_axis = out.getProfile(name = 'time') # maybe other x variable are possible whithin it
+        number_of_abscissae = out.npts
+
+        if normalization_type != 'local' and normalization_type != 'max_value':
+            raise ValueError('Please select one of the available normalization: local | max_value')
+
+        normalization_type = bytes(normalization_type, 'utf-8')
+
+        self.c_library.GetSensitivityCoefficient.argtypes = [c_char_p, # kinetic folder
+                                                            c_char_p,  # output folder
+                                                            c_int,     # reaction index
+                                                            c_char_p,  # target
+                                                            c_char_p,  # normalization type
+                                                            c_void_p]  # sensitivity coeff
+
+        self.c_library.GetSensitivityCoefficient.restype = c_int
+        
+        sensitivity_coeff = (c_double * number_of_abscissae)()
+
+        code = self.c_library.GetSensitivityCoefficient(c_char_p(self.kineticFolder), # kinetic folder
+                                                        c_char_p(self.outputFolder),  # output folder
+                                                        c_int(reaction_index),        # reaction index
+                                                        c_char_p(target),             # target
+                                                        c_char_p(normalization_type), # normalization type
+                                                        byref(sensitivity_coeff))     # sensitivity coeff
+
+        if code != 0:
+            raise ValueError('Exit code != 0')
+        else:
+            sc = [i for i in sensitivity_coeff]
+            return x_axis, sc
+
+
+        
