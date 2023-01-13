@@ -204,3 +204,16 @@ int PostProcessor::GiveMeReactionRate(int reaction_index, double* reaction_rate)
 
 	return widget->GetReactionRates(reaction_index, reaction_rate);
 }
+
+int PostProcessor::GiveMeFormationRate(std::string specie, std::string units, 
+									std::string type, double* formation_rate)
+{
+	ROPA* widget;
+    widget = new ROPA(kineticFolder_, outputFolder_, "global", "H2", 0, 0, 0);
+	
+	data_->ReadFileResults(outputFolder_);
+	data_->ReadKineticMechanism(kineticFolder_);
+	widget->SetDatabase(data_);
+
+	return widget->GetFormationRates(specie, units, type, formation_rate);
+}

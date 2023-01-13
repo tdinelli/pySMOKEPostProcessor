@@ -8,20 +8,7 @@ Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor
 - Eigen (https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - Boost (https://www.boost.org/)
 
-## External python packages dependencies
-
-- pydot
-- graphviz 
-- ctypes
-- Element Tree
-- networkx
-- pandas
-
-Just to run the [examples](examples/)
-
-- numpy
-- matplotlib
-## Compile
+## Compile and Install
 
 **N.B.** At the moment the package is tested only in Linux and MacOS however soon there will be also a detailed procedure also for Windows.
 
@@ -42,8 +29,8 @@ In order to make CMAKE able to find the necessary libraries it is recommended to
 - export Boost_ROOT  = $ PATH_TO_YOUR_BOOST_INSTALLATION
 - export EIGEN3_ROOT = $ PATH_TO_YOUR_EIGEN_INSTALLATION
 - export OpenSMOKEpp_ROOT = $ PATH_TO_YOUR_OPENSMOKE_INSTALLATION
-## Installing
 
+Once the compilation is done whithin your package manager run the following command.
 ```bash
 python setup.py install
 ```
@@ -53,8 +40,8 @@ python setup.py install
 - **Rate Of Production Analysis**
 - **Sensitivity Analysis**
 - **Flux Analysis**
-- **Reaction Rates plots**: TODO
+- **Reaction Rates plots**: (ALMOST)
 - **Sensitivity Coefficients plots**: TODO
-- **Adaption to ROPA reaction class post processing**: (ALMOST)
+- **Adaption to ROPA reaction class post processing**
 
 ## Examples

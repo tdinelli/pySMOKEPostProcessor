@@ -61,6 +61,8 @@ public:
 
 	int GiveMeReactionRate(int reaction_index, double* reaction_rate);
 
+	int GiveMeFormationRate(std::string specie, std::string units, std::string type, double* formation_rate);
+
 	std::string Type_;
 	std::string kineticFolder_;
 	std::string outputFolder_;
