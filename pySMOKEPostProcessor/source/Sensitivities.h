@@ -62,6 +62,8 @@ public:
 
 	int ReadSensitvityCoefficients();
 
+	int GetSensitivityProfile(int reaction_index, double* coefficient);
+
 private:
 	ProfilesDatabase* data_;
 	

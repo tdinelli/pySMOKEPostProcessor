@@ -63,6 +63,8 @@ public:
 
 	int GiveMeFormationRate(std::string specie, std::string units, std::string type, double* formation_rate);
 
+	int GiveMeSensitivityCoefficient(std::string normalization_type, std::string target, double* coefficient, int reaction_index);
+
 	std::string Type_;
 	std::string kineticFolder_;
 	std::string outputFolder_;

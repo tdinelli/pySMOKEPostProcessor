@@ -66,7 +66,11 @@ void Sensitivities::Prepare()
 	sensitivities = new Sensitivities_Database();
 	sensitivities->SetDatabase(data_);
 	sensitivities->ReadParentFile();
-
+	
+	// Widget: reactions
+	{
+		sensitivities->ReactionsReset();
+	}
 	// Widget: variables y
 	// Non so se serve questa shit
 	{
@@ -434,3 +438,29 @@ int Sensitivities::ReadSensitvityCoefficients()
 	return 0;
 }
 
+int Sensitivities::GetSensitivityProfile(int reaction_index, double* coefficient) 
+{
+	bool iLocalNormalization = true;
+	if(normalizationType_ == "max-value")
+		iLocalNormalization = false;
+
+	std::string selected_y = target_;
+	/*if (selected_y.size() == 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText(QString::fromStdString("You have to select one of the available Y variables"));
+		msgBox.exec();
+		return;
+	}*/
+
+	unsigned int selected_reaction_indices = reaction_index;
+	std::vector<double> senscoeff = sensitivities->NormalizedProfile(sensitivities->current_coarse_index()[selected_reaction_indices]-1, iLocalNormalization);
+	
+	for(unsigned int i = 0; i < senscoeff.size(); i++)
+	{
+		coefficient[i] = senscoeff[i];
+	}
+
+	return 0;
+
+}

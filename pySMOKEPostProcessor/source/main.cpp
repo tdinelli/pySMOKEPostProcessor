@@ -201,6 +201,24 @@ extern "C" int GetFormationRates (
 	return 0;
 }
 
+extern "C" int GetSensitivityCoefficient(
+	char* kineticFolder,
+	char* outputFolder,
+	int reaction_index,
+	char* target,
+	char* normalization_type,
+	double* coefficient
+)
+{
+	std::string postprocessorType = "sensitivity";
+	PostProcessor* pp;
+	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
+
+	pp->GiveMeSensitivityCoefficient(normalization_type, target, coefficient, reaction_index);
+
+	return 0;
+}
+
 int main() 
 {
 	return 0;
