@@ -211,7 +211,6 @@ extern "C" int GetSensitivityCoefficient(
 )
 {
 	std::string postprocessorType = "sensitivity";
-	std::cout << "CIOA" << std::endl;
 	PostProcessor* pp;
 	pp = new PostProcessor(postprocessorType, kineticFolder, outputFolder);
 

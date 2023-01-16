@@ -408,8 +408,8 @@ class pySMOKEpostprocessor:
         x_axis = out.getProfile(name = 'time') # maybe other x variable are possible whithin it
         number_of_abscissae = out.npts
 
-        if normalization_type != 'local' and normalization_type != 'max_value':
-            raise ValueError('Please select one of the available normalization: local | max_value')
+        if normalization_type != 'local' and normalization_type != 'max-value':
+            raise ValueError('Please select one of the available normalization: local | max-value')
 
         normalization_type = bytes(normalization_type, 'utf-8')
 

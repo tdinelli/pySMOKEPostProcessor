@@ -235,7 +235,7 @@ int PostProcessor::GiveMeSensitivityCoefficient(std::string normalization_type, 
 	data_->ReadKineticMechanism(kineticFolder_);
 	widget->SetDatabase(data_);
 	widget->Prepare();
-	// widget->ReadSensitvityCoefficients();
+	widget->ReadSensitvityCoefficients();
 
 	return widget->GetSensitivityProfile(reaction_index, coefficient);
 }

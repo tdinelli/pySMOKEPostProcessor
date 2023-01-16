@@ -66,7 +66,11 @@ void Sensitivities::Prepare()
 	sensitivities = new Sensitivities_Database();
 	sensitivities->SetDatabase(data_);
 	sensitivities->ReadParentFile();
-
+	
+	// Widget: reactions
+	{
+		sensitivities->ReactionsReset();
+	}
 	// Widget: variables y
 	// Non so se serve questa shit
 	{
@@ -449,14 +453,8 @@ int Sensitivities::GetSensitivityProfile(int reaction_index, double* coefficient
 		return;
 	}*/
 
-	// la reazione gliela sto passando come indiceeeeee
-
 	unsigned int selected_reaction_indices = reaction_index;
-	std::cout << "ciao" << std::endl;
-	std::cout << selected_reaction_indices << std::endl;
-	std::cout << sensitivities->current_coarse_index().size() << std::endl;
-	std::vector<double> senscoeff = sensitivities->NormalizedProfile(sensitivities->current_coarse_index()[selected_reaction_indices], iLocalNormalization);
-	std::cout << "ciao" << std::endl;
+	std::vector<double> senscoeff = sensitivities->NormalizedProfile(sensitivities->current_coarse_index()[selected_reaction_indices]-1, iLocalNormalization);
 	
 	for(unsigned int i = 0; i < senscoeff.size(); i++)
 	{
