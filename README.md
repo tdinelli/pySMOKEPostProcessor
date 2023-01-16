@@ -39,9 +39,13 @@ python setup.py install
 
 - **Rate Of Production Analysis**
 - **Sensitivity Analysis**
-- **Flux Analysis**
-- **Reaction Rates plots**: (ALMOST)
-- **Sensitivity Coefficients plots**: TODO
-- **Adaption to ROPA reaction class post processing**
+- **Elementary Flux Analysis**
+- **Reaction Rates plots**
+- **Formation Rates plots**
+- **Sensitivity Coefficients plots**
+- **Rate Of Production Analysis for reaction classes**
 
-## Examples
+## WIP
+
+- Characteristic Times analysis
+- Plot of the shortest time scale
