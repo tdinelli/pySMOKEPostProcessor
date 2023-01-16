@@ -9,7 +9,7 @@ project (pySMOKEpostprocessor)
 # --- Set module path in order to use custom CMake modules
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{EIGEN_LIBRARY_PATH}/cmake)
 set (CMAKE_COLOR_MAKEFILE ON)
@@ -55,8 +55,8 @@ if (OPENSMOKE_USE_OPENMP)
   add_link_options(-fopenmp)
 endif()
 
-add_compile_options(-std=c++17 -fPIC -m64 -w -shared -lgfortran)
-add_link_options(-std=c++17 -fPIC -m64 -w -shared -lgfortran)
+add_compile_options(-std=c++14 -fPIC -m64 -w -shared -lgfortran)
+add_link_options(-std=c++14 -fPIC -m64 -w -shared -lgfortran)
 
 #--------------------------------------------------------------------
 # Include flags
