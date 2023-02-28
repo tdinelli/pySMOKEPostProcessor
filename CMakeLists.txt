@@ -28,16 +28,16 @@ message (STATUS "Compiling in mode: ${CMAKE_BUILD_TYPE}")
 
 # --- Boost (Compulsory)
 find_package (Boost REQUIRED COMPONENTS date_time filesystem program_options system regex timer chrono)
-message (STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
-message (STATUS "Boost_LIBRARIES    = ${Boost_LIBRARIES}")
+message (STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+message (STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
 
 # --- Eigen (Compulsory)
 find_package (Eigen3 REQUIRED)
-message (STATUS "Eigen_LIBRARIES = ${EIGEN3_INCLUDE_DIR}")
+message (STATUS "Eigen_LIBRARIES: ${EIGEN3_INCLUDE_DIR}")
 
 # --- OpenSmoke++ (Compulsory)
 find_package(OpenSMOKEpp REQUIRED)
-message (STATUS "OpenSmoke++        = ${OpenSMOKEpp_INCLUDE_DIR}")
+message (STATUS "OpenSmoke++: ${OpenSMOKEpp_INCLUDE_DIR}")
 
 set(COMPULSORY_LIBRARIES ${Boost_LIBRARIES})
 
@@ -48,25 +48,36 @@ set(COMPULSORY_INCLUDE ${Boost_INCLUDE_DIRS}
 # Compilation flags and options
 #--------------------------------------------------------------------
 
-add_compile_options(-fPIC -m64 -w -shared)
-add_link_options(-fPIC -m64 -w -shared)
+add_compile_options(-fPIC -m64 -w)
+add_link_options(-fPIC -m64 -w)
 
 #--------------------------------------------------------------------
 # Include flags
 #--------------------------------------------------------------------
 
-INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor/source
+include_directories (${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor/c_interface
                      ${COMPULSORY_INCLUDE})
 #--------------------------------------------------------------------
 # Library flags
 #--------------------------------------------------------------------
 
-LINK_LIBRARIES (${COMPULSORY_LIBRARIES})
+link_libraries (${COMPULSORY_LIBRARIES})
+
+#--------------------------------------------------------------------
+# Set source and headers files
+#--------------------------------------------------------------------
+
+set( SOURCE_FILES 
+  pySMOKEPostProcessor/c_interface/utilities.cpp
+  pySMOKEPostProcessor/c_interface/main.cpp
+)
+
 #--------------------------------------------------------------------
 # Targets to compile
 #--------------------------------------------------------------------
 
-add_executable (pySMOKEPostProcessor.o pySMOKEPostProcessor/source/main.cpp)
+add_library(pySMOKEPostProcessor SHARED
+            ${SOURCE_FILES})
 
 #--------------------------------------------------------------------
 # Installing options
