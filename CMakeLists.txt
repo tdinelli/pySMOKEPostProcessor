@@ -48,15 +48,8 @@ set(COMPULSORY_INCLUDE ${Boost_INCLUDE_DIRS}
 # Compilation flags and options
 #--------------------------------------------------------------------
 
-# Suppress warnings
-option(OPENSMOKE_USE_OPENMP "Activate support for OpenMP" FALSE)
-if (OPENSMOKE_USE_OPENMP)
-  add_compile_options(-fopenmp)
-  add_link_options(-fopenmp)
-endif()
-
-add_compile_options(-std=c++14 -fPIC -m64 -w -shared -lgfortran)
-add_link_options(-std=c++14 -fPIC -m64 -w -shared -lgfortran)
+add_compile_options(-fPIC -m64 -w -shared)
+add_link_options(-fPIC -m64 -w -shared)
 
 #--------------------------------------------------------------------
 # Include flags

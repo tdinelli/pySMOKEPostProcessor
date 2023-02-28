@@ -41,8 +41,7 @@ class OpenSMOKEppXMLFile:
         # System type
         systemType = ((root.find('Type')).text).strip()
         if (systemType != "HomogeneousReactor" and systemType != "Flamelet" and systemType != "Flame1D" and systemType != "Flame2D"):
-            print(systemType)
-            sys.exit("Unknown system type")
+            sys.exit(f"Unknown system type: {systemType}")
         
         # Check simulation/kinetics consistency
         dummy = root.find('mass-fractions')
@@ -108,7 +107,7 @@ class OpenSMOKEppXMLFile:
         
         # Additional variables name
         for i in range(len(column_index_of_massfractions_profiles)):
-            if(Y[0, column_index_of_massfractions_profiles[i] - 8] > 1e-8): # Warning this -8 can generate bugs
+            if(Y[0, column_index_of_massfractions_profiles[i] - len(additional_variable)] > 1e-8): # Warning this can generate bugs
                 additional_variable.append('conversion-' + list_names[i]) 
 
         # Assign internal members
