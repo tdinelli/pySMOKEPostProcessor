@@ -13,7 +13,7 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{EIGEN_LIBRARY_PATH}/cmake)
 set (CMAKE_COLOR_MAKEFILE ON)
-set (VERSION "0.2.0")
+set (VERSION "0.3.0")
 set (INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH "Installation directory for executables")
 
 if( NOT CMAKE_BUILD_TYPE)
@@ -67,9 +67,23 @@ link_libraries (${COMPULSORY_LIBRARIES})
 # Set source and headers files
 #--------------------------------------------------------------------
 
-set( SOURCE_FILES 
-  pySMOKEPostProcessor/c_interface/utilities.cpp
-  pySMOKEPostProcessor/c_interface/main.cpp
+set ( CPP_SOURCE_FILES 
+  pySMOKEPostProcessor/c_interface/source/utilities.cpp
+)
+
+set (CPP_INCLUDE
+  pySMOKEPostProcessor/c_interface/source/utilities.h
+)
+
+set ( C_INTERFACE_SOURCE_FILES
+  pySMOKEPostProcessor/c_interface/c_interface.cpp
+  pySMOKEPostProcessor/c_interface/c_utilities.cpp
+)
+
+set ( C_INTERFACE_INCLUDE_FILES
+  pySMOKEPostProcessor/c_interface/c_interface.h
+  pySMOKEPostProcessor/c_interface/c_utilities.h
+  pySMOKEPostProcessor/c_interface/definitions.h
 )
 
 #--------------------------------------------------------------------
@@ -77,7 +91,9 @@ set( SOURCE_FILES
 #--------------------------------------------------------------------
 
 add_library(pySMOKEPostProcessor SHARED
-            ${SOURCE_FILES})
+            ${CPP_SOURCE_FILES}
+            ${CPP_INCLUDE}
+)
 
 #--------------------------------------------------------------------
 # Installing options

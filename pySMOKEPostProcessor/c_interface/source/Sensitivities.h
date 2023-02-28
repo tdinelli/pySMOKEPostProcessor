@@ -35,33 +35,45 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-// Standard library
-#include <string>
-#include <iostream>
-#include <numeric>
-#include <vector>
-#include <sstream>
+#ifndef SENSITIVITIES_H
+#define SENSITIVITIES_H
 
-// OpenSMOKEpp library
-#include <OpenSMOKEpp>
-#include <maps/Maps_CHEMKIN>
-#include <kernel/kinetics/KineticsUtilityFunctions.h>
+class Sensitivities
+{
+	
+public:
 
-void MergePositiveAndNegativeBars( const std::vector<unsigned int>& positive_indices, 
-								const std::vector<unsigned int>& negative_indices,
-								const std::vector<double>& positive_coefficients, 
-								const std::vector<double>& negative_coefficients, 
-								std::vector<int>& indices,
-								std::vector<double>& coefficients);
+	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, 
+					std::string specie, double localValue, double lowerBound, double upperBound);
 
-void MergeBars( const std::vector<unsigned int>& total_indices, 
-				const std::vector<double>& total_coefficients, 
-				std::vector<int>& indices,
-				std::vector<double>& coefficients);
+	~Sensitivities();
 
-void MergeBars( const std::vector<unsigned int>& total_indices, 
-				const std::vector<double>& total_coefficients, 
-				const std::vector<double>& total_peaks,
-				std::vector<int>& indices,
-				std::vector<double>& coefficients, 
-				std::vector<double>& peaks);
+	void SetDatabase(ProfilesDatabase* data);
+	
+	void Prepare();
+
+	void Sensitivities_PostProcessing();
+
+	int Sensitivities_Python_PostProcessing(double* sensitivity_coefficients, int* reactions, int len);
+
+	int ReadSensitvityCoefficients();
+
+	int GetSensitivityProfile(int reaction_index, double* coefficient);
+
+private:
+	ProfilesDatabase* data_;
+	
+	Sensitivities_Database* sensitivities;
+
+	std::string normalizationType_;
+	std::string sensitivityType_;
+	std::string orderingType_;
+	std::string target_;
+
+	double localValue_;
+	double lowerBound_;
+	double upperBound_;
+};
+
+// #include "Sensitivities.hpp"
+#endif // SENSITIVITIES_H

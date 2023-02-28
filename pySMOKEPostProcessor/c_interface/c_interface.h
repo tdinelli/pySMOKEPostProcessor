@@ -1,13 +1,7 @@
 #ifndef OPENSMOKE_POSTPROCESSOR_CINTERFACE_H
 #define OPENSMOKE_POSTPROCESSOR_CINTERFACE_H
 
-#ifndef POSTPROCESSOR_API
-# ifdef _MSC_VER
-#  define POSTPROCESSOR_API __declspec(dllexport)
-# else
-#  define POSTPROCESSOR_API
-# endif
-#endif
+#include "definitions.h"
 
 // Pointer to C++ objects, passed into the C interface then cast to the correct type.
 typedef void *postprocessor_obj_ptr;
