@@ -35,13 +35,9 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-Sensitivities_Database::Sensitivities_Database(void)
-{
-}
+Sensitivities_Database::Sensitivities_Database(void) {}
 
-Sensitivities_Database::~Sensitivities_Database(void)
-{
-}
+Sensitivities_Database::~Sensitivities_Database(void) {}
 
 void Sensitivities_Database::SetDatabase(ProfilesDatabase* data)
 {

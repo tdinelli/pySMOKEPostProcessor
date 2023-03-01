@@ -44,13 +44,11 @@ class ROPA
 {
 public:
 
-    ROPA(const std::string kineticFolder, std::string outputFolder, std::string ropaType, std::string species, double localValue, double lowerBound, double upperBound);
+    ROPA();
 
 	void SetDatabase(ProfilesDatabase* data);
 
-	void ROPA_Calculations();
-
-    int ROPA_Calculations_Python(double* coefficients, int* reactions, int len);
+    void RateOfProductionAnalysis(double* coefficients, int* reactions, int len);
 
 	void MergePositiveAndNegativeBars (const std::vector<unsigned int>& positive_indices,
 		const std::vector<unsigned int>& negative_indices,
@@ -59,17 +57,45 @@ public:
 		std::vector<int>& indices,
 		std::vector<double>& coefficients);
 	
-	int FluxAnalysis(std::string element, std::string thickness,
+	void FluxAnalysis(std::string element, std::string thickness,
 					std::string type, std::string labeltype, 
 					int depth, int width, double threshold, 
 					bool thicknesslogscale,int* indexFirstName, 
 					int* indexSecondName, double* computedThickness, 
 					double* computedLabel, int* lenght);
 
-	int GetReactionRates(int index, double* reaction_rate);
+	void GetReactionRates(int index, double* reaction_rate);
 
-	int GetFormationRates(std::string specie, std::string units, std::string type, double* rate);
+	void GetFormationRates(std::string specie, std::string units, std::string type, double* rate);
+	
+	void SetKineticFolder(const std::string kineticFolder);
 
+	void SetOutputFolder(const std::string outputFolder);
+
+	void SetROPAType(const std::string kineticFolder);
+
+	void SetSpecies(const std::string kineticFolder);
+
+	void SetLocalValue(double localValue);
+	
+	void SetLowerBound(double lowerBound);
+
+	void SetUpperBound(double upperBound);
+
+	void SetElement(const std::string element);
+
+	void SetThickness(const std::string thickness);
+
+	void SetFluxAnalysisType(const std::string type);
+
+	void SetWidth(const int width);
+
+	void SetDepth(const int depth);
+
+	void SetThreshold(const double threshold);
+
+	void SetThicknessLogScale(bool thicknesslogscale);
+	
 private:
 
 	ProfilesDatabase* data_;
@@ -80,10 +106,19 @@ private:
 	std::string kineticFolder_;
 	std::string outputFolder_;
 	std::string species_;
+
 	double localValue_;
 	double upperBound_;
 	double lowerBound_;
 	bool speciesIsSelected;
+
+	std::string element_;
+	std::string thickness_;
+	std::string flux_type_;
+	int width_;
+	int depth_;
+	double threshold_;
+	bool thicknesslogscale_;
 };
 
 #include "ROPA.hpp"

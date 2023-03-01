@@ -46,22 +46,33 @@ class Sensitivities
 
 public:
 
-	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, 
-					std::string specie, double localValue, double lowerBound, double upperBound);
+	Sensitivities();
 
 	~Sensitivities();
 
 	void SetDatabase(ProfilesDatabase* data);
 	
+	void SetNormalizationType(std::string normalizationType);
+
+	void SetSensitivityType(std::string sensitivityType);
+	
+	void SetOrderingType(std::string orderingType);
+	
+	void SetTargetType(std::string target);
+
+	void SetLocalValue(double localValue);
+	
+	void SetLowerBound(double lowerBound);
+
+	void SetUpperBound(double upperBound);
+
 	void Prepare();
 
-	void Sensitivities_PostProcessing();
+	void Sensitivity_Analysis(double* sensitivity_coefficients, int* reactions, int len);
 
-	int Sensitivities_Python_PostProcessing(double* sensitivity_coefficients, int* reactions, int len);
+	void ReadSensitvityCoefficients();
 
-	int ReadSensitvityCoefficients();
-
-	int GetSensitivityProfile(int reaction_index, double* coefficient);
+	void GetSensitivityProfile(int reaction_index, double* coefficient);
 
 private:
 	ProfilesDatabase* data_;
@@ -76,6 +87,8 @@ private:
 	double localValue_;
 	double lowerBound_;
 	double upperBound_;
+
+	bool iLocalNormalization = false;
 };
 
 #include "Sensitivities.hpp"

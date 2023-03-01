@@ -57,8 +57,7 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 
 	if (!boost::filesystem::exists(path_mechanism))
 	{
-		std::cout << "The provided folder directory does not contain the kinetics.xml file" << std::endl;
-		return false;
+		throw PostProcessor::Exception("The provided folder directory does not contain the kinetics.xml file");
 	}
 
 	// Read from file 
@@ -76,8 +75,7 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 	}
 	else
 	{
-		std::cout << "The rate of production analysis is not available because the Output.xml file contains only a subset of the total number of species in the kinetic mechanism" << std::endl;
-		return false;
+		throw PostProcessor::Exception("The rate of production analysis is not available because the Output.xml file contains only a subset of the total number of species in the kinetic mechanism");
 	}
 
 	// Read the reaction strings 
@@ -87,8 +85,7 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 
 		if (!boost::filesystem::exists(path_reaction_names))
 		{
-			std::cout << " The provided folder directory does not contain the reaction_names.xml file" << std::endl;
-			return false;
+			throw PostProcessor::Exception("The provided folder directory does not contain the reaction_names.xml file");
 		}
 
 		{
@@ -125,8 +122,7 @@ bool ProfilesDatabase::ReadFileResults(const std::string& folder_name)
 
 	if (!boost::filesystem::exists(path_results))
 	{
-		std::cout << " The provided folder directory does not contain the output.xml file" << std::endl;
-		return false;
+		throw PostProcessor::Exception("The provided folder directory does not contain the output.xml file");
 	}
 
 	boost::property_tree::read_xml((path_results).string(), xml_main_input);
@@ -156,9 +152,7 @@ void ProfilesDatabase::Prepare()
 		}
 		else
 		{
-			std::cout << " Corrupted xml file : missing the t - p - mw leaf" << std::endl;
-			exit(-1);
-			
+			throw PostProcessor::Exception("Corrupted xml file : missing the t - p - mw leaf");	
 		}
 	}
 
@@ -192,8 +186,7 @@ void ProfilesDatabase::Prepare()
 		}
 		else
 		{
-			std::cout << " Corrupted xml file: missing the additional leaf" << std::endl;
-			exit(-1);
+			throw PostProcessor::Exception("Corrupted xml file: missing the additional leaf");
 		}
 	}
 
@@ -242,8 +235,7 @@ void ProfilesDatabase::Prepare()
 		}
 		else
 		{
-			std::cout << " Corrupted xml file: missing the mass-fractions leaf" << std::endl;	
-			exit(-1);
+			throw PostProcessor::Exception("Corrupted xml file: missing the mass-fractions leaf");
 		}
 	}
 
@@ -263,8 +255,7 @@ void ProfilesDatabase::Prepare()
 			}
 			else
 			{
-				std::cout << " Corrupted xml file: missing the profiles-size leaf" << std::endl;
-				exit(-1);
+				throw PostProcessor::Exception("Corrupted xml file: missing the profiles-size leaf");
 			}
 		}
 
@@ -292,8 +283,7 @@ void ProfilesDatabase::Prepare()
 		}
 		else
 		{
-			std::cout << " Corrupted xml file: missing the profiles leaf" << std::endl;
-			exit(-1);
+			throw PostProcessor::Exception("Corrupted xml file: missing the profiles leaf");
 		}
 
 		sorted_max.resize(string_list_massfractions_sorted.size());

@@ -9,22 +9,25 @@
 # endif
 #endif // POSTPROCESSOR_API
 
-// Standard library
-#include <sstream>
-#include <vector>
+# include <exception>
+# include <stdexcept>
 
-// OpenSMOKEpp library
-#include <OpenSMOKEpp>
-#include <maps/Maps_CHEMKIN>
-#include <maps/FluxAnalysisMap.h>
-#include <math/PhysicalConstants.h>
-#include <kernel/kinetics/KineticsUtilityFunctions.h>
+namespace PostProcessor
+{
+    class Exception : public std::exception
+    {
+        private:
+            std::string __what;
 
-// Boost library
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+        public:
 
-// #include <PostProcessorFluxMap.h>
+        Exception(const std::string& what) : __what(what){}
+
+        const char* what() const throw()
+        {
+            return this->__what.c_str();
+        }
+    };
+} // namespace Post Processor
 
 #endif // POSTPROCESSOR_DEFINITIONS_H
