@@ -49,10 +49,21 @@ class FluxByClass:
         if self.verbose:
             print('processing simul {}'.format(results_folder))
 
+        # distinguish pp input based on ropa type
+        loc_low_up = np.array([0, 0, 0,], dtype = float)
+        if isinstance(ropa_type, dict):
+            if 'local' in ropa_type.keys():
+                loc_low_up[0] = ropa_type['local']
+                ropa_type = 'local'
+            elif 'region' in ropa_type.keys():
+                loc_low_up[1:] = ropa_type['region']
+                ropa_type = 'region'
+            
         # simul output
         for sp in species_list:
             pp = postproc(self.kinetic_mechanism, results_folder)
-            tot_rop, indexes, _ = pp.RateOfProductionAnalysis(specie = sp, ropa_type = ropa_type, number_of_reactions = n_of_rxns)
+            tot_rop, indexes, _ = pp.RateOfProductionAnalysis(specie = sp, ropa_type = ropa_type, local_value = loc_low_up[0],
+                                 lower_value = loc_low_up[1], upper_value = loc_low_up[2], number_of_reactions = n_of_rxns)
             tot_rop_df = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=['flux_{}'.format(sp)], dtype=float)
             tot_rop_df = tot_rop_df.groupby(level=0).sum() # sum rxns with same indexes
             # assign flux
