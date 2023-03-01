@@ -75,7 +75,7 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 	}
 	else
 	{
-		throw PostProcessor::Exception("The rate of production analysis is not available because the Output.xml file contains only a subset of the total number of species in the kinetic mechanism");
+		throw PostProcessor::Exception("The rate of production analysis is not available because the Output.xml \nfile contains only a subset of the total number of species in the kinetic mechanism");
 	}
 
 	// Read the reaction strings 

@@ -55,15 +55,15 @@ add_link_options(-fPIC -m64 -w)
 # Set source and headers files
 #--------------------------------------------------------------------
 
-set ( CPP_SOURCE_FILES 
-  pySMOKEPostProcessor/c_interface/source/Utilities.cpp
-  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.cpp
-)
+#set ( CPP_SOURCE_FILES 
+#  pySMOKEPostProcessor/c_interface/source/Utilities.cpp
+#  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.cpp
+#)
 
-set (CPP_INCLUDE
-  pySMOKEPostProcessor/c_interface/source/Utilities.h
-  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.h
-)
+#set (CPP_INCLUDE
+#  pySMOKEPostProcessor/c_interface/source/Utilities.h
+#  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.h
+#)
 
 set ( C_INTERFACE_SOURCE_FILES
   pySMOKEPostProcessor/c_interface/c_interface.cpp
@@ -93,9 +93,8 @@ link_libraries (${COMPULSORY_LIBRARIES})
 #--------------------------------------------------------------------
 
 add_library(pySMOKEPostProcessor SHARED
-            ${CPP_SOURCE_FILES}
-            ${CPP_INCLUDE}
             ${C_INTERFACE_INCLUDE_FILES}
+            ${C_INTERFACE_SOURCE_FILES}
 )
 
 #--------------------------------------------------------------------

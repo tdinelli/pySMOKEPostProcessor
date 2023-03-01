@@ -72,7 +72,7 @@ void Sensitivities::SetOrderingType(std::string orderingType){
 	orderingType_ = orderingType;
 }
 	
-void Sensitivities::SetTargetType(std::string target){
+void Sensitivities::SetTarget(std::string target){
 	target_ = target;
 }
 
@@ -249,7 +249,7 @@ void Sensitivities::Sensitivity_Analysis(double* sensitivity_coefficients, int* 
 void Sensitivities::ReadSensitvityCoefficients()
 {
 	if (target_ == "")
-		// ERROROR
+		throw PostProcessor::Exception("Select a target!");
 
 	sensitivities->ReadFromChildFile(target_);
 }
@@ -258,10 +258,7 @@ void Sensitivities::GetSensitivityProfile(int reaction_index, double* coefficien
 {
 	std::string selected_y = target_;
 	if (target_ == ""){
-		//QMessageBox msgBox;
-		//msgBox.setText(QString::fromStdString("You have to select one of the available Y variables"));
-		//msgBox.exec();
-		//return;
+		throw PostProcessor::Exception("You have to select one of the available Y variables");
 	}
 
 	unsigned int selected_reaction_indices = reaction_index;

@@ -58,7 +58,7 @@ public:
 	
 	void SetOrderingType(std::string orderingType);
 	
-	void SetTargetType(std::string target);
+	void SetTarget(std::string target);
 
 	void SetLocalValue(double localValue);
 	
