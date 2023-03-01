@@ -38,9 +38,12 @@
 #ifndef SENSITIVITIES_H
 #define SENSITIVITIES_H
 
+#include "ProfilesDatabase.h"
+#include "Sensitivities_Database.h"
+
 class Sensitivities
 {
-	
+
 public:
 
 	Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, 
@@ -75,5 +78,5 @@ private:
 	double upperBound_;
 };
 
-// #include "Sensitivities.hpp"
+#include "Sensitivities.hpp"
 #endif // SENSITIVITIES_H

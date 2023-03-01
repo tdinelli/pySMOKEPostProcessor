@@ -52,27 +52,17 @@ add_compile_options(-fPIC -m64 -w)
 add_link_options(-fPIC -m64 -w)
 
 #--------------------------------------------------------------------
-# Include flags
-#--------------------------------------------------------------------
-
-include_directories (${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor/c_interface
-                     ${COMPULSORY_INCLUDE})
-#--------------------------------------------------------------------
-# Library flags
-#--------------------------------------------------------------------
-
-link_libraries (${COMPULSORY_LIBRARIES})
-
-#--------------------------------------------------------------------
 # Set source and headers files
 #--------------------------------------------------------------------
 
 set ( CPP_SOURCE_FILES 
-  pySMOKEPostProcessor/c_interface/source/utilities.cpp
+  pySMOKEPostProcessor/c_interface/source/Utilities.cpp
+  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.cpp
 )
 
 set (CPP_INCLUDE
-  pySMOKEPostProcessor/c_interface/source/utilities.h
+  pySMOKEPostProcessor/c_interface/source/Utilities.h
+  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.h
 )
 
 set ( C_INTERFACE_SOURCE_FILES
@@ -87,12 +77,25 @@ set ( C_INTERFACE_INCLUDE_FILES
 )
 
 #--------------------------------------------------------------------
+# Include flags
+#--------------------------------------------------------------------
+
+include_directories (${COMPULSORY_INCLUDE})
+
+#--------------------------------------------------------------------
+# Library flags
+#--------------------------------------------------------------------
+
+link_libraries (${COMPULSORY_LIBRARIES})
+
+#--------------------------------------------------------------------
 # Targets to compile
 #--------------------------------------------------------------------
 
 add_library(pySMOKEPostProcessor SHARED
             ${CPP_SOURCE_FILES}
             ${CPP_INCLUDE}
+            ${C_INTERFACE_INCLUDE_FILES}
 )
 
 #--------------------------------------------------------------------

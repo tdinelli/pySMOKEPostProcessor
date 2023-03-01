@@ -65,21 +65,18 @@ void ROPA::SetDatabase(ProfilesDatabase* data)
 void ROPA::ROPA_Calculations()
 {
 	// Select y variables among the species
-	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
-	{
+	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end()){
 		speciesIsSelected = true;
 	}
-	else 
-	{
+	else {
 		std::cout << " ERROR: Please select an existing specie." << std::endl;
 		exit(-1);
 	}
 	
 	unsigned int index_of_species;
-	for (unsigned int j = 0; j < data_->thermodynamicsMapXML->NumberOfSpecies(); j++)
-		if (speciesIsSelected == true)
-			if (species_ == data_->string_list_massfractions_sorted[j])
-			{
+	for (unsigned int j = 0; j < data_->thermodynamicsMapXML->NumberOfSpecies(); j++){
+		if (speciesIsSelected == true){
+			if (species_ == data_->string_list_massfractions_sorted[j]){
 				index_of_species = data_->sorted_index[j];
 
 				// debug check 
@@ -89,6 +86,8 @@ void ROPA::ROPA_Calculations()
 				
 				break;
 			}
+		}
+	}
 
 	{
 		OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
@@ -158,8 +157,7 @@ void ROPA::ROPA_Calculations()
 				std::cout << reaction_coefficients[i] << "\t\t" << reaction_indices[i] << "\t\t" << production_reaction_names[i] << std::endl;
 			}
 		} // Global | Region
-		else
-		{
+		else{
 			unsigned int index_min = 0;
 			unsigned int index_max = data_->number_of_abscissas_ - 1;
 			if (ropaType_ == "region")
@@ -484,7 +482,9 @@ int ROPA::FluxAnalysis(std::string element, std::string thickness,
 					double* computedLabel, int* lenght)
 {
 	// Select y variables among the species
-	if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(), species_) != data_->string_list_massfractions_sorted.end())
+	if (std::find(data_->string_list_massfractions_sorted.begin(), 
+				data_->string_list_massfractions_sorted.end(), 
+				species_) != data_->string_list_massfractions_sorted.end())
 	{
 		speciesIsSelected = true;
 	}
@@ -754,8 +754,7 @@ int ROPA::GetFormationRates(std::string specie, std::string units, std::string t
 		OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
 		OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
 		
-		for (unsigned int i=0;i<data_->number_of_abscissas_;i++)
-		{
+		for (unsigned int i=0;i<data_->number_of_abscissas_;i++){
 			// Recovers mass fractions
 			for (unsigned int k=0;k<data_->thermodynamicsMapXML->NumberOfSpecies();k++)
 				omega[k+1] = data_->omega[k][i];
@@ -780,15 +779,12 @@ int ROPA::GetFormationRates(std::string specie, std::string units, std::string t
 			data_->kineticsMapXML->ReactionRates(c.GetHandle());
 			data_->kineticsMapXML->ProductionAndDestructionRates(P.GetHandle(), D.GetHandle());			// kmol/m3/s
 
-			if (type == "characteristic-time")
-			{
+			if (type == "characteristic-time"){
 				const unsigned k = data_->sorted_index[formation_rates_to_plot[1]]+1;
 				tmp[i] = c[k] / (D[k]+1.e-32);	
 			}
-			else
-			{
-				if (units == "mass")
-				{
+			else{
+				if (units == "mass"){
 					OpenSMOKE::ElementByElementProduct(P.Size(), P.GetHandle(), data_->thermodynamicsMapXML->MWs().data(), P.GetHandle());
 					OpenSMOKE::ElementByElementProduct(D.Size(), D.GetHandle(), data_->thermodynamicsMapXML->MWs().data(), D.GetHandle());
 				}
@@ -804,8 +800,7 @@ int ROPA::GetFormationRates(std::string specie, std::string units, std::string t
 			}
 		}	
 
-		for(unsigned int i = 0; i < tmp.size(); i++)
-		{
+		for(unsigned int i = 0; i < tmp.size(); i++){
 			rate[i] = tmp[i];
 		}
 	}

@@ -39,8 +39,6 @@
 #include "Sensitivities_Database.h"
 #include "Utilities.h"
 
-#include "Sensitivities.h"
-
 Sensitivities::Sensitivities(std::string normalizationType, std::string sensitivityType, std::string orderingType, std::string target, double localValue, double lowerBound, double upperBound)
 {
 	normalizationType_ = normalizationType;
