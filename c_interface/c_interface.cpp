@@ -70,4 +70,16 @@ extern "C"
             set_error_string(e.what());
         }
     }
+    
+    int postprocessor_get_error()
+    {        
+        int temp = PostProcessor::postprocessor_last_func_call_error;
+        PostProcessor::postprocessor_last_func_call_error = 0;
+        return temp;
+    }
+
+    const char *postprocessor_get_error_string()
+    {
+        return PostProcessor::postprocessor_error_string;
+    }   
 } // extern "C"

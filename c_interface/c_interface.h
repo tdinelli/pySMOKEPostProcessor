@@ -81,6 +81,21 @@ POSTPROCESSOR_API void BoundaryLimits( char* kineticFolder,
                                     double* minimum_domain,
                                     double* middle_domain);
 
+/**
+ * Check if the last library call resulted in an error.
+ * Will reset upon call, so two consecutive calls to this function may not return the same value.
+ *
+ * @return 1 if error, 0 else.
+ */
+POSTPROCESSOR_API int postprocessor_get_error();
+
+/**
+ * Get a string describing the error.
+ *
+ * @return Error string.
+ */
+POSTPROCESSOR_API const char *postprocessor_get_error_string();
+
 #ifdef __cplusplus
     }
 #endif
