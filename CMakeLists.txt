@@ -139,19 +139,45 @@ install ( DIRECTORY
         )
 
 # Include boost libraries inside the packaging
-set(CPACK_COMPONENTS_ALL lib)
+set (APPLICATION_NAME "libpySMOKEPostProcessor.dylib")
+execute_process(  # Get interesting dynamic libraries from binary
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build
+  COMMAND ldd ${APPLICATION_NAME}
+  COMMAND nawk "{print $3}"
+  COMMAND sort -u
+  COMMAND egrep "std|boost" # Only libs I want to copy
+  OUTPUT_VARIABLE INSTALL_FILES
+  ERROR_VARIABLE INSTALL_FILES_ERROR
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+string(REGEX REPLACE "\n" ";" INSTALL_FILES "${INSTALL_FILES}") # Convert into list
+
+message(" ----> ${INSTALL_FILES}")
+
+if (${INSTALL_FILES_ERROR})
+  message("----> ${INSTALL_FILES_ERROR}")
+endif (${INSTALL_FILES_ERROR})
+
+foreach (_file ${INSTALL_FILES}) # Resolve links
+  get_filename_component(_resolvedFile "${_file}" REALPATH)
+  list (APPEND INSTALL_RESOLVED_FILES ${_resolvedFile} )
+endforeach()
+
+set(CPACK_COMPONENTS_ALL librerie)
 set(CPACK_COMPONENT_SOURCE_GROUP "Boost libraries")
 set(CPACK_COMPONENT_SOURCE_DESCRIPTION "Shared boost libraries")
 set(CPACK_COMPONENTS_IGNORE_GROUPS ".*")
-install ( TARGETS
-            ${Boost_DATETIME_LIBRARY}
-            ${Boost_FILE_SYSTEM_LIBRARY} 
-            ${Boost_PROGRAMOPTIONS_LIBRARY}
-            ${Boost_regex_LIBRARY}
-            ${Boost_timer_LIBRARY}
-            ${Boost_chrono_LIBRARY}
-          DESTINATION lib
-        )
+
+install(FILES                               # Copy all libraries and symlinks pointing to real paths
+    ${INSTALL_FILES}
+    DESTINATION librerie
+    COMPONENT core
+    )
+install(FILES                               # Copy all libraries real paths
+    ${INSTALL_RESOLVED_FILES}
+    DESTINATION librerie
+    COMPONENT core
+)
 
 # Imposta i dettagli del pacchetto
 set(CPACK_GENERATOR "TGZ")

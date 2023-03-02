@@ -46,7 +46,7 @@ class PostProcessorBackend:
             return True
 
         if lib_file is None:
-            lib_file = self._locate_splinter()
+            lib_file = self._locate_postprocessor()
             if lib_file is None:
                 raise FileNotFoundError(
                     "Unable to automatically locate pySMOKEPostProcessor.\n"
@@ -128,7 +128,7 @@ class PostProcessorBackend:
 
         set_signature('postprocessor_get_error', c_int)
         set_signature('postprocessor_get_error_string', c_char_p)
-        set_signature('getBoundary', c_void_p, c_char_p, c_char_p, c_double_p, c_double_p, c_double_p)
+        set_signature('BoundaryLimits', c_void_p, c_char_p, c_char_p, c_double_p, c_double_p, c_double_p)
 
     def _locate_postprocessor(self) -> ty.Optional[str]:
         is_linux = platform.system() == 'Linux'
@@ -138,7 +138,8 @@ class PostProcessorBackend:
         full_path = os.path.realpath(__file__)  # Path to this file
         postprocessor_python_main_dir = os.path.dirname(full_path)
 
-        postprocessor_basename = "pySMOKEPostProcessor-" + self.version
+        # postprocessor_basename = "pySMOKEPostProcessor-" + self.version
+        postprocessor_basename = "pySMOKEPostProcessor"
         if is_linux:
             operating_system = "linux"
             postprocessor_name = "lib" + postprocessor_basename + ".so"
@@ -151,8 +152,8 @@ class PostProcessorBackend:
         else:
             raise "pySMOKEPostProcessor: Unknown platform: " + platform.system()
 
-        lib_postprocessor = os.path.join(postprocessor_python_main_dir, "lib", operating_system, get_architecture(), postprocessor_name)
-
+        #lib_postprocessor = os.path.join(postprocessor_python_main_dir, "lib", operating_system, get_architecture(), postprocessor_name)
+        lib_postprocessor = "/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib"
         if os.path.exists(lib_postprocessor):
             return lib_postprocessor
 

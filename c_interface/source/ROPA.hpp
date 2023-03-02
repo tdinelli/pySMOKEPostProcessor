@@ -111,6 +111,10 @@ void ROPA::SetThicknessLogScale(bool thicknesslogscale){
 	thicknesslogscale_ = thicknesslogscale;
 }
 
+void ROPA::SetLabelType(std::string type){
+	label_type_ = type;
+}
+
 void ROPA::RateOfProductionAnalysis(double* coefficients, int* reactions, int len)
 {
 	// Select y variables among the species
@@ -275,12 +279,9 @@ void ROPA::RateOfProductionAnalysis(double* coefficients, int* reactions, int le
     }
 }
 
-void ROPA::FluxAnalysis(std::string element, std::string thickness,
-					std::string type, std::string labeltype, 
-					int depth, int width, double threshold, 
-					bool thicknesslogscale, int* indexFirstName, 
-					int* indexSecondName, double* computedThickness, 
-					double* computedLabel, int* lenght)
+void ROPA::FluxAnalysis(int* indexFirstName, int* indexSecondName, 
+						double* computedThickness, double* computedLabel, 
+						int* lenght)
 {
 	// Select y variables among the species
 	if (std::find(data_->string_list_massfractions_sorted.begin(), 
@@ -305,7 +306,7 @@ void ROPA::FluxAnalysis(std::string element, std::string thickness,
 	unsigned int index_element; // = ui.comboBox_Elements->currentIndex();
 	std::vector<std::string> elements_names = data_->thermodynamicsMapXML->elements();
 	for(unsigned int k = 0; k < elements_names.size(); k++){
-		if(element == elements_names[k]){
+		if(element_ == elements_names[k]){
 			index_element = k;	
 			break;		
 		}
@@ -316,9 +317,9 @@ void ROPA::FluxAnalysis(std::string element, std::string thickness,
 		throw PostProcessor::Exception("The selected species does not contain the selected element");
 	}
 
-	const int max_depth = depth;
-	const int max_width = width;
-	const double min_threshold_percentage = threshold;
+	const int max_depth = depth_;
+	const int max_width = width_;
+	const double min_threshold_percentage = threshold_;
 
 	// Local Analysis (Flux can be done only in when local ropa is available) 
     unsigned int index = 0;
@@ -364,22 +365,19 @@ void ROPA::FluxAnalysis(std::string element, std::string thickness,
 	bool relativethickness = false;
 	bool labelrelative = false;
 
-	if(type == "destruction")
-	{
+	if(flux_type_ == "destruction")
 		destruction = true;
-	}
-	if(thickness == "relative")
-	{
+	
+	if(thickness_ == "relative")
 		relativethickness = true;
-	}
-	if(labeltype == "relative")
-	{
+	
+	if(label_type_== "relative")
 		labelrelative = true;
-	}
+	
 	flux_analysis.SetDestructionAnalysis(destruction);
 	flux_analysis.SetNormalThickness(relativethickness);
 	flux_analysis.SetNormalTags(labelrelative);
-	flux_analysis.SetLogarithmicThickness(thicknesslogscale);
+	flux_analysis.SetLogarithmicThickness(thicknesslogscale_);
 	flux_analysis.SetMaxDepth(max_depth);
 	flux_analysis.SetMaxWidth(max_width);
 	flux_analysis.SetMinPercentageThreshold(min_threshold_percentage);

@@ -5,12 +5,195 @@ using namespace PostProcessor;
 
 extern "C"
 {
-    void GetSensitivityCoefficient(char* kineticFolder, 
-                                char* outputFolder, 
-                                int reaction_index, 
-                                char* target, 
-                                char* normalization_type, 
-                                double* sensitivity_coefficients)
+
+    void SensitivityAnalysis(char* kineticFolder,
+                            char* outputFolder,
+                            char* target,
+                            char* sensitivity_type,
+                            char* ordering_type,
+                            char* normalization_type,
+                            double sensitivity_local_value,
+                            double sensitivity_region_lower_value,
+                            double sensitivity_region_upper_value,
+                            int len,
+                            double* coefficients,
+                            int* reactions)
+    {
+        try
+        {
+            ProfilesDatabase *data_;
+            data_ = new ProfilesDatabase();
+        
+            Sensitivities* widget;
+            widget = new Sensitivities();
+
+            data_->ReadFileResults(outputFolder);
+            data_->ReadKineticMechanism(kineticFolder);
+            
+            widget->SetDatabase(data_);
+            widget->SetSensitivityType(sensitivity_type);
+            widget->SetOrderingType(ordering_type);
+            widget->SetNormalizationType(normalization_type);
+            widget->SetTarget(target);
+            widget->SetLocalValue(sensitivity_local_value);
+            widget->SetLowerBound(sensitivity_region_lower_value);
+            widget->SetUpperBound(sensitivity_region_upper_value);
+            widget->Prepare();
+            widget->ReadSensitvityCoefficients();
+
+            widget->Sensitivity_Analysis(coefficients, reactions, len);
+        }
+        catch(const Exception &e)
+        {
+            set_error_string(e.what());
+        } 
+    }
+
+    void RateOfProductionAnalysis( char* kineticFolder,
+                                char* outputFolder,
+                                char* species,
+                                char* ropa_type,
+                                double ropa_local_value,
+                                double ropa_region_lower_value,
+                                double ropa_region_upper_value,
+                                int len,
+                                double* coefficients,
+                                int* reactions)
+    {
+        try
+        {
+            ProfilesDatabase *data_;
+            data_ = new ProfilesDatabase();
+        
+            ROPA* widget;
+            widget = new ROPA();
+
+            data_->ReadFileResults(outputFolder);
+            data_->ReadKineticMechanism(kineticFolder);
+            widget->SetDatabase(data_);
+
+            widget->SetROPAType(ropa_type);
+            widget->SetSpecies(species);
+            widget->SetLocalValue(ropa_local_value);
+            widget->SetLowerBound(ropa_region_lower_value);
+            widget->SetUpperBound(ropa_region_upper_value);
+
+            widget->RateOfProductionAnalysis(coefficients, reactions, len);
+
+        }
+        catch(const Exception &e)
+        {
+            set_error_string(e.what());
+        }  
+    }
+    
+    void FluxAnalysis ( char* kineticFolder, 
+                    char* outputFolder, 
+                    char* species, 
+                    char* element, 
+                    char* type,
+                    double local_value,
+                    char* thickness, // 0-absolute 1-relative(%)
+                    bool* thicknesslogscale,
+                    char* labeltype, // 0-absolute 1-relative(%)
+                    int depth,
+                    int width,
+                    double threshold,
+                    int* indexFirstName,
+                    int* indexSecondName,
+                    double* computedThickness,
+                    double* computedLabel,
+                    int* lenght)
+    {
+        try
+        {
+            ProfilesDatabase *data_;
+            data_ = new ProfilesDatabase();
+        
+            ROPA* widget;
+            widget = new ROPA();
+
+            data_->ReadFileResults(outputFolder);
+            data_->ReadKineticMechanism(kineticFolder);
+
+            widget->SetDatabase(data_);
+            widget->SetSpecies(species);
+            widget->SetElement(element);
+            widget->SetFluxAnalysisType(type);
+            widget->SetLocalValue(local_value);
+            widget->SetThickness(thickness);
+            widget->SetThicknessLogScale(thicknesslogscale);
+            widget->SetLabelType(labeltype);
+            widget->SetDepth(depth);
+            widget->SetWidth(width);
+            widget->SetThreshold(threshold);
+
+            widget->FluxAnalysis(indexFirstName, indexSecondName, 
+                                computedThickness, computedLabel, lenght);
+        }
+        catch(const Exception &e)
+        {
+            set_error_string(e.what());
+        } 
+    }
+    void GetFormationRates ( char* kineticFolder, 
+                            char* outputFolder, 
+                            char* species, 
+                            char* units, 
+                            char* type, 
+                            double* formation_rate)
+    {
+        try
+        {
+            // TODO Handling errorss
+            ProfilesDatabase *data_;
+            data_ = new ProfilesDatabase();
+        
+            ROPA* widget;
+            widget = new ROPA();
+        
+            data_->ReadFileResults(outputFolder);
+            data_->ReadKineticMechanism(kineticFolder);
+            widget->SetDatabase(data_);
+            widget->GetFormationRates(species, units, type, formation_rate);
+        }
+        catch(const Exception &e)
+        {
+            set_error_string(e.what());
+        }
+    }
+
+    void GetReactionRates ( char* kineticFolder, 
+                        char* outputFolder, 
+                        int reaction_index, 
+                        double* reaction_rate)
+    {
+        try
+        {
+            // TODO Handling errorss
+            ProfilesDatabase *data_;
+            data_ = new ProfilesDatabase();
+        
+            ROPA* widget;
+            widget = new ROPA();
+        
+            data_->ReadFileResults(outputFolder);
+            data_->ReadKineticMechanism(kineticFolder);
+            widget->SetDatabase(data_);
+            widget->GetReactionRates(reaction_index, reaction_rate);
+        }
+        catch(const Exception &e)
+        {
+            set_error_string(e.what());
+        }
+    }
+
+    void GetSensitivityCoefficients(char* kineticFolder, 
+                                    char* outputFolder, 
+                                    int reaction_index, 
+                                    char* target, 
+                                    char* normalization_type, 
+                                    double* sensitivity_coefficients)
     {
         try
         {
@@ -41,11 +224,11 @@ extern "C"
         }
     }
 
-    void getBoundary( char* kineticFolder, 
-	                char* outputFolder,
-	                double* maximum_domain,
-	                double* minimum_domain,
-                	double* middle_domain)
+    void BoundaryLimits( char* kineticFolder, 
+	                    char* outputFolder,
+	                    double* maximum_domain,
+	                    double* minimum_domain,
+                	    double* middle_domain)
     {
         try
         {

@@ -57,12 +57,8 @@ public:
 		std::vector<int>& indices,
 		std::vector<double>& coefficients);
 	
-	void FluxAnalysis(std::string element, std::string thickness,
-					std::string type, std::string labeltype, 
-					int depth, int width, double threshold, 
-					bool thicknesslogscale,int* indexFirstName, 
-					int* indexSecondName, double* computedThickness, 
-					double* computedLabel, int* lenght);
+	void FluxAnalysis(int* indexFirstName, int* indexSecondName, 
+					double* computedThickness, double* computedLabel, int* lenght);
 
 	void GetReactionRates(int index, double* reaction_rate);
 
@@ -95,6 +91,8 @@ public:
 	void SetThreshold(const double threshold);
 
 	void SetThicknessLogScale(bool thicknesslogscale);
+
+	void SetLabelType(std::string type);
 	
 private:
 
@@ -119,6 +117,7 @@ private:
 	int depth_;
 	double threshold_;
 	bool thicknesslogscale_;
+	std::string label_type_;
 };
 
 #include "ROPA.hpp"

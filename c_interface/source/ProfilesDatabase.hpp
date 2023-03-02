@@ -75,7 +75,7 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 	}
 	else
 	{
-		throw PostProcessor::Exception("The rate of production analysis is not available because the Output.xml \nfile contains only a subset of the total number of species in the kinetic mechanism");
+		throw PostProcessor::Exception("Output.xml file contains a subset of the total species in the kinetic mechanism");
 	}
 
 	// Read the reaction strings 
@@ -85,7 +85,7 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name)
 
 		if (!boost::filesystem::exists(path_reaction_names))
 		{
-			throw PostProcessor::Exception("The provided folder directory does not contain the reaction_names.xml file");
+			throw PostProcessor::Exception("Kinetic folder does not contain the reaction_names.xml file");
 		}
 
 		{
@@ -122,7 +122,7 @@ bool ProfilesDatabase::ReadFileResults(const std::string& folder_name)
 
 	if (!boost::filesystem::exists(path_results))
 	{
-		throw PostProcessor::Exception("The provided folder directory does not contain the output.xml file");
+		throw PostProcessor::Exception("Output folder does not contain the output.xml file");
 	}
 
 	boost::property_tree::read_xml((path_results).string(), xml_main_input);
@@ -152,7 +152,7 @@ void ProfilesDatabase::Prepare()
 		}
 		else
 		{
-			throw PostProcessor::Exception("Corrupted xml file : missing the t - p - mw leaf");	
+			throw PostProcessor::Exception("Corrupted xml file: missing the t - p - mw leaf");	
 		}
 	}
 

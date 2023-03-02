@@ -15,8 +15,9 @@ def get_c_string(py_string):
     else:
         return ctypes.c_char_p(py_string)
 
-def get_py_string(c_string):
-    return str(c_string)
+def get_py_string(stringa):
+    decoded_string = stringa.decode('UTF-8')
+    return str(decoded_string)
 
 def is_string(py_string):
     if is_python3():

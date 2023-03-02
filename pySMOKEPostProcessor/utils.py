@@ -4,17 +4,16 @@ from typing import List
 from .utilities import *
 
 def GetBoundary():
-    from ctypes import c_double
-    backend.load('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib')
-    path = os.path.join('..', 'build', 'libpySMOKEPostProcessor.dylib')
-    kineticFolder = bytes('../examples/data/ROPA-02/kinetics', 'utf-8')
-    outputFolder = bytes('../examples/data/ROPA-01/Output', 'utf-8')
-    domain_maximum = (c_double*1)()
-    domain_minimum = (c_double*1)()
-    domain_middle = (c_double*1)()
+    
+    kineticFolder = get_c_string('../examples/data/ROPA-01/kinetics')
+    outputFolder = get_c_string('../examples/data/ROPA-01/Output')
+
+    domain_maximum = list_to_c_array_of_doubles([0])
+    domain_minimum = list_to_c_array_of_doubles([0])
+    domain_middle = list_to_c_array_of_doubles([0])
     
     f_handle = backend.handle.getBoundary
     ciao = backend.call(f_handle, kineticFolder, outputFolder, domain_maximum, domain_minimum, domain_middle)
     
-    domain_maximum = [i for i in domain_maximum][0]
+    domain_maximum = c_array_to_list(domain_maximum, 1)
     print(domain_maximum)
