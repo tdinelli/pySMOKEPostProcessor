@@ -58,3 +58,4 @@ pySMOKEPostProcessor/maps/prova_kinMAP.py
 dist/
 build/
 pySMOKEPostProcessor.egg-info/
+pySMOKEPostProcessor_old
