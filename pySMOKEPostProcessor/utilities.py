@@ -44,7 +44,6 @@ def flatten_list(l):
             result.append(item)
     return result
 
-
 def get_architecture():
     arch = "x86"
     if ctypes.sizeof(ctypes.c_void_p) == 8:

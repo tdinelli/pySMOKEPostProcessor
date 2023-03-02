@@ -5,6 +5,72 @@
 cmake_minimum_required (VERSION 3.16)
 
 project (pySMOKEpostprocessor)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+# --- Read version from the file
+file(STRINGS "version" VERSION)
+
+# --- Default configuration values
+set(DEFAULT_BUILD_TYPE "Release")
+set(DEFAULT_ARCH "x86-64")
+
+# --- Detect platform
+string(COMPARE EQUAL "Linux"   ${CMAKE_SYSTEM_NAME} LINUX)
+string(COMPARE EQUAL "Windows" ${CMAKE_SYSTEM_NAME} WINDOWS)
+string(COMPARE EQUAL "Darwin"  ${CMAKE_SYSTEM_NAME} OS_X)
+
+if(LINUX)
+    set(OS_STRING "linux")
+elseif(WINDOWS)
+    set(OS_STRING "windows")
+elseif(OS_X)
+    set(OS_STRING "osx")
+else()
+    set(OS_STRING "Unknown")
+endif()
+
+# --- Detect compiler
+string(COMPARE EQUAL "Clang"      ${CMAKE_CXX_COMPILER_ID} CLANG)
+string(COMPARE EQUAL "AppleClang" ${CMAKE_CXX_COMPILER_ID} APPLECLANG)
+string(COMPARE EQUAL "GNU"        ${CMAKE_CXX_COMPILER_ID} GCC)
+string(COMPARE EQUAL "Intel"      ${CMAKE_CXX_COMPILER_ID} INTEL)
+string(COMPARE EQUAL "MSVC"       ${CMAKE_CXX_COMPILER_ID} MSVC)
+
+if (CLANG OR APPLECLANG)
+    set(CLANG 1)
+endif()
+
+# --- Set build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE ${DEFAULT_BUILD_TYPE})
+endif()
+message (STATUS "Compiling in mode: ${CMAKE_BUILD_TYPE}")
+
+string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+
+# Set architecture to default if not set
+if(NOT ARCH)
+    set(ARCH ${DEFAULT_ARCH})
+endif()
+
+# Set bitness
+if(${ARCH} STREQUAL "x86-64")
+    set(BITNESS "64")
+    set(BITNESS_FLAG "-m${BITNESS}")
+elseif(${ARCH} STREQUAL "x86")
+    set(BITNESS "32")
+    set(BITNESS_FLAG "-m${BITNESS}")
+elseif(${ARCH} STREQUAL "armv8")
+    set(BITNESS "64")
+    set(BITNESS_FLAG "")
+elseif(${ARCH} STREQUAL "arm64")
+    set(BITNESS "64")
+    set(BITNESS_FLAG "")
+else()
+    set(BITNESS "32")
+    set(ARCH "x86")
+    set(BITNESS_FLAG "-m${BITNESS}")
+    message("Unknown architecture selected, defaulting to x86")
+endif()
 
 # --- Set module path in order to use custom CMake modules
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -17,12 +83,6 @@ set (PROJECT_VERSION_MAJOR 0)
 set (PROJECT_VERSION_MINOR 3)
 set (PROJECT_VERSION_PATCH 0)
 set (INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Installation directory for executables")
-
-if( NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE Release)
-endif()
-
-message (STATUS "Compiling in mode: ${CMAKE_BUILD_TYPE}")
 
 #--------------------------------------------------------------------
 # Compulsory libraries
@@ -57,16 +117,6 @@ add_link_options(-fPIC -m64 -w)
 # Set source and headers files
 #--------------------------------------------------------------------
 
-#set ( CPP_SOURCE_FILES 
-#  pySMOKEPostProcessor/c_interface/source/Utilities.cpp
-#  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.cpp
-#)
-
-#set (CPP_INCLUDE
-#  pySMOKEPostProcessor/c_interface/source/Utilities.h
-#  pySMOKEPostProcessor/c_interface/source/ProfilesDatabase.h
-#)
-
 set ( C_INTERFACE_SOURCE_FILES
       ${CMAKE_SOURCE_DIR}/c_interface/c_interface.cpp
       ${CMAKE_SOURCE_DIR}/c_interface/c_utilities.cpp
@@ -94,7 +144,9 @@ link_libraries (${COMPULSORY_LIBRARIES})
 # Targets to compile
 #--------------------------------------------------------------------
 
-add_library(pySMOKEPostProcessor SHARED
+set(SHARED_LIBRARY ${PROJECT_NAME_LOWER}-${VERSION})
+
+add_library(${SHARED_LIBRARY} SHARED
             ${C_INTERFACE_INCLUDE_FILES}
             ${C_INTERFACE_SOURCE_FILES}
 )
@@ -103,87 +155,21 @@ add_library(pySMOKEPostProcessor SHARED
 # Installing options
 #--------------------------------------------------------------------
 
-install ( TARGETS pySMOKEPostProcessor 
-          DESTINATION ${INSTALL_BIN_DIR}/bin)
+#install(
+#        DIRECTORY ${CMAKE_SOURCE_DIR}/pySMOKEPostProcessor
+#        DESTINATION ${INSTALL_BIN_DIR}/python-postprocessor
+#        PATTERN "*.pyc" EXCLUDE
+#        PATTERN "__pycache__*" EXCLUDE
+#)
+#file(COPY ${CMAKE_SOURCE_DIR}/version DESTINATION ${INSTALL_BIN_DIR}/python-postprocessor/pySMOKEpostprocessor)
+#install ( TARGETS ${SHARED_LIBRARY} 
+#          DESTINATION ${INSTALL_BIN_DIR}/python-postprocessor/pySMOKEpostprocessor/lib/${OS_STRING}/${ARCH})
 
 #--------------------------------------------------------------------
 # Packing options
 #--------------------------------------------------------------------
 
-set(CPACK_PACKAGE_NAME "pySMOKEPostProcessor")
-set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-set(CPACK_PACKAGE_VENDOR "CRECK modeling group")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Python binder of the OpenSMOKEPostProcessor")
+# TODO
 
-# Include whithin the package the compiled library
-set(CPACK_COMPONENTS_ALL bin)
-set(CPACK_COMPONENT_SOURCE_GROUP "Compiled Librayr")
-set(CPACK_COMPONENT_SOURCE_DESCRIPTION "Compiled interface of pySMOKEPostProcessor")
-set(CPACK_COMPONENTS_IGNORE_GROUPS ".*")
-install ( TARGETS pySMOKEPostProcessor DESTINATION bin)
-
-# Include whithin the package also the source code 
-# both c_interface and python
-set(CPACK_COMPONENTS_ALL source)
-set(CPACK_COMPONENT_SOURCE_GROUP "Source code")
-set(CPACK_COMPONENT_SOURCE_DESCRIPTION "Source code for c_interface and python of the pySMOKEPostProcessor")
-set(CPACK_COMPONENTS_IGNORE_GROUPS ".*")
-install ( DIRECTORY
-            ${CMAKE_SOURCE_DIR}/c_interface
-            ${CMAKE_SOURCE_DIR}/pySMOKEPostProcessor
-          DESTINATION source
-          PATTERN "*.pyc" EXCLUDE
-          PATTERN "__pycache__*" EXCLUDE
-        )
-
-# Include boost libraries inside the packaging
-set (APPLICATION_NAME "libpySMOKEPostProcessor.dylib")
-execute_process(  # Get interesting dynamic libraries from binary
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build
-  COMMAND ldd ${APPLICATION_NAME}
-  COMMAND nawk "{print $3}"
-  COMMAND sort -u
-  COMMAND egrep "std|boost" # Only libs I want to copy
-  OUTPUT_VARIABLE INSTALL_FILES
-  ERROR_VARIABLE INSTALL_FILES_ERROR
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-string(REGEX REPLACE "\n" ";" INSTALL_FILES "${INSTALL_FILES}") # Convert into list
-
-message(" ----> ${INSTALL_FILES}")
-
-if (${INSTALL_FILES_ERROR})
-  message("----> ${INSTALL_FILES_ERROR}")
-endif (${INSTALL_FILES_ERROR})
-
-foreach (_file ${INSTALL_FILES}) # Resolve links
-  get_filename_component(_resolvedFile "${_file}" REALPATH)
-  list (APPEND INSTALL_RESOLVED_FILES ${_resolvedFile} )
-endforeach()
-
-set(CPACK_COMPONENTS_ALL librerie)
-set(CPACK_COMPONENT_SOURCE_GROUP "Boost libraries")
-set(CPACK_COMPONENT_SOURCE_DESCRIPTION "Shared boost libraries")
-set(CPACK_COMPONENTS_IGNORE_GROUPS ".*")
-
-install(FILES                               # Copy all libraries and symlinks pointing to real paths
-    ${INSTALL_FILES}
-    DESTINATION librerie
-    COMPONENT core
-    )
-install(FILES                               # Copy all libraries real paths
-    ${INSTALL_RESOLVED_FILES}
-    DESTINATION librerie
-    COMPONENT core
-)
-
-# Imposta i dettagli del pacchetto
-set(CPACK_GENERATOR "TGZ")
-set(CPACK_SOURCE_GENERATOR "TGZ")
-set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;.gitignore;.vscode/")
-
-set (CPACK)
-
-include(CPack)
+message("Configuring ${PROJECT_NAME} version ${VERSION} in ${CMAKE_BUILD_TYPE} mode for ${ARCH} (${BITNESS} bit)")
+message("Compiler flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")

@@ -1,5 +1,4 @@
 from .postprocessor_backend import postprocessor_backend_obj as _backend
-from .utils import GetBoundary
 
 def load(lib_file_path: str):
     """

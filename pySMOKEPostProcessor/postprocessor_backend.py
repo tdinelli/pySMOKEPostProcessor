@@ -138,8 +138,8 @@ class PostProcessorBackend:
         full_path = os.path.realpath(__file__)  # Path to this file
         postprocessor_python_main_dir = os.path.dirname(full_path)
 
-        # postprocessor_basename = "pySMOKEPostProcessor-" + self.version
-        postprocessor_basename = "pySMOKEPostProcessor"
+        postprocessor_basename = "pysmokepostprocessor-" + self.version
+        #postprocessor_basename = "pySMOKEPostProcessor"
         if is_linux:
             operating_system = "linux"
             postprocessor_name = "lib" + postprocessor_basename + ".so"
@@ -152,8 +152,8 @@ class PostProcessorBackend:
         else:
             raise "pySMOKEPostProcessor: Unknown platform: " + platform.system()
 
-        #lib_postprocessor = os.path.join(postprocessor_python_main_dir, "lib", operating_system, get_architecture(), postprocessor_name)
-        lib_postprocessor = "/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib"
+        lib_postprocessor = os.path.join(postprocessor_python_main_dir, "lib", operating_system, get_architecture(), postprocessor_name)
+        # lib_postprocessor = "/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib"
         if os.path.exists(lib_postprocessor):
             return lib_postprocessor
 
