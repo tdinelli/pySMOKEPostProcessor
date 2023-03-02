@@ -13,8 +13,10 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{EIGEN_LIBRARY_PATH}/cmake)
 set (CMAKE_COLOR_MAKEFILE ON)
-set (VERSION "0.3.0")
-set (INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH "Installation directory for executables")
+set (PROJECT_VERSION_MAJOR 0)
+set (PROJECT_VERSION_MINOR 3)
+set (PROJECT_VERSION_PATCH 0)
+set (INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Installation directory for executables")
 
 if( NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -66,14 +68,14 @@ add_link_options(-fPIC -m64 -w)
 #)
 
 set ( C_INTERFACE_SOURCE_FILES
-  pySMOKEPostProcessor/c_interface/c_interface.cpp
-  pySMOKEPostProcessor/c_interface/c_utilities.cpp
+      ${CMAKE_SOURCE_DIR}/c_interface/c_interface.cpp
+      ${CMAKE_SOURCE_DIR}/c_interface/c_utilities.cpp
 )
 
 set ( C_INTERFACE_INCLUDE_FILES
-  pySMOKEPostProcessor/c_interface/c_interface.h
-  pySMOKEPostProcessor/c_interface/c_utilities.h
-  pySMOKEPostProcessor/c_interface/definitions.h
+      ${CMAKE_SOURCE_DIR}/c_interface/c_interface.h
+      ${CMAKE_SOURCE_DIR}/c_interface/c_utilities.h
+      ${CMAKE_SOURCE_DIR}/c_interface/definitions.h
 )
 
 #--------------------------------------------------------------------
@@ -100,3 +102,62 @@ add_library(pySMOKEPostProcessor SHARED
 #--------------------------------------------------------------------
 # Installing options
 #--------------------------------------------------------------------
+
+install ( TARGETS pySMOKEPostProcessor 
+          DESTINATION ${INSTALL_BIN_DIR}/bin)
+
+#--------------------------------------------------------------------
+# Packing options
+#--------------------------------------------------------------------
+
+set(CPACK_PACKAGE_NAME "pySMOKEPostProcessor")
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_VENDOR "CRECK modeling group")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Python binder of the OpenSMOKEPostProcessor")
+
+# Include whithin the package the compiled library
+set(CPACK_COMPONENTS_ALL bin)
+set(CPACK_COMPONENT_SOURCE_GROUP "Compiled Librayr")
+set(CPACK_COMPONENT_SOURCE_DESCRIPTION "Compiled interface of pySMOKEPostProcessor")
+set(CPACK_COMPONENTS_IGNORE_GROUPS ".*")
+install ( TARGETS pySMOKEPostProcessor DESTINATION bin)
+
+# Include whithin the package also the source code 
+# both c_interface and python
+set(CPACK_COMPONENTS_ALL source)
+set(CPACK_COMPONENT_SOURCE_GROUP "Source code")
+set(CPACK_COMPONENT_SOURCE_DESCRIPTION "Source code for c_interface and python of the pySMOKEPostProcessor")
+set(CPACK_COMPONENTS_IGNORE_GROUPS ".*")
+install ( DIRECTORY
+            ${CMAKE_SOURCE_DIR}/c_interface
+            ${CMAKE_SOURCE_DIR}/pySMOKEPostProcessor
+          DESTINATION source
+          PATTERN "*.pyc" EXCLUDE
+          PATTERN "__pycache__*" EXCLUDE
+        )
+
+# Include boost libraries inside the packaging
+set(CPACK_COMPONENTS_ALL lib)
+set(CPACK_COMPONENT_SOURCE_GROUP "Boost libraries")
+set(CPACK_COMPONENT_SOURCE_DESCRIPTION "Shared boost libraries")
+set(CPACK_COMPONENTS_IGNORE_GROUPS ".*")
+install ( TARGETS
+            ${Boost_DATETIME_LIBRARY}
+            ${Boost_FILE_SYSTEM_LIBRARY} 
+            ${Boost_PROGRAMOPTIONS_LIBRARY}
+            ${Boost_regex_LIBRARY}
+            ${Boost_timer_LIBRARY}
+            ${Boost_chrono_LIBRARY}
+          DESTINATION lib
+        )
+
+# Imposta i dettagli del pacchetto
+set(CPACK_GENERATOR "TGZ")
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;.gitignore;.vscode/")
+
+set (CPACK)
+
+include(CPack)
