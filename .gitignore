@@ -59,3 +59,4 @@ dist/
 build/
 pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
+pySMOKEPostProcessor/version
