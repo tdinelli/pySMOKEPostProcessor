@@ -93,9 +93,9 @@ extern "C"
                     char* element, 
                     char* type,
                     double local_value,
-                    char* thickness, // 0-absolute 1-relative(%)
+                    char* thickness,
                     bool* thicknesslogscale,
-                    char* labeltype, // 0-absolute 1-relative(%)
+                    char* labeltype,
                     int depth,
                     int width,
                     double threshold,
