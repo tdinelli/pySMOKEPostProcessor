@@ -2,7 +2,7 @@ from .postprocessor_backend import postprocessor_backend_obj as backend
 from .utilities import get_c_string, list_to_c_array_of_doubles, c_array_to_list
 
 def GetSimulationsBoundary():
-	
+
 	kineticFolder = get_c_string('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/examples/data/ROPA-01/kinetics')
 	outputFolder = get_c_string('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/examples/data/ROPA-01/Output')
 
