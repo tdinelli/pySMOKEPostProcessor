@@ -1,5 +1,6 @@
 import sys
 import ctypes
+import platform
 
 def out(text, newLine=True):
 	sys.stdout.write(text)
@@ -45,7 +46,4 @@ def flatten_list(l):
 	return result
 
 def get_architecture():
-	arch = "x86"
-	if ctypes.sizeof(ctypes.c_void_p) == 8:
-		arch = "x86-64"
-	return arch
+	return platform.machine()
