@@ -10,8 +10,8 @@ import os.path
 if os.path.isdir("/Users/tdinelli/"):
     pp.load("/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib")
 
-kineticFolder = os.path.join("data", "ROPA-01", "kinetics")
-resultsFolder = os.path.join("data", "ROPA-01", "Output")
+kineticFolder = path.join("data", "ROPA-01", "kinetics")
+resultsFolder = path.join("data", "ROPA-01", "Output")
 
 coefficients, indices, names = pp.RateOfProductionAnalysis(kinetic_folder=kineticFolder, 
                                         output_folder=resultsFolder,
