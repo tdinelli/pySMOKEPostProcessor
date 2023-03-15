@@ -94,7 +94,7 @@ extern "C"
                     char* type,
                     double local_value,
                     char* thickness,
-                    bool* thicknesslogscale,
+                    bool thicknesslogscale,
                     char* labeltype,
                     int depth,
                     int width,
@@ -112,10 +112,9 @@ extern "C"
         
             ROPA* widget;
             widget = new ROPA();
-
+            
             data_->ReadFileResults(outputFolder);
             data_->ReadKineticMechanism(kineticFolder);
-
             widget->SetDatabase(data_);
             widget->SetSpecies(species);
             widget->SetElement(element);

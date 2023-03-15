@@ -207,7 +207,7 @@ void Sensitivities::Sensitivity_Analysis(double* sensitivity_coefficients, int* 
 					sum += profile[i] * (data_->additional[0][i + 1] - data_->additional[0][i]);
 				total_coefficients[j] = sum / delta;
 			}
-			else if (orderingType_ == "absolutearea"){
+			else if (orderingType_ == "absolute-area"){
 				double sumPlus = 0;
 				double sumMinus = 0;
 				for (unsigned int i = index_min; i < index_max - 1; i++){
@@ -221,7 +221,7 @@ void Sensitivities::Sensitivity_Analysis(double* sensitivity_coefficients, int* 
 				else                    total_coefficients[j] = -(sumPlus + sumMinus) / delta;
 			}
 			else{
-				// ERROR
+				throw PostProcessor::Exception("Available ordering types are: peak-values | area | absolute-area");
 			}
 		}
 

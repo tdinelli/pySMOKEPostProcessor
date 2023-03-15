@@ -39,7 +39,7 @@ POSTPROCESSOR_API void FluxAnalysis (char* kineticFolder,
                                     char* type,
                                     double local_value,
                                     char* thickness, // 0-absolute 1-relative(%)
-                                    bool* thicknesslogscale,
+                                    bool thicknesslogscale,
                                     char* labeltype, // 0-absolute 1-relative(%)
                                     int depth,
                                     int width,
