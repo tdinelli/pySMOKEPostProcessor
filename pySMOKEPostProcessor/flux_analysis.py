@@ -15,7 +15,8 @@ def FluxAnalysis(kinetic_folder: str, output_folder: str,
 
 	if(flux_analysis_type != 'production' and  flux_analysis_type != 'destruction'):
 		raise ValueError("The available type for the flux analysis are: production | destruction")
-
+	flux_type = flux_analysis_type
+	
 	if(thickness != 'absolute' and thickness != 'relative'):
 		raise ValueError("The available type for the caluclation of the thicknsss are: absolute | relative(%)")
 
@@ -23,12 +24,13 @@ def FluxAnalysis(kinetic_folder: str, output_folder: str,
 		raise ValueError("The available type for the labeling are: absolute | relative(%)")
 
 	flux_analysis_type = get_c_string(flux_analysis_type)
-	thickness = get_c_string(flux_analysis_type)
+	thickness = get_c_string(thickness)
 	label_type = get_c_string(label_type)
+	kf_ = kinetic_folder
 	kinetic_folder = get_c_string(kinetic_folder)
 	output_folder = get_c_string(output_folder)
 
-	thickness = c_bool(thickness_log_scale)
+	thickness_log_scale = c_bool(thickness_log_scale)
 	depth = c_int(depth)
 	width = c_int(width)
 	threshold = c_double(threshold)
@@ -60,7 +62,7 @@ def FluxAnalysis(kinetic_folder: str, output_folder: str,
 				computedLabel,
 				length)
 	
-	length = c_array_to_list(length)[0]
+	length = [l for l in length][0]
 	indexFirstName = c_array_to_list(indexFirstName, length)
 	indexSecondName = c_array_to_list(indexSecondName, length)
 	computedThickness = c_array_to_list(computedThickness, length)
@@ -68,13 +70,13 @@ def FluxAnalysis(kinetic_folder: str, output_folder: str,
 
 	firstNames = []
 	secondNames = []
-	KineticMap_ = KineticMap(kinetic_folder.decode("utf-8"))
+	KineticMap_ = KineticMap(kf_)
 
 	for j in range(len(indexFirstName)):
-		firstNames.append( KineticMap_.SpecieNameFromIndex(indexFirstName[j]))
-		secondNames.append(KineticMap_.SpecieNameFromIndex(indexSecondName[j]))
+		firstNames.append( KineticMap_.SpeciesNameFromIndex(indexFirstName[j]))
+		secondNames.append(KineticMap_.SpeciesNameFromIndex(indexSecondName[j]))
 
-	Graph = GraphWriter(flux_analysis_type)
+	Graph = GraphWriter(flux_type)
 	Graph = Graph.CreateGraph(firstNames, secondNames, computedThickness, computedLabel)
 
 	return Graph

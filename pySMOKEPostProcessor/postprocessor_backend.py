@@ -112,12 +112,12 @@ class PostProcessorBackend:
 		c_int = ctypes.c_int
 		c_double = ctypes.c_double
 		c_void_p = ctypes.c_void_p
-		c_char = ctypes.c_char
+		c_bool = ctypes.c_bool
 		c_char_p = ctypes.c_char_p
 
-		c_int_p = ctypes.POINTER(c_int) # This has to be checkeddddd
+		c_int_p = ctypes.POINTER(c_int)
 		c_double_p = ctypes.POINTER(c_double)
-		c_bool_p = ctypes.POINTER(ctypes.c_bool)
+		c_bool_p = ctypes.POINTER(c_bool)
 
 		this = self
 
@@ -132,8 +132,8 @@ class PostProcessorBackend:
 		set_signature('BoundaryLimits', c_void_p, c_char_p, c_char_p, c_double_p, c_double_p, c_double_p)
 		set_signature('SensitivityAnalysis', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double, c_double, c_double, c_int, c_double_p, c_int_p)
 		set_signature('RateOfProductionAnalysis', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double, c_double, c_double, c_int, c_double_p, c_int_p)
-		set_signature('FluxAnalysis', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double, c_char_p, c_bool_p, c_char_p, c_int, c_int, c_double, c_int_p, c_int_p, c_double_p, c_double_p, c_int_p)
-		set_signature('GetFormationRates', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double)
+		set_signature('FluxAnalysis', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double, c_char_p, c_bool, c_char_p, c_int, c_int, c_double, c_int_p, c_int_p, c_double_p, c_double_p, c_int_p)
+		set_signature('GetFormationRates', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double_p)
 		set_signature('GetReactionRates', c_void_p, c_char_p, c_char_p, c_int, c_double_p)
 		set_signature('GetSensitivityCoefficients', c_void_p, c_char_p, c_char_p, c_int, c_char_p, c_char_p, c_double_p)
 

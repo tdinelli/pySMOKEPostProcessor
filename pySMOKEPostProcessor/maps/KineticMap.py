@@ -201,11 +201,11 @@ class KineticMap:
                 return i # this is the index of the reaction 0-based 
                          # pay attention to cabr and falloff reactions 
         
-    def SpecieNameFromIndex(self, specieIndex: int):
-        return self.species[specieIndex]
+    def SpeciesNameFromIndex(self, speciesIndex: int):
+        return self.species[speciesIndex]
     
-    def IndexFromSpecieName(self, specieName: str):
+    def IndexFromSpeciesName(self, speciesName: str):
         for i in range(0, self.NumberOfSpecies):
-            if(specieName == self.species[i]):
+            if(speciesName == self.species[i]):
                 return i
 

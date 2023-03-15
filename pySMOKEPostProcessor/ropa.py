@@ -1,12 +1,13 @@
 from .postprocessor_backend import postprocessor_backend_obj as backend
 from .maps.KineticMap import KineticMap
+from .maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
 from .utilities import get_c_string, get_py_string, list_to_c_array_of_doubles, list_to_c_array_of_ints, c_array_to_list
 from ctypes import c_double, c_int
 
 def RateOfProductionAnalysis(kinetic_folder: str, output_folder: str,
 							species: str, ropa_type: str, local_value: float = 0,
-                            lower_value: float = 0, upper_value: float = 0,
-                            number_of_reactions: int = 10):
+							lower_value: float = 0, upper_value: float = 0,
+							number_of_reactions: int = 10):
         
 	species = get_c_string(species)
         
@@ -44,8 +45,87 @@ def RateOfProductionAnalysis(kinetic_folder: str, output_folder: str,
 
 	reaction_names = []
 	KineticMap_ = KineticMap(kf_)
-	
+
 	for i in reactions:
 		reaction_names.append(KineticMap_.ReactionNameFromIndex(i))
 
 	return coefficients, reactions, reaction_names
+
+def GetReactionRates(kinetic_folder: str, output_folder: str, abscissae_name: str, reaction_name: str):
+        
+	kin = KineticMap(kinetic_folder)
+	out = OpenSMOKEppXMLFile(kineticFolder = kinetic_folder, 
+							OutputFolder = output_folder)
+        
+	valid_x_name = out.additional_variable
+	number_of_abscissae = out.npts
+
+	x_axis_name = ''
+	for i in valid_x_name:
+		if abscissae_name in i:
+			x_axis_name = i
+        
+	if (x_axis_name == ''): raise Exception('The provided name for the x axis is not valid')
+
+	x_axis = out.getProfile(name = x_axis_name)
+
+	reaction_index = kin.ReactionIndexFromName(name = reaction_name)
+	reaction_index = c_int(reaction_index)
+	reaction_rates = list_to_c_array_of_doubles([0]*number_of_abscissae)
+	kinetic_folder = get_c_string(kinetic_folder)
+	output_folder = get_c_string(output_folder)
+
+	f_handle = backend.handle.GetReactionRates
+	backend.call(f_handle, 
+				kinetic_folder, 
+				output_folder,
+				reaction_index,
+				reaction_rates)
+	
+	reaction_rates = c_array_to_list(reaction_rates, number_of_abscissae)
+	
+	return x_axis, reaction_rates
+
+def GetFormationRates(kinetic_folder: str, output_folder: str, species: str, 
+				abscissae_name: str, units: str, formation_rate_type: str):
+        
+	out = OpenSMOKEppXMLFile(kineticFolder = kinetic_folder,
+							OutputFolder = output_folder)
+        
+	valid_x_name = out.additional_variable
+	number_of_abscissae = out.npts
+	x_axis_name = ''
+
+	for i in valid_x_name:
+		if abscissae_name in i:
+			x_axis_name = i
+        
+	if (x_axis_name == ''): raise Exception('The provided name for the x axis is not valid')
+
+	x_axis = out.getProfile(name = x_axis_name)
+
+	if units != 'mole' and units != 'mass':
+		raise ValueError('Available units are: mole | mass')
+
+	if formation_rate_type != 'net' and formation_rate_type != 'production' and formation_rate_type != 'destruction' and formation_rate_type != 'characteristic-time':
+		raise ValueError('Available types for the formation rate are: net | production | destruction | characteristic-time')
+
+	formation_rates = list_to_c_array_of_doubles([0]*number_of_abscissae)
+	kinetic_folder = get_c_string(kinetic_folder)
+	output_folder = get_c_string(output_folder)
+	species = get_c_string(species)
+	units = get_c_string(units)
+	formation_rate_type = get_c_string(formation_rate_type)
+
+	f_handle = backend.handle.GetFormationRates
+	backend.call(f_handle, 
+				kinetic_folder, 
+				output_folder,
+				species,
+				units,
+				formation_rate_type,
+				formation_rates)
+	
+	formation_rates = c_array_to_list(formation_rates, number_of_abscissae)
+
+	return x_axis, formation_rates

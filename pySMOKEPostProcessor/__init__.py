@@ -1,7 +1,8 @@
 from .postprocessor_backend import postprocessor_backend_obj as _backend
 from .simulation_utilities import GetSimulationsBoundary
-from .ropa import RateOfProductionAnalysis
-from .sensitivity_analysis import SensitivityAnalysis
+from .ropa import RateOfProductionAnalysis, GetReactionRates, GetFormationRates
+from .sensitivity_analysis import SensitivityAnalysis, SensitivityCoefficients
+from .flux_analysis import FluxAnalysis
 
 def load(lib_file_path: str):
 	"""
