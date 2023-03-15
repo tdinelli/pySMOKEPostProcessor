@@ -10,7 +10,7 @@ cmake \
     -DCMAKE_C_COMPILER=/opt/homebrew/bin/gcc-12 \
     -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-12 \
     -DARCH=arm64 \
-    -DCMAKE_INSTALL_PREFIX=/Users/tdinelli/Desktop \
+    -DCMAKE_INSTALL_PREFIX=/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/pySMOKEPostProcessor/lib/osx/arm64 \
     ..
 
 make
