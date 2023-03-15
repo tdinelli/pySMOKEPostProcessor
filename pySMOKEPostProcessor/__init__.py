@@ -1,5 +1,5 @@
 from .postprocessor_backend import postprocessor_backend_obj as _backend
-from .simulation_utilities import GetSimulationsBoundary
+from .simulation_utilities import GetSimulationsBoundary, GetSimulationINFO
 from .ropa import RateOfProductionAnalysis, GetReactionRates, GetFormationRates
 from .sensitivity_analysis import SensitivityAnalysis, SensitivityCoefficients
 from .flux_analysis import FluxAnalysis
