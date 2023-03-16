@@ -7,8 +7,8 @@ import numpy as np
 
 # Only for dev purposes
 import os.path
-if os.path.isdir("/Users/tdinelli/"):
-	pp.load("/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib")
+#if os.path.isdir("/Users/tdinelli/"):
+#	pp.load("/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib")
 
 kineticFolder = os.path.join("examples", "data", "ROPA-01", "kinetics")
 resultsFolder = os.path.join("examples", "data", "ROPA-01", "Output")

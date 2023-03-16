@@ -3,6 +3,7 @@ from .simulation_utilities import GetSimulationsBoundary, GetSimulationINFO
 from .ropa import RateOfProductionAnalysis, GetReactionRates, GetFormationRates
 from .sensitivity_analysis import SensitivityAnalysis, SensitivityCoefficients
 from .flux_analysis import FluxAnalysis
+from .reaction_classes import FluxByClass
 
 def load(lib_file_path: str):
 	"""
@@ -17,7 +18,8 @@ __all__ = [
 	"simulation_utilities",
 	"ropa",
 	"sensitivity_analysis",
-	"flux_analysis"
+	"flux_analysis",
+	"reaction_classes"
 ]
 
 try:

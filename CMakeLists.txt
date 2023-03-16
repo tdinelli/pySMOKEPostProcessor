@@ -7,7 +7,7 @@ cmake_minimum_required (VERSION 3.16)
 project (pySMOKEpostprocessor)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 # --- Read version from the file
-file(STRINGS "version" VERSION)
+file(STRINGS "${CMAKE_SOURCE_DIR}/pySMOKEPostProcessor/version" VERSION)
 
 # --- Default configuration values
 set(DEFAULT_BUILD_TYPE "Release")

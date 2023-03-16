@@ -13,3 +13,4 @@ cmake \
     ..
 
 make
+make install
