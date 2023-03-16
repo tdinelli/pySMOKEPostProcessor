@@ -160,11 +160,9 @@ class PostProcessorBackend:
 			raise "pySMOKEPostProcessor: Unknown platform: " + platform.system()
 
 		lib_postprocessor = os.path.join(postprocessor_python_main_dir, "lib", operating_system, get_architecture(), postprocessor_name)
-		# lib_postprocessor = "/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/build/libpySMOKEPostProcessor.dylib"
 		if os.path.exists(lib_postprocessor):
 			return lib_postprocessor
 
 		return None
-
 
 postprocessor_backend_obj = PostProcessorBackend()

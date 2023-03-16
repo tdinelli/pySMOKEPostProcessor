@@ -46,4 +46,9 @@ def flatten_list(l):
 	return result
 
 def get_architecture():
-	return platform.machine()
+	default_arch = 'x86-64'
+	arch = platform.machine()
+	if(arch == 'x86_64'):
+		arch = default_arch
+	return arch
+
