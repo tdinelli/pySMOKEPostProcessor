@@ -163,7 +163,7 @@ add_library(${SHARED_LIBRARY} SHARED
 #)
 #file(COPY ${CMAKE_SOURCE_DIR}/version DESTINATION ${INSTALL_BIN_DIR}/python-postprocessor/pySMOKEpostprocessor)
 install (TARGETS ${SHARED_LIBRARY} 
-        DESTINATION ${PROJECT_SOURCE_DIR}/pySMOKEpostprocessor/lib/${OS_STRING}/${ARCH})
+        DESTINATION ${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor/lib/${OS_STRING}/${ARCH})
 
 #--------------------------------------------------------------------
 # Packing options

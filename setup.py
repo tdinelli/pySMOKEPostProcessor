@@ -1,7 +1,7 @@
 import setuptools
 import os
 
-version_file_name = 'version'  # Name of the file where the C++ back-end version is written
+version_file_name = 'pySMOKEPostProcessor/version'  # Name of the file where the C++ back-end version is written
 interface_package_name = 'pySMOKEPostProcessor'  # Both the name of the project and the name of the package
 library_files_dir_name = 'lib'  # Path to the compiled library files
 
@@ -69,9 +69,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Titodinelli/pySMOKEPostProcessor",
 	packages=setuptools.find_packages(exclude=['__pycache__']),
-	install_requires=['numpy', 'pandas', 'matplotlib', 'networkx', 'jupyter', 'pydot', 'graphviz', 'scipy'],
+	install_requires=['numpy', 'pandas', 'matplotlib', 'networkx', 'pydot', 'graphviz', 'scipy'],
 	package_data={interface_package_name: package_data,
-					'':['version']},
+					'pySMOKEPostProcessor': ['version']},
 	#package_data={'pySMOKEPostProcessor/lib': ['*']},
 	classifiers=[
 		"Programming Language :: Python :: 3",
