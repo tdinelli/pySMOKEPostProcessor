@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from ctypes import c_bool, c_int, c_double, c_void_p, c_char_p, byref, cdll
 from pySMOKEPostProcessor.maps.KineticMap import KineticMap
 from pySMOKEPostProcessor.maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
@@ -437,5 +438,24 @@ class pySMOKEpostprocessor:
             sc = [i for i in sensitivity_coeff]
             return x_axis, sc
 
+def coeffs_to_df(coefficients, indexes, names, type, netflux = True):
+    """ turn ROPA/SENS coefficients into dataframe
+        sum the fluxes of the equilibrium reactions if netflux option is active
+    """
+    if type in ['ROPA', 'SENS']:
+        col = type + '-Coeff'
+    else:
+        raise ValueError('type must be ROPA or SENS')
 
-        
+    dic = {col: coefficients,'Indices-0based': indexes, 'Reaction Name': names}
+    df = pd.DataFrame(dic)
+    if netflux:
+        new_df = pd.DataFrame(index = list(set(indexes)), columns = ['abs', col, 'Reaction Name'])
+        for grp_idx, grp_df in df.groupby('Indices-0based'): 
+            new_df.loc[grp_idx][['abs', col, 'Reaction Name']] = [abs(sum(grp_df[col])), sum(grp_df[col]), grp_df['Reaction Name'].iloc[0]]
+        new_df = new_df.sort_values(by = 'abs', ascending = False)
+        # back to df
+        df = new_df.reset_index()
+    
+    return df
+    

@@ -1,1 +1,2 @@
 from pySMOKEPostProcessor.plots import heatmaps
+from pySMOKEPostProcessor.plots import barplots
