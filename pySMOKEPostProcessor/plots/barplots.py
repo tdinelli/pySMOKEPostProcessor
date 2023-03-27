@@ -31,12 +31,12 @@ def plot_bars(df, type: str, title: str = ''):
         y = i.get_y()+0.5*i.get_height()
         if(x<0):
             ax.text(0, y, 
-                df['Reaction Name'][idx] + "  (" + str('{:6.4f}'.format(df["ROPA-Coeff"][idx])) + ")", 
+                df['Reaction Name'][idx] + "  (" + str('{:6.4f}'.format(df[col][idx])) + ")", 
                 va='center', fontsize=14)
         else:
             ax.text(0,
                     y, 
-                    df['Reaction Name'][idx] + "  (" + str('{:6.4f}'.format(df["ROPA-Coeff"][idx])) + ")", 
+                    df['Reaction Name'][idx] + "  (" + str('{:6.4f}'.format(df[col][idx])) + ")", 
                     va='center',
                     ha='right',
                     fontsize=14) 
