@@ -1,4 +1,3 @@
-export Eigen3_ROOT="/Users/tdinelli/NumericalLibraries/eigen/eigen-3.4.0"
 export OpenSMOKEpp_ROOT="/Users/tdinelli/Documents/GitHub/OpenSMOKEpp"
 export CC=/opt/homebrew/bin/gcc-12
 export CXX=/opt/homebrew/bin/g++-12
