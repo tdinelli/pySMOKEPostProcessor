@@ -58,7 +58,6 @@ package_data = [version_file_path]
 for operating_system, arch in get_available_backends(library_files_dir_path):
     package_data.append(get_backend_binary_path(library_files_dir_path, operating_system, arch))
 
-
 setuptools.setup(
     name="pySMOKEPostProcessor",
 	version = version,
@@ -70,9 +69,7 @@ setuptools.setup(
     url="https://github.com/Titodinelli/pySMOKEPostProcessor",
 	packages=setuptools.find_packages(exclude=['__pycache__']),
 	install_requires=['numpy', 'pandas', 'matplotlib', 'networkx', 'pydot', 'graphviz', 'scipy'],
-	package_data={interface_package_name: package_data,
-					'pySMOKEPostProcessor': ['version']},
-	#package_data={'pySMOKEPostProcessor/lib': ['*']},
+	package_data={interface_package_name: package_data},
 	classifiers=[
 		"Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
