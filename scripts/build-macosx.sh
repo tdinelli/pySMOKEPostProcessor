@@ -1,5 +1,4 @@
 export Eigen3_ROOT="/Users/tdinelli/NumericalLibraries/eigen/eigen-3.4.0"
-export Boost_ROOT="/Users/tdinelli/NumericalLibraries/boost/boost-1.79-gcc-12"
 export OpenSMOKEpp_ROOT="/Users/tdinelli/Documents/GitHub/OpenSMOKEpp"
 export CC=/opt/homebrew/bin/gcc-12
 export CXX=/opt/homebrew/bin/g++-12
@@ -16,3 +15,6 @@ cmake \
 
 make
 make install
+cd ..
+python setup.py bdist_wheel
+pip install dist/pySMOKEPostProcessor-0.3.0-py3-none-any.whl

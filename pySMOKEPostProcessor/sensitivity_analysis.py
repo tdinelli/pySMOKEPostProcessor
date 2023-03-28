@@ -9,17 +9,16 @@ def SensitivityAnalysis(kinetic_folder: str, output_folder: str,
 						normalization_type: str, local_value: float = 0,
 						lower_value: float = 0, upper_value: float = 0,
 						number_of_reactions: int = 10):
-    
-	target = get_c_string(target)
-    
+
+	target = get_c_string(target)		
 	if (sensitivity_type != 'global' and sensitivity_type != 'local' and sensitivity_type != 'region'):
 		raise ValueError('Please select one of the available Sensitivity analysis type global | local | region')
 
 	if (ordering_type != 'peak-values' and ordering_type != "area" and ordering_type != "absolute-area"):
 		raise ValueError('Please select one of the available ordering type: peak-values | area | absolute-area')
 
-	if (normalization_type != 'local' and normalization_type != 'max_value'):
-		raise ValueError('Please select one of the available normalization: local | max_value')
+	if (normalization_type != 'local' and normalization_type != 'max-value'):
+		raise ValueError('Please select one of the available normalization: local | max-value')
 
 	sensitivity_type = get_c_string(sensitivity_type)
 	ordering_type = get_c_string(ordering_type)

@@ -11,7 +11,7 @@ def RateOfProductionAnalysis(kinetic_folder: str, output_folder: str,
         
 	species = get_c_string(species)
         
-	if(ropa_type != 'global' and ropa_type != 'global' and ropa_type != 'global'):
+	if(ropa_type != 'global' and ropa_type != 'local' and ropa_type != 'region'):
 		raise ValueError('Please select one of the available ROPA type: global | local | region')
 
 	ropa_type = get_c_string(ropa_type)
