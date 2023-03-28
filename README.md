@@ -5,7 +5,7 @@ Python binder for the OpenSMOKEpp Graphical PostProcessor developed by Professor
 ---
 ## Compile and Install
 
-The detailed explanation on how to build and install the package is available [installation guide](scripts/COMPILE_INSTALL.md).
+The detailed explanation on how to build and install the package for LINUX is available [here](scripts/COMPILE_INSTALL_LINUX.md) for Mac-OSX [here](scripts/COMPILE_INSTALL_MACOSX.md) and for Windows will be released soon.
 
 ## Features
 
