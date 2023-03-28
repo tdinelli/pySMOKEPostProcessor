@@ -1,0 +1,7 @@
+name: post-processor
+
+channels:
+  - conda-forge
+
+dependencies:
+  - conda-forge::boost=1.78
