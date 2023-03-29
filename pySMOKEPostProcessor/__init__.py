@@ -1,9 +1,11 @@
 from .postprocessor_backend import postprocessor_backend_obj as _backend
 from .simulation_utilities import GetSimulationsBoundary, GetSimulationINFO
-from .ropa import RateOfProductionAnalysis, GetReactionRates, GetFormationRates
+from .ropa import RateOfProductionAnalysis, GetReactionRates, GetFormationRates, coeffs_to_df
 from .sensitivity_analysis import SensitivityAnalysis, SensitivityCoefficients
 from .flux_analysis import FluxAnalysis
 from .reaction_classes import FluxByClass
+from .plotting_utilities.heat_maps import plot_heatmap, save_fig
+from .plotting_utilities.bar_plot import plot_bars
 
 def load(lib_file_path: str):
 	"""
@@ -19,7 +21,9 @@ __all__ = [
 	"ropa",
 	"sensitivity_analysis",
 	"flux_analysis",
-	"reaction_classes"
+	"reaction_classes",
+	"plotting_utilities.heat_maps",
+	"plotting_utilities.bar_plot"
 ]
 
 try:

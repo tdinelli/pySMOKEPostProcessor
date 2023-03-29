@@ -1,8 +1,9 @@
 from .postprocessor_backend import postprocessor_backend_obj as backend
 from .maps.KineticMap import KineticMap
 from .maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
-from .utilities import get_c_string, get_py_string, list_to_c_array_of_doubles, list_to_c_array_of_ints, c_array_to_list
+from .utilities import get_c_string, list_to_c_array_of_doubles, list_to_c_array_of_ints, c_array_to_list
 from ctypes import c_double, c_int
+import pandas as pd
 
 def RateOfProductionAnalysis(kinetic_folder: str, output_folder: str,
 							species: str, ropa_type: str, local_value: float = 0,
@@ -129,3 +130,27 @@ def GetFormationRates(kinetic_folder: str, output_folder: str, species: str,
 	formation_rates = c_array_to_list(formation_rates, number_of_abscissae)
 
 	return x_axis, formation_rates
+
+def coeffs_to_df(coefficients, indexes, names, type, netflux = True):
+	""" turn ROPA/SENS coefficients into dataframe
+		sum the fluxes of the equilibrium reactions if netflux option is active
+	"""
+	if type in ['ROPA', 'SENS']:
+		col = type + '-Coeff'
+	else:
+		raise ValueError('type must be ROPA or SENS')
+
+	dic = {col: coefficients,'Indices-0based': indexes, 'Reaction Name': names}
+	df = pd.DataFrame(dic)
+	
+	if netflux:
+		new_df = pd.DataFrame(index = list(set(indexes)), columns = ['abs', col, 'Reaction Name'])
+		
+		for grp_idx, grp_df in df.groupby('Indices-0based'): 
+			new_df.loc[grp_idx][['abs', col, 'Reaction Name']] = [abs(sum(grp_df[col])), sum(grp_df[col]), grp_df['Reaction Name'].iloc[0]]
+		
+		new_df = new_df.sort_values(by = 'abs', ascending = False)
+		# back to df
+		df = new_df.reset_index()
+    
+	return df
