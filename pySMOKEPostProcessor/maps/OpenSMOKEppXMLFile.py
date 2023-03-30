@@ -177,6 +177,4 @@ class OpenSMOKEppXMLFile:
             else:
                 raise Exception(f'{name} is not supported yet')
 
-        raise Exception(f'{name} is not available as additional variable')
-
 
