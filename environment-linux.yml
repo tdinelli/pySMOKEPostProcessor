@@ -1,0 +1,11 @@
+name: post-processor
+
+channels:
+    - conda-forge
+
+dependencies:
+    - conda-forge::boost=1.78
+    - conda-forge::eigen=3.4
+    - conda-forge::cmake=3.20.2
+    - conda-forge::gcc_linux-64=11.2.0
+    - conda-forge::gxx_linux-64=11.2.0

@@ -40,8 +40,20 @@ class OpenSMOKEppXMLFile:
         
         # System type
         systemType = ((root.find('Type')).text).strip()
-        if (systemType != "HomogeneousReactor" and systemType != "Flamelet" and systemType != "Flame1D" and systemType != "Flame2D"):
-            sys.exit(f"Unknown system type: {systemType}")
+        if (systemType != "HomogeneousReactor" and 
+            systemType != "Flamelet" and 
+            systemType != "Flame1D" and 
+            systemType != "Flame2D"):
+
+            if(systemType == "BatchReactor" or 
+               systemType == "PlugFlowReactor" or 
+               systemType == "PerfectlyStirredReactor"):
+            
+                print(" * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained!\n",
+                      "          Some of the functions in this class may not work!")
+            
+            else:
+                sys.exit(f"Unknown system type: {systemType}")
         
         # Check simulation/kinetics consistency
         dummy = root.find('mass-fractions')
