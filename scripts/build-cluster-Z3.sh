@@ -1,4 +1,3 @@
-export OpenSMOKEpp_ROOT="/home/chimica2/tdinelli/GitHub/OpenSMOKEpp"
 export ARCH=x86-64
 
 # --- Do not modify below this
