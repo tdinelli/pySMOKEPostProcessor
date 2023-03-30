@@ -33,7 +33,7 @@ Eigen and Boost are automatically installed by creating the predefined conda env
 
 Go into the base directory of the project, for instance the one containing the "setup.py" file. Run the following commands:
 ```bash
-> conda create env -f environment-linux.yml
+> conda env create -f environment-linux.yml
 > conda activate post-processor
 > cd scripts
 > sh build-linux.sh
