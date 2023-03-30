@@ -68,7 +68,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Titodinelli/pySMOKEPostProcessor",
 	packages=setuptools.find_packages(exclude=['__pycache__']),
-	install_requires=['numpy', 'pandas', 'matplotlib', 'networkx', 'pydot', 'graphviz', 'scipy'],
+	install_requires=['numpy', 'pandas', 'matplotlib', 'networkx', 'pydot', 'graphviz', 'scipy', 'jupyter'],
 	package_data={interface_package_name: package_data},
 	classifiers=[
 		"Programming Language :: Python :: 3",
