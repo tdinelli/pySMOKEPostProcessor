@@ -75,7 +75,7 @@ def write_file(string, path, file_name):
         fobj.write(string)
 
 
-def read_file(path, file_name,
+def read_file(fname,
               remove_comments=None, remove_whitespace=False,
               print_debug=False):
     """ Read a file with specified prefix path
@@ -88,7 +88,6 @@ def read_file(path, file_name,
         :rtype: str
     """
 
-    fname = os.path.join(path, file_name)
     if os.path.exists(fname):
         with open(fname, mode='r', errors='ignore', encoding='utf-8') as fobj:
             file_str = fobj.read()
@@ -100,8 +99,7 @@ def read_file(path, file_name,
         file_str = None
         if print_debug:
             print('WARNING: FILE NOT FOUND\n'
-                  'NAME:', file_name, '\n'
-                  'PREFIX PATH:', path)
+                  'NAME:', fname)
 
     return file_str
 
