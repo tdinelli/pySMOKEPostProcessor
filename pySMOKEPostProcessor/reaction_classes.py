@@ -8,6 +8,7 @@ from .reaction_classes_utilities.reaction_classes_groups import ReadReactionsGro
 from .reaction_classes_utilities.reaction_classes import reaction_classes
 from .reaction_classes_utilities.reaction_classes import reaction_fluxes
 
+
 class FluxByClass:
 
 	def __init__(self, kinetic_mechanism, classes_definition, verbose: bool):
@@ -18,15 +19,16 @@ class FluxByClass:
 		reactions_all = []
 		for i in range(kinetics.NumberOfReactions):
 
-			reaction = {'index': i+1, 
-                        'name': kinetics.reaction_names[i], 
-                        'class': kinetics.rxnclass[i+1], 
+			reaction = {'index': i+1,
+                        'name': kinetics.reaction_names[i],
+                        'class': kinetics.rxnclass[i+1],
                         'reactiontype': kinetics.rxnsubclass[i+1]}
 
 			reactions_all.append(reaction)
 
 		# parse classes
-		_, subcl_grp_dct = ReadReactionsGroups(classes_definition, 'rxn_class_groups.txt')
+		_, subcl_grp_dct = ReadReactionsGroups(
+		    classes_definition)
 
         # sort
 		rxns_sorted = reaction_classes(reactions_all, verbose=False)
@@ -38,17 +40,17 @@ class FluxByClass:
 		self.classes_definition = classes_definition
 		self.verbose = verbose
 
-	def process_flux(self, 
+	def process_flux(self,
 				species_list,
-				results_folder, 
-				n_of_rxns = 100,
-				ropa_type = 'global'):
-        
+				results_folder,
+				n_of_rxns=100,
+				ropa_type='global'):
+
 		if self.verbose:
 			print('processing simul {}'.format(results_folder))
 
 		# distinguish pp input based on ropa type
-		loc_low_up = np.array([0, 0, 0,], dtype = float)
+		loc_low_up = np.array([0, 0, 0, ], dtype=float)
 		if isinstance(ropa_type, dict):
 			if 'local' in ropa_type.keys():
 				loc_low_up[0] = ropa_type['local']
@@ -56,35 +58,54 @@ class FluxByClass:
 			elif 'region' in ropa_type.keys():
 				loc_low_up[1:] = ropa_type['region']
 				ropa_type = 'region'
-            
+
         # simul output
 		for sp in species_list:
-            
-			tot_rop, indexes, _ = RateOfProductionAnalysis(kinetic_folder=self.kinetic_mechanism, 
-														output_folder=results_folder, 
-                                                        species = sp, 
-                                                        ropa_type = ropa_type, 
-                                                    	local_value = loc_low_up[0],
-														lower_value = loc_low_up[1], 
-                                                        upper_value = loc_low_up[2], 
-                                                        number_of_reactions = n_of_rxns)
-            
-			tot_rop_df = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=['flux_{}'.format(sp)], dtype=float)
-			tot_rop_df = tot_rop_df.groupby(level=0).sum() # sum rxns with same indexes
-			# assign flux
+
+			if isinstance(sp, str):
+				sps = [sp]
+				spname = sp
+			elif isinstance(sp, dict):
+				spname = list(sp.keys())[0]
+				sps = sp[spname]
+				if isinstance(sps, list) == False:
+					raise TypeError('in spc dictionary, the value must be a list of species')
+			else:
+				raise TypeError('species must be a single string or a dictionary with a list of species')
+    
+			tot_rop_df = None
+			for sp in sps:
+				tot_rop, indexes, _ = RateOfProductionAnalysis(kinetic_folder=self.kinetic_mechanism, 
+															output_folder=results_folder, 
+															species = sp, 
+															ropa_type = ropa_type, 
+															local_value = loc_low_up[0],
+															lower_value = loc_low_up[1], 
+															upper_value = loc_low_up[2], 
+															number_of_reactions = n_of_rxns)
+				tot_rop_df0 = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=['flux_{}'.format(spname)], dtype=float)
+				tot_rop_df0 = tot_rop_df0.groupby(level=0).sum() # sum rxns with same indexes
+    
+				if isinstance(tot_rop_df, pd.DataFrame):
+					# concatenate
+					tot_rop_df = pd.concat([tot_rop_df, tot_rop_df0])
+					tot_rop_df = tot_rop_df.groupby(level=0).sum() # sum rxns with same indexes
+				else:
+					tot_rop_df = copy.deepcopy(tot_rop_df0)			
+     		# assign flux
 			self.flux_sorted.assign_flux(tot_rop_df)
 
 		self.flux_sorted.sum_fwbw()
         
-	def sort_and_filter(self, sortlist, filter_dct, thresh):
+	def sort_and_filter(self, sortlist, filter_dct = {}, thresh = 1e-3, weigheach = True):
 		# filter rxns
 		rxns_sorted = copy.deepcopy(self.flux_sorted)
-		if filter_dct:
+		if len(filter_dct) > 0:
 			rxns_sorted.filter_class(filter_dct)
 		# filter flux
 		rxns_sorted.filter_flux(threshold=thresh)
 		# sum same speciestype-classgroup-reactiontype together
-		sortdf = rxns_sorted.sortby(sortlist)
+		sortdf = rxns_sorted.sortby(sortlist, weigheach = weigheach)
 		# drop unsorted cols
 		col_names = sortdf.columns
 		for col in col_names:
