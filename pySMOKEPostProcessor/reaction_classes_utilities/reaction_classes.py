@@ -193,7 +193,7 @@ class reaction_fluxes:
 
 		self.rxn_class_df = self.rxn_class_df.loc[list(set(indexes_filter))]
 
-	def sortby(self, sortlist):
+	def sortby(self, sortlist, weigheach = True):
 		""" sum fluxes by criteria in sortlist
         """
         # check that all criteria are columns
@@ -218,12 +218,17 @@ class reaction_fluxes:
 			new_sort_df[name] = grp_df[self.flux_cols].sum()
 
         # renormalize by species
-        
-		for flux_sp_name in new_sort_df.index:
-			renorm_factor = max(abs(new_sort_df.loc[flux_sp_name]))
-			weight_factor = sum(abs(self.rxn_class_df[flux_sp_name]))/sum(abs(self.rxn_class_df_all[flux_sp_name]))
-			#new_sort_df.loc[flux_sp_name] /= renorm_factor
-			new_sort_df.loc[flux_sp_name] *= (weight_factor/renorm_factor)
+		if weigheach:
+			for flux_sp_name in new_sort_df.index:
+				
+				renorm_factor = max(abs(new_sort_df.loc[flux_sp_name]))
+				weight_factor = sum(abs(self.rxn_class_df[flux_sp_name]))/sum(abs(self.rxn_class_df_all[flux_sp_name]))
+				#new_sort_df.loc[flux_sp_name] /= renorm_factor
+				new_sort_df.loc[flux_sp_name] *= (weight_factor/renorm_factor)
+		else:
+			renorm_factor = abs(self.rxn_class_df_all[new_sort_df.index]).max().max()
+			new_sort_df /= renorm_factor
+			
 
 		if self.verbose:
 			print(new_sort_df) # questo print e probabilmente anche alcuni di quelli sopra forse hanno poco
