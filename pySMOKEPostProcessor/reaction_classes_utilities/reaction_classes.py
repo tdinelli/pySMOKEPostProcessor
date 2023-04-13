@@ -226,8 +226,9 @@ class reaction_fluxes:
 				#new_sort_df.loc[flux_sp_name] /= renorm_factor
 				new_sort_df.loc[flux_sp_name] *= (weight_factor/renorm_factor)
 		else:
-			renorm_factor = abs(self.rxn_class_df_all[new_sort_df.index]).max().max()
-			new_sort_df /= renorm_factor
+			#renorm_factor = abs(self.rxn_class_df_all[new_sort_df.index]).max().max()
+			#new_sort_df /= renorm_factor
+			print('ciao')
 			
 
 		if self.verbose:

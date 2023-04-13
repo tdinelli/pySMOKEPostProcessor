@@ -39,12 +39,14 @@ class FluxByClass:
 		self.kinetic_mechanism = kinetic_mechanism
 		self.classes_definition = classes_definition
 		self.verbose = verbose
+		self.kinetic_map = kinetics
 
 	def process_flux(self,
 				species_list,
 				results_folder,
 				n_of_rxns=100,
-				ropa_type='global'):
+				ropa_type='global',
+				mass_ropa = False):
 
 		if self.verbose:
 			print('processing simul {}'.format(results_folder))
@@ -75,6 +77,9 @@ class FluxByClass:
     
 			tot_rop_df = None
 			for sp in sps:
+				indice = self.kinetic_map.IndexFromSpeciesName(sp)
+				mwi = self.kinetic_map.mws[indice]
+
 				tot_rop, indexes, _ = RateOfProductionAnalysis(kinetic_folder=self.kinetic_mechanism, 
 															output_folder=results_folder, 
 															species = sp, 
@@ -83,6 +88,10 @@ class FluxByClass:
 															lower_value = loc_low_up[1], 
 															upper_value = loc_low_up[2], 
 															number_of_reactions = n_of_rxns)
+				
+				if mass_ropa==True:
+					tot_rop = [i * mwi for i in tot_rop]
+
 				tot_rop_df0 = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=['flux_{}'.format(spname)], dtype=float)
 				tot_rop_df0 = tot_rop_df0.groupby(level=0).sum() # sum rxns with same indexes
     

@@ -9,7 +9,7 @@ def RateOfProductionAnalysis(kinetic_folder: str, output_folder: str,
 							species: str, ropa_type: str, local_value: float = 0,
 							lower_value: float = 0, upper_value: float = 0,
 							number_of_reactions: int = 10):
-        
+    
 	species = get_c_string(species)
         
 	if(ropa_type != 'global' and ropa_type != 'local' and ropa_type != 'region'):
