@@ -87,6 +87,39 @@ def GetReactionRates(kinetic_folder: str, output_folder: str, abscissae_name: st
 	
 	return x_axis, reaction_rates
 
+def GetReactionRatesIndex(kinetic_folder: str, output_folder: str, reaction_index: int, abscissae_name: str):
+
+	out = OpenSMOKEppXMLFile(kineticFolder = kinetic_folder, 
+							OutputFolder = output_folder)
+        
+	valid_x_name = out.additional_variable
+	number_of_abscissae = out.npts
+
+	x_axis_name = ''
+	for i in valid_x_name:
+		if abscissae_name in i:
+			x_axis_name = i
+        
+	if (x_axis_name == ''): raise Exception('The provided name for the x axis is not valid')
+
+	x_axis = out.getProfile(name = x_axis_name)
+
+	reaction_index = c_int(reaction_index)
+	reaction_rates = list_to_c_array_of_doubles([0]*number_of_abscissae)
+	kinetic_folder = get_c_string(kinetic_folder)
+	output_folder = get_c_string(output_folder)
+
+	f_handle = backend.handle.GetReactionRates
+	backend.call(f_handle, 
+				kinetic_folder, 
+				output_folder,
+				reaction_index,
+				reaction_rates)
+	
+	reaction_rates = c_array_to_list(reaction_rates, number_of_abscissae)
+	
+	return x_axis, reaction_rates
+
 def GetFormationRates(kinetic_folder: str, output_folder: str, species: str, 
 				abscissae_name: str, units: str, formation_rate_type: str):
         

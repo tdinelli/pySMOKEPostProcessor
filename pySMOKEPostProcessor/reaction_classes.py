@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 import copy
+from operator import add
 
-from .ropa import RateOfProductionAnalysis
+from .ropa import RateOfProductionAnalysis, GetReactionRatesIndex
 from .maps.KineticMap import KineticMap
 from .reaction_classes_utilities.reaction_classes_groups import ReadReactionsGroups
 from .reaction_classes_utilities.reaction_classes import reaction_classes
@@ -23,7 +24,7 @@ class FluxByClass:
                         'name': kinetics.reaction_names[i],
                         'class': kinetics.rxnclass[i+1],
                         'reactiontype': kinetics.rxnsubclass[i+1]}
-
+			
 			reactions_all.append(reaction)
 
 		# parse classes
@@ -40,6 +41,7 @@ class FluxByClass:
 		self.classes_definition = classes_definition
 		self.verbose = verbose
 		self.kinetic_map = kinetics
+		self.reactions_all = reactions_all
 
 	def process_flux(self,
 				species_list,
@@ -105,7 +107,27 @@ class FluxByClass:
 			self.flux_sorted.assign_flux(tot_rop_df)
 
 		self.flux_sorted.sum_fwbw()
-        
+    
+	def process_reaction_class_rate(self, results_folder: str, x_axis_name: str, reactionclass_type: str):
+		print(self.reactions_all[0])
+		indici = [i['index'] for i in self.reactions_all if not i['reactiontype']==None if reactionclass_type in i['reactiontype']]
+		#indici = indici[:5] #to speed up calculations just to test if it works. Remove
+		print(indici)
+		reaction_rate_all = []
+		for i in range(len(indici)):
+			x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism, 
+				output_folder=results_folder, 
+				reaction_index=indici[i], 
+				abscissae_name=x_axis_name)
+
+			if i == 0:
+				reaction_rate_all = reaction_rate_
+			else:
+				reaction_rate_all = list( map(add, reaction_rate_all, reaction_rate_))
+		
+		return x_axis, reaction_rate_all
+		
+
 	def sort_and_filter(self, sortlist, filter_dct = {}, thresh = 1e-3, weigheach = True):
 		# filter rxns
 		rxns_sorted = copy.deepcopy(self.flux_sorted)
