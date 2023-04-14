@@ -76,9 +76,9 @@ def plot_heatmap(sort_df, weigheach = True):
 		vmax = sort_df.max(numeric_only=True).max()
 		midpoint = 1 - vmax/(vmax + abs(vmin))
 		
-		print('midpoint is: ', midpoint)
-		print('min val: ', vmin)
-		print('max val: ', vmax)
+		#print('midpoint is: ', midpoint)
+		#print('min val: ', vmin)
+		#print('max val: ', vmax)
 		
 		shifted_cmap = shiftedColorMap(orig_cmap, midpoint=midpoint, name='shifted')
 		image = axes.imshow(sort_df.values,
