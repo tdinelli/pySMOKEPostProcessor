@@ -108,10 +108,17 @@ class FluxByClass:
 
 		self.flux_sorted.sum_fwbw()
     
+<<<<<<< HEAD
 	def process_reaction_class_rate(self, results_folder: str, x_axis_name: str, reactionclass_type: str):
 		print(self.reactions_all[0])
 		indici = [i['index'] for i in self.reactions_all if not i['reactiontype']==None if reactionclass_type in i['reactiontype']]
 		#indici = indici[:5] #to speed up calculations just to test if it works. Remove
+=======
+	def process_reaction_class_rate(self, results_folder: str, x_axis_name: str):
+
+		indici = [i['index'] for i in self.reactions_all if 'DEH' in i['reactiontype']]
+		indici = indici[:5]
+>>>>>>> 7cefb7e08ce8101e832d3058bd63f9fa9af9ad9c
 		print(indici)
 		reaction_rate_all = []
 		for i in range(len(indici)):
