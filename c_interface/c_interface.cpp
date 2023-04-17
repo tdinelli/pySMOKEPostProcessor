@@ -135,6 +135,7 @@ extern "C"
             set_error_string(e.what());
         } 
     }
+
     void GetFormationRates ( char* kineticFolder, 
                             char* outputFolder, 
                             char* species, 
@@ -164,7 +165,8 @@ extern "C"
 
     void GetReactionRates ( char* kineticFolder, 
                         char* outputFolder, 
-                        int reaction_index, 
+                        int* reaction_index,
+                        int size_of_index,
                         double* reaction_rate)
     {
         try
@@ -179,7 +181,7 @@ extern "C"
             data_->ReadFileResults(outputFolder);
             data_->ReadKineticMechanism(kineticFolder);
             widget->SetDatabase(data_);
-            widget->GetReactionRates(reaction_index, reaction_rate);
+            widget->GetReactionRates(reaction_index, size_of_index, reaction_rate);
         }
         catch(const Exception &e)
         {

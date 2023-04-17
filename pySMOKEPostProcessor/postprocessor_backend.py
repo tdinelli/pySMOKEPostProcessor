@@ -134,7 +134,7 @@ class PostProcessorBackend:
 		set_signature('RateOfProductionAnalysis', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double, c_double, c_double, c_int, c_double_p, c_int_p)
 		set_signature('FluxAnalysis', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double, c_char_p, c_bool, c_char_p, c_int, c_int, c_double, c_int_p, c_int_p, c_double_p, c_double_p, c_int_p)
 		set_signature('GetFormationRates', c_void_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_double_p)
-		set_signature('GetReactionRates', c_void_p, c_char_p, c_char_p, c_int, c_double_p)
+		set_signature('GetReactionRates', c_void_p, c_char_p, c_char_p, c_int_p, c_int, c_double_p)
 		set_signature('GetSensitivityCoefficients', c_void_p, c_char_p, c_char_p, c_int, c_char_p, c_char_p, c_double_p)
 
 	def _locate_postprocessor(self) -> ty.Optional[str]:

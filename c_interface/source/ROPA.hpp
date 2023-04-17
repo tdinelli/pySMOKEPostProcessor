@@ -451,11 +451,7 @@ void ROPA::MergePositiveAndNegativeBars (const std::vector<unsigned int>& positi
 
 }
 
-void ROPA::GetReactionRates(int index, double* reaction_rate){
-	// Select the appropriate reaction
-
-	unsigned int selected_reaction_indices = index; // In principle you can query more than once reaction at the time but keep it simple
-	
+void ROPA::GetReactionRates(int* index, int size_of_index, double* reaction_rate){
 	// Calculates the formation rates
 	{
 		std::vector<double> tmp;
@@ -492,8 +488,14 @@ void ROPA::GetReactionRates(int index, double* reaction_rate){
 			data_->kineticsMapXML->ReactionRates(c.GetHandle());
 			data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 			
-			const unsigned k = selected_reaction_indices + 1;
-			tmp[i] = r[k];	
+			double sum_rate;
+			for(unsigned int j = 0; j < size_of_index; j++)
+			{
+				const unsigned k = index[j] + 1;
+				sum_rate += r[k];
+			}
+
+			tmp[i] = sum_rate;
 		}	
 
 		for(unsigned int i = 0; i<tmp.size(); i++)

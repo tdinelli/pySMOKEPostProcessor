@@ -29,7 +29,8 @@ POSTPROCESSOR_API void GetFormationRates ( char* kineticFolder,
 
 POSTPROCESSOR_API void GetReactionRates ( char* kineticFolder, 
                                         char* outputFolder, 
-                                        int reaction_index, 
+                                        int* reaction_index, 
+                                        int size_of_index,
                                         double* reaction_rate);
 
 POSTPROCESSOR_API void FluxAnalysis (char* kineticFolder, 

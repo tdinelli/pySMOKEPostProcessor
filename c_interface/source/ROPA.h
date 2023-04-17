@@ -60,7 +60,7 @@ public:
 	void FluxAnalysis(int* indexFirstName, int* indexSecondName, 
 					double* computedThickness, double* computedLabel, int* lenght);
 
-	void GetReactionRates(int index, double* reaction_rate);
+	void GetReactionRates(int* index, int size_of_index, double* reaction_rate);
 
 	void GetFormationRates(std::string specie, std::string units, std::string type, double* rate);
 	

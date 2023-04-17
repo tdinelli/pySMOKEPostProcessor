@@ -87,8 +87,13 @@ def GetReactionRates(kinetic_folder: str, output_folder: str, abscissae_name: st
 	
 	return x_axis, reaction_rates
 
-def GetReactionRatesIndex(kinetic_folder: str, output_folder: str, reaction_index: int, abscissae_name: str):
-
+def GetReactionRatesIndex(kinetic_folder: str, output_folder: str, reaction_index: list, abscissae_name: str):
+	"""
+	IMPORTANT: reaction_index in principle should be a list with a single int which is the index of the desired
+	reaction, it has to be 0-based, moreover take in mind that if a list of multiple index is provided the resulting
+	rate would be the sum of the desired rates. This will be probably changed in the future however for the moment
+	keep this.
+	"""
 	out = OpenSMOKEppXMLFile(kineticFolder = kinetic_folder, 
 							OutputFolder = output_folder)
         
@@ -104,7 +109,9 @@ def GetReactionRatesIndex(kinetic_folder: str, output_folder: str, reaction_inde
 
 	x_axis = out.getProfile(name = x_axis_name)
 
-	reaction_index = c_int(reaction_index)
+	size_of_index = c_int(len(reaction_index))
+	reaction_index = list_to_c_array_of_ints(reaction_index)
+	
 	reaction_rates = list_to_c_array_of_doubles([0]*number_of_abscissae)
 	kinetic_folder = get_c_string(kinetic_folder)
 	output_folder = get_c_string(output_folder)
@@ -114,6 +121,7 @@ def GetReactionRatesIndex(kinetic_folder: str, output_folder: str, reaction_inde
 				kinetic_folder, 
 				output_folder,
 				reaction_index,
+				size_of_index,
 				reaction_rates)
 	
 	reaction_rates = c_array_to_list(reaction_rates, number_of_abscissae)
