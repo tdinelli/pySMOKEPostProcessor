@@ -129,6 +129,8 @@ class reaction_fluxes:
 		rows_todel = [idx for idx in self.rxn_class_df.index if all(self.rxn_class_df.loc[idx][self.flux_cols] == 0)]
 		self.rxn_class_df = self.rxn_class_df.drop(rows_todel)
 		#list of irrev rxns
+		for rxn in self.rxn_class_df['name']:
+			print(rxn)
 		rxns_irrev = [rxn for rxn in self.rxn_class_df['name'] if '=>' in rxn]
 		idxs_rxns_irrev = list(set([self.rxn_class_df.index[self.rxn_class_df['name'] == rxn][0] for rxn in rxns_irrev]))
 		rxns_irrev_series = pd.DataFrame(index=idxs_rxns_irrev, columns=['name', 'rcts', 'prds'])

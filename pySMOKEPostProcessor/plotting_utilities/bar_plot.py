@@ -15,7 +15,7 @@ def plot_bars(df, type: str, title: str = ''):
 	else:
 		raise ValueError('type must be ROPA or SENS')
     
-	fig = plt.figure(figsize=(15, 12))
+	fig = plt.figure()#figsize=(30, 24))
 	ax = plt.subplot()
     
 	if len(title) > 0:

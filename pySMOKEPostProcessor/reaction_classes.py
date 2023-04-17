@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
 import copy
-from operator import add
-import time
-import matplotlib.pyplot as plt
+from operator import add, neg
 
 from .ropa import RateOfProductionAnalysis, GetReactionRatesIndex
 from .maps.KineticMap import KineticMap
@@ -180,9 +178,9 @@ class FluxByClass:
 		else:
 			tot_rop_df = copy.deepcopy(tot_rop_df0)			
      		# assign flux
-			self.flux_sorted.assign_flux(tot_rop_df)
+			# self.flux_sorted.assign_flux(tot_rop_df)
 				
-		#self.flux_sorted.sum_fwbw() # some errors to be fixed. Ask Luna
+		self.flux_sorted.sum_fwbw() # some errors to be fixed. Ask Luna
 
 		tot_rop_pos_df = tot_rop_df[(tot_rop_df >= 0).all(axis=1)]
 		tot_rop_sorted_pos_df = tot_rop_pos_df.sort_values(by = 'flux_' + species, axis=0, ascending=False)
@@ -214,11 +212,21 @@ class FluxByClass:
 				output_folder=results_folder, 
 				reaction_index=[indici[i]-1], 
 				abscissae_name=x_axis_name)
-		
-			nomi.append(self.kinetic_map.ReactionNameFromIndex(indici[i]-1))
-			print('Indice: ', indici[i])
-			#plt.plot(x_axis, reaction_rate_)
-			#plt.show()
+			
+			nome = self.kinetic_map.ReactionNameFromIndex(indici[i]-1)
+			if not "=>" in nome:
+				reagenti = nome.split(':')[-1].split('=')[0]
+				prodotti = nome.split(':')[-1].split('=')[-1]
+				if rate_type == 'P':
+					if(species in reagenti):
+						reaction_rate_ = list( map(neg, reaction_rate_))
+				elif rate_type == 'C':
+					if(species in prodotti):
+						reaction_rate_ = list( map(neg, reaction_rate_))
+
+
+			nomi.append(self.kinetic_map.ReactionNameFromIndex(indici[i]-1)[:30])
+						
 			matrix_of_rates.append(reaction_rate_)
 
 			if i == 0:
@@ -232,5 +240,8 @@ class FluxByClass:
 			rate_percentage_contribution.append(single_rate_area / total_rate_area * 100)
 			
 		print(rate_percentage_contribution)
-		print(nomi)
-		return x_axis, matrix_of_rates, nomi
+		nomi_ret = []
+		for i in range(len(nomi)):
+			if rate_percentage_contribution[i] > 5:
+				nomi_ret.append(nomi[i] + ' ' + str(round(rate_percentage_contribution[i],1))+ ' %')
+		return x_axis, matrix_of_rates, nomi_ret
