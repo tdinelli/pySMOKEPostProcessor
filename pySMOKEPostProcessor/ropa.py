@@ -109,9 +109,8 @@ def GetReactionRatesIndex(kinetic_folder: str, output_folder: str, reaction_inde
 
 	x_axis = out.getProfile(name = x_axis_name)
 
-	size_of_index = c_int(len(reaction_index))
+	size_of_index = c_int(len(reaction_index))	
 	reaction_index = list_to_c_array_of_ints(reaction_index)
-	
 	reaction_rates = list_to_c_array_of_doubles([0]*number_of_abscissae)
 	kinetic_folder = get_c_string(kinetic_folder)
 	output_folder = get_c_string(output_folder)

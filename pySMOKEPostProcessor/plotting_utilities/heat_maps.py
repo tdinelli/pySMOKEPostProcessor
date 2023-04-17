@@ -76,20 +76,10 @@ def plot_heatmap(sort_df, weigheach = True):
 		vmax = sort_df.max(numeric_only=True).max()
 		midpoint = 1 - vmax/(vmax + abs(vmin))
 		
-		#print('midpoint is: ', midpoint)
-		#print('min val: ', vmin)
-		#print('max val: ', vmax)
-		
 		shifted_cmap = shiftedColorMap(orig_cmap, midpoint=midpoint, name='shifted')
 		image = axes.imshow(sort_df.values,
 		    interpolation='none', 
 			cmap=shifted_cmap)  # coolwarm, RdBu, seismic, bwr
-		
-        #image = axes.imshow(sort_df.values, 
-		#    aspect='auto', cmap='RdBu_r', 
-		#	vmin=vmin, 
-		#	vmax=vmax)  # coolwarm, RdBu, seismic, bwr
-
     
 	axes.set_yticks(np.arange(0, len(sort_df.index)))    
 	axes.set_xticks(np.arange(0, len(sort_df.columns)))

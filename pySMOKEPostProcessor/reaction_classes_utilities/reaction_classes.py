@@ -220,7 +220,6 @@ class reaction_fluxes:
         # renormalize by species
 		if weigheach:
 			for flux_sp_name in new_sort_df.index:
-				
 				renorm_factor = max(abs(new_sort_df.loc[flux_sp_name]))
 				weight_factor = sum(abs(self.rxn_class_df[flux_sp_name]))/sum(abs(self.rxn_class_df_all[flux_sp_name]))
 				#new_sort_df.loc[flux_sp_name] /= renorm_factor
@@ -228,7 +227,7 @@ class reaction_fluxes:
 		else:
 			#renorm_factor = abs(self.rxn_class_df_all[new_sort_df.index]).max().max()
 			#new_sort_df /= renorm_factor
-			print('ciao')
+			print('ciao')  # fake to use new option by AN. Fix and also allow to use previous option by LPM
 			
 
 		if self.verbose:

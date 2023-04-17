@@ -488,7 +488,7 @@ void ROPA::GetReactionRates(int* index, int size_of_index, double* reaction_rate
 			data_->kineticsMapXML->ReactionRates(c.GetHandle());
 			data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 			
-			double sum_rate;
+			double sum_rate = 0.;
 			for(unsigned int j = 0; j < size_of_index; j++)
 			{
 				const unsigned k = index[j] + 1;
