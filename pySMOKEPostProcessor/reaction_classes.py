@@ -153,7 +153,8 @@ class FluxByClass:
 				      					x_axis_name: str,
 										species: str,
 										n_of_rxns: int,
-										rate_type: str):
+										rate_type: str,
+										threshold: float):
 
 		# distinguish pp input based on ropa type
 		loc_low_up = np.array([0, 0, 0, ], dtype=float)
@@ -193,7 +194,6 @@ class FluxByClass:
 		
 		print(tot_rop_df)
 
-		# fare una keyword da input.py per scegliere se usare indici_production o indici_consumption
 		if rate_type == 'P':
 			indici = indici_production
 		elif rate_type == 'C':
@@ -224,7 +224,6 @@ class FluxByClass:
 					if(species in prodotti):
 						reaction_rate_ = list( map(neg, reaction_rate_))
 
-
 			nomi.append(self.kinetic_map.ReactionNameFromIndex(indici[i]-1)[:30])
 						
 			matrix_of_rates.append(reaction_rate_)
@@ -242,6 +241,6 @@ class FluxByClass:
 		print(rate_percentage_contribution)
 		nomi_ret = []
 		for i in range(len(nomi)):
-			if rate_percentage_contribution[i] > 5:
+			if rate_percentage_contribution[i] > threshold:
 				nomi_ret.append(nomi[i] + ' ' + str(round(rate_percentage_contribution[i],1))+ ' %')
 		return x_axis, matrix_of_rates, nomi_ret
