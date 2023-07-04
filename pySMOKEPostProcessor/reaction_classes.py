@@ -154,6 +154,7 @@ class FluxByClass:
 										species: str,
 										n_of_rxns: int,
 										rate_type: str,
+										filter_ClassesToPlot: list,
 										threshold: float):
 
 		# distinguish pp input based on ropa type
@@ -202,6 +203,7 @@ class FluxByClass:
 			raise TypeError('rate_type can be only "P" (production) or "C" (consumption)')
 		
 		reaction_rate_all = []
+		matrix_of_rates_all = []
 		matrix_of_rates = []
 		rate_percentage_contribution = []
 		nomi = []
@@ -213,7 +215,10 @@ class FluxByClass:
 				reaction_index=[indici[i]-1], 
 				abscissae_name=x_axis_name)
 			
-			nome = self.kinetic_map.ReactionNameFromIndex(indici[i]-1)
+			nome = self.kinetic_map.ReactionNameFromIndex(indici[i]-1) # nome della reazione
+
+			# to manage equilibrium reaction where 'species' can be on the right or on the left of '=' 
+			# i.e., consistently if they are produced or consumed in a specific simulation
 			if not "=>" in nome:
 				reagenti = nome.split(':')[-1].split('=')[0]
 				prodotti = nome.split(':')[-1].split('=')[-1]
@@ -224,23 +229,37 @@ class FluxByClass:
 					if(species in prodotti):
 						reaction_rate_ = list( map(neg, reaction_rate_))
 
-			nomi.append(self.kinetic_map.ReactionNameFromIndex(indici[i]-1)[:30])
-						
-			matrix_of_rates.append(reaction_rate_)
+			# to plot reactions only in specific reaction class
+			ToPlot = 1
+			if len(filter_ClassesToPlot) >= 1:
+				ToPlot = 0
+				for j in range(len(filter_ClassesToPlot)):
+					indici_ToPlot = [k['index']-1 for k in self.reactions_all if not k['reactiontype'] == None if filter_ClassesToPlot[j] in k['reactiontype']]
+					if indici[i] in indici_ToPlot:
+						ToPlot = ToPlot + 1
+				
+				if ToPlot == 0:
+					reaction_rate_ = [0] * len(reaction_rate_)
 
-			if i == 0:
-				reaction_rate_all = reaction_rate_
-			else:
-				reaction_rate_all = list( map(add, reaction_rate_all, reaction_rate_))
-			
-		total_rate_area = np.trapz(y = reaction_rate_all, x = x_axis)
-		for i in range(len(indici)):
-			single_rate_area = np.trapz(y = matrix_of_rates[i], x = x_axis)
-			rate_percentage_contribution.append(single_rate_area / total_rate_area * 100)
-			
-		print(rate_percentage_contribution)
+			if ToPlot == 1:
+				nomi.append(self.kinetic_map.ReactionNameFromIndex(indici[i]-1)[:30])
+				matrix_of_rates_all.append(reaction_rate_)
+				if len(nomi) == 1:
+					reaction_rate_all = reaction_rate_
+				else:
+					reaction_rate_all = list( map(add, reaction_rate_all, reaction_rate_))
+				
 		nomi_ret = []
+		total_rate_area = np.trapz(y = reaction_rate_all, x = x_axis)
 		for i in range(len(nomi)):
-			if rate_percentage_contribution[i] > threshold:
-				nomi_ret.append(nomi[i] + ' ' + str(round(rate_percentage_contribution[i],1))+ ' %')
+			single_rate_area = np.trapz(y = matrix_of_rates_all[i], x = x_axis)
+			rate_percentage_contribution.append(single_rate_area / total_rate_area * 100)	
+			if rate_percentage_contribution[-1] > threshold:
+				nomi_ret.append(nomi[i] + ' ' + str(round(rate_percentage_contribution[-1],1))+ ' %')
+				matrix_of_rates.append(matrix_of_rates_all[:][i])
+			else:
+				rate_percentage_contribution.pop(-1)
+	
+		print(rate_percentage_contribution)
+
 		return x_axis, matrix_of_rates, nomi_ret

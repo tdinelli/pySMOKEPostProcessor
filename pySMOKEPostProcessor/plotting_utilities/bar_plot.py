@@ -19,7 +19,7 @@ def plot_bars(df, type: str, title: str = ''):
 	ax = plt.subplot()
     
 	if len(title) > 0:
-		ax.set_title(title, fontsize = 20)
+		ax.set_title(title, fontsize = 6)
     
 	bar = ax.barh(df.index, df[col], color = (df[col] >= 0.).map({True:'red', False:'blue'}))
 
@@ -29,14 +29,14 @@ def plot_bars(df, type: str, title: str = ''):
 		if(x<0):
 			ax.text(0, y, 
 	   			df['Reaction Name'][idx] + "  (" + str('{:6.4f}'.format(df[col][idx])) + ")", 
-				va='center', fontsize=14)
+				va='center', fontsize=2)
 		else:
 			ax.text(0,
                     y, 
                     df['Reaction Name'][idx] + "  (" + str('{:6.4f}'.format(df[col][idx])) + ")", 
                     va='center',
                     ha='right',
-                    fontsize=14) 
+                    fontsize=2) 
 
 	ax.set_yticks(np.arange(0, 10, 1))
 	ax.set_yticklabels([])
