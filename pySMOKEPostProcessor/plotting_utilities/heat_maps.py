@@ -53,47 +53,50 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
         cdict['alpha'].append((si, a, a))
 
     newcmap = matplotlib.colors.LinearSegmentedColormap(name, cdict)
-    plt.register_cmap(cmap=newcmap)
+    # plt.register_cmap(cmap=newcmap)
 
     return newcmap
 
-def plot_heatmap(sort_df, weigheach = True):
-	"""
-	heat maps of x: df.columns, y: df.index 
-	"""
-	# generate the figure
-	fig, axes = plt.subplots(figsize = [len(sort_df.columns), len(sort_df.index)])
-	# valmax = max([np.min(sort_df.values), np.max(sort_df.values)])
-	if weigheach:
-		image = axes.imshow(sort_df.values, 
-		    aspect='auto', cmap='RdBu_r',
-			vmin=-1, 
-			vmax=1)  # coolwarm, RdBu, seismic, bwr
-	else:
-		orig_cmap = matplotlib.cm.RdBu_r
-		
-		vmin = sort_df.min(numeric_only=True).min() 
-		vmax = sort_df.max(numeric_only=True).max()
-		midpoint = 1 - vmax/(vmax + abs(vmin))
-		
-		shifted_cmap = shiftedColorMap(orig_cmap, midpoint=midpoint, name='shifted')
-		image = axes.imshow(sort_df.values,
-		    interpolation='none', 
-			cmap=shifted_cmap)  # coolwarm, RdBu, seismic, bwr
+def plot_heatmap(sort_df, symmetricaxis = False):
+    """
+    heat maps of x: df.columns, y: df.index 
+    """
+    # generate the figure
+    fig, axes = plt.subplots(figsize = [len(sort_df.columns), len(sort_df.index)])
+ 
+	# shift axes based on maximum and minimum values. 0 is always in the middle
+    orig_cmap = matplotlib.cm.RdBu_r
+    vmin = sort_df.min(numeric_only=True).min() 
+    vmax = sort_df.max(numeric_only=True).max()
     
-	axes.set_yticks(np.arange(0, len(sort_df.index)))    
-	axes.set_xticks(np.arange(0, len(sort_df.columns)))
+    if symmetricaxis:
+    # always get symmetric axes
+        vmaxabs = max([abs(vmin), vmax])
+        image = axes.imshow(sort_df.values, 
+            cmap=orig_cmap,
+            vmin=-vmaxabs, 
+            vmax=vmaxabs)  # coolwarm, RdBu,
+    else:
+    # shift according to where the 0 is and compress the other axis
+        midpoint = 1 - vmax/(vmax + abs(vmin))
+        shifted_cmap = shiftedColorMap(orig_cmap, midpoint=midpoint, name='shifted')
+        image = axes.imshow(sort_df.values,
+            interpolation='none', 
+            cmap=shifted_cmap)  # coolwarm, RdBu, seismic, bwr
     
-	size_for_lbl = 'xx-large'*(len(sort_df.index) > 3) + 'medium'*(len(sort_df.index) <= 3)
+    axes.set_yticks(np.arange(0, len(sort_df.index)))    
+    axes.set_xticks(np.arange(0, len(sort_df.columns)))
 
-	axes.set_yticklabels([idx.split('flux_')[1] for idx in sort_df.index], fontsize=size_for_lbl)
-	axes.set_xticklabels(sort_df.columns, rotation=90, fontsize=size_for_lbl)
-    
-    
-	plt.colorbar(image)
-	fig.tight_layout()
-    
-	return fig
+    size_for_lbl = 'xx-large'*(len(sort_df.index) > 3) + 'medium'*(len(sort_df.index) <= 3)
+
+    axes.set_yticklabels([idx.split('flux_')[1] for idx in sort_df.index], fontsize=size_for_lbl)
+    axes.set_xticklabels(sort_df.columns, rotation=90, fontsize=size_for_lbl)
+
+
+    plt.colorbar(image)
+    fig.tight_layout()
+
+    return fig
 
 def save_fig(fig, plt_fld, sortlist, simul_name):          
     
