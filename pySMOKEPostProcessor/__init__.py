@@ -4,6 +4,7 @@ from .ropa import RateOfProductionAnalysis, GetReactionRates, GetFormationRates,
 from .sensitivity_analysis import SensitivityAnalysis, SensitivityCoefficients
 from .flux_analysis import FluxAnalysis
 from .reaction_classes import FluxByClass
+from .reaction_classes import merge_maps_onespecies
 from .plotting_utilities.heat_maps import plot_heatmap, save_fig
 from .plotting_utilities.bar_plot import plot_bars
 

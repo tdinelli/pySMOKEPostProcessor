@@ -36,7 +36,8 @@ class FluxByClass:
 		rxns_sorted.assign_class_grp(subcl_grp_dct)
 
 		# assign to self
-		self.flux_sorted = reaction_fluxes(rxns_sorted.rxn_class_df, verbose)
+		self.rxns_sorted = rxns_sorted
+		self.flux_sorted = reaction_fluxes(rxns_sorted.rxn_class_df, verbose) #needed for cumulative reaction rates - but should be removed
 		self.kinetic_mechanism = kinetic_mechanism
 		self.classes_definition = classes_definition
 		self.verbose = verbose
@@ -50,6 +51,9 @@ class FluxByClass:
 				ropa_type='global',
 				mass_ropa = False):
 
+		# reinitialize
+		self.flux_sorted = reaction_fluxes(self.rxns_sorted.rxn_class_df, self.verbose)
+  
 		if self.verbose:
 			print('processing simul {}'.format(results_folder))
 
@@ -112,8 +116,6 @@ class FluxByClass:
 
 		self.flux_sorted.sum_fwbw()
 
-
-
 	def sort_and_filter(self, sortlist, filter_dct = {}, thresh = 1e-3, weigheach = True):
 		# filter rxns
 		rxns_sorted = copy.deepcopy(self.flux_sorted)
@@ -131,11 +133,10 @@ class FluxByClass:
 
 		return sortdf
 
-
-
 	# new function to compute and plot reaction class rate profiles along axial coordinate
 	def process_reaction_class_rate(self, results_folder: str, x_axis_name: str, reactionclass_type: str):
-
+    # to be extended to all types (reactiontype, classtype, speciestype, bimoltype. requires a call to sort_and_filter first)
+	# do it similar to sort_and_filter, with sortlist (which only provides criteria for getting the rates) and filter_dct
 		indici = [i['index']-1 for i in self.reactions_all if not i['reactiontype'] == None if reactionclass_type in i['reactiontype']]
 
 		x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism, 
@@ -145,8 +146,6 @@ class FluxByClass:
 		
 		return x_axis, reaction_rate_
 	
-
-
 	# new function to compute plot cumulative contribution of different reactions
 	# to production/consumption rate profile of a species
 	def process_cumulative_reaction_rate(self, results_folder: str,
@@ -263,3 +262,40 @@ class FluxByClass:
 		print(rate_percentage_contribution)
 
 		return x_axis, matrix_of_rates, nomi_ret
+
+def merge_maps_onespecies(sorted_dfs_dct):
+	""" combines the heatmaps of different simulations for the same set of species and puts them in a new dataframe
+	Args:
+		sorted_dfs ({idx: dataframe}): sorted dataframes with fluxes.
+	"""
+ 
+	# simul names
+	sim_names = sorted_dfs_dct.keys()
+	species_lists = np.concatenate([np.array(sorted_dfs_dct[sim_name].index) for sim_name in sim_names])
+	classes_list = np.concatenate([np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names])
+  	# find common species and classes
+	common_sp = np.array(list(set(species_lists)))
+	common_cl = np.sort(np.array(list(set(classes_list))))
+ 	# for each species: rename according to simulation name and concatenate dataframes
+	dftot = pd.DataFrame(columns = common_cl)
+
+	for sim_name, dffull in sorted_dfs_dct.items():
+		# filter indexes
+		pdnew = dffull.loc[common_sp]
+		# rename indexes according to simul name
+		pdnew = pdnew.rename(index = lambda spname: spname + '-' + str(sim_name))
+		# now concate to dftot
+		dftot = pd.concat([dftot, pdnew])
+  
+	# replace nan with 0
+	dftot = dftot.replace(np.nan, 0)
+	# order according to index, so you have all species in rows
+	dftot = dftot.sort_index()
+ 
+	return dftot
+			
+			
+ 
+ 
+	
+ 
