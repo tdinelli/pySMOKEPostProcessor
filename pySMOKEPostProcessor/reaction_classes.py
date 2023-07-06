@@ -151,108 +151,90 @@ class FluxByClass:
 	def process_cumulative_reaction_rate(self, results_folder: str,
 				      					x_axis_name: str,
 										species: str,
-										rate_type: str,
+										rate_type = 'TOT',
 										filter_ClassesToPlot = [],
 										threshold = 5e-2,
           								n_of_rxns = 20,
           								verbose = False):
 
-		# distinguish pp input based on ropa type
-		loc_low_up = np.array([0, 0, 0, ], dtype=float)
-		tot_rop_df = None
-
+		# ROPA ONLY NEEDED FOR RXN INDEXES - BASED ON GLOBAL ROPA
 		tot_rop, indexes, _ = RateOfProductionAnalysis(kinetic_folder=self.kinetic_mechanism, 
 														output_folder=results_folder, 
 														species = species, 
 														ropa_type = 'global', 
-														local_value = loc_low_up[0],
-														lower_value = loc_low_up[1], 
-														upper_value = loc_low_up[2], 
 														number_of_reactions = n_of_rxns)
-
-		tot_rop_df0 = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=['flux_' + species], dtype=float)
+		col_species = 'flux_' + species
+		tot_rop_df0 = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=[col_species], dtype=float)
 		tot_rop_df0 = tot_rop_df0.groupby(level=0).sum() # sum rxns with same indexes
-    
-		if isinstance(tot_rop_df, pd.DataFrame):
-			# concatenate
-			tot_rop_df = pd.concat([tot_rop_df, tot_rop_df0])
-			tot_rop_df = tot_rop_df.groupby(level=0).sum() # sum rxns with same indexes
-		else:
-			tot_rop_df = copy.deepcopy(tot_rop_df0)			
-     		# assign flux
-			# self.flux_sorted.assign_flux(tot_rop_df)
+		tot_rop_df = copy.deepcopy(tot_rop_df0)	
 				
-		self.flux_sorted.sum_fwbw() # some errors to be fixed. Ask Luna
+		#to be fixed - it will be called for rxn class grouping # self.flux_sorted.sum_fwbw() # some errors to be fixed. Ask Luna
 
-		tot_rop_pos_df = tot_rop_df[(tot_rop_df >= 0).all(axis=1)]
-		tot_rop_sorted_pos_df = tot_rop_pos_df.sort_values(by = 'flux_' + species, axis=0, ascending=False)
+		# sort by absolute flux
+		tot_rop_df['absflux'] = abs(tot_rop_df[col_species].values)
+		# indexes for production and consumption
+		newPCcol = list([tot_rop_df[col_species] >= 0][0])
+		newPCcol = ['P'*(i==True) + 'C'*(i==False) for i in newPCcol]
+		tot_rop_df['PC'] =  newPCcol
+		# sort by max abs flux
+		tot_rop_df = tot_rop_df.sort_values(by = 'absflux', ascending = False)
 
-		tot_rop_neg_df = tot_rop_df[(tot_rop_df < 0).all(axis=1)]
-		tot_rop_sorted_neg_df = tot_rop_neg_df.sort_values(by = 'flux_' + species, axis=0, ascending=True)
-
-		indici_production = [tot_rop_sorted_pos_df.index[i] for i in range(len(tot_rop_sorted_pos_df))]
-		indici_consumption = [tot_rop_sorted_neg_df.index[i] for i in range(len(tot_rop_sorted_neg_df))]
-		
-		# print(tot_rop_df)
-
-		if rate_type == 'P':
-			indici = indici_production
-		elif rate_type == 'C':
-			indici = indici_consumption
-		else:
-			raise TypeError('rate_type can be only "P" (production) or "C" (consumption)')
-		
 		reaction_rate_all = []
 		matrix_of_rates_all = []
 		matrix_of_rates = []
 		rate_percentage_contribution = []
 		nomi = []
 
-		# print(indici)
-		for i in range(len(indici)):
-			x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism, 
+		if verbose: print(tot_rop_df)
+          
+		for index in tot_rop_df.index:
+			rxn_type = tot_rop_df['PC'][index]
+   
+			x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder = self.kinetic_mechanism, 
 				output_folder=results_folder, 
-				reaction_index=[indici[i]-1], 
+				reaction_index=[index - 1], 
 				abscissae_name=x_axis_name)
 			
-			nome = self.kinetic_map.ReactionNameFromIndex(indici[i]-1) # nome della reazione
+			name = self.kinetic_map.ReactionNameFromIndex(index - 1) # name della reazione
 
-			# to manage equilibrium reaction where 'species' can be on the right or on the left of '=' 
-			# i.e., consistently if they are produced or consumed in a specific simulation
-			if not "=>" in nome:
-				reagenti = nome.split(':')[-1].split('=')[0]
-				prodotti = nome.split(':')[-1].split('=')[-1]
-				if rate_type == 'P':
-					if(species in reagenti):
-						reaction_rate_ = list( map(neg, reaction_rate_))
-				elif rate_type == 'C':
-					if(species in prodotti):
-						reaction_rate_ = list( map(neg, reaction_rate_))
+			# put production rates positive and consumption rates negative
+			rcts = name.split(':')[-1].split('=')[0].strip().split('(+M)')[0].split('+')
+			prds = name.split(':')[-1].split('=')[-1].strip().split('(+M)')[0].split('+')
+   
+			if verbose : print('rxn: {}, rcts: {}; prds: {}'.format(index, rcts, prds))
+   
+			if rxn_type == 'P' and species in rcts: # if species is produced from a reversible reactions the rate will appear negative but it shouldn't
+				reaction_rate_ = list( map(neg, reaction_rate_))
+			elif rxn_type == 'C' and species in rcts: # when species is consumed and it is in the reactants; put flux to negative
+				reaction_rate_ = list( map(neg, reaction_rate_))
+			# elif rxn_type == 'C' and species in prds: do not change sign, it will already be negative
 
-			# to plot reactions only in specific reaction class
+			# IN FUTURE_ MOVE THIS SECTION AS AN ADDITIONAL ONE AFTER ASSIGNING ALL RATES - 
+   			# to plot reactions only in specific reaction class; ADDITIONAL OPTION: PLOT RXNS BY CLASS
 			ToPlot = 1
 			if len(filter_ClassesToPlot) >= 1:
 				ToPlot = 0
 				for j in range(len(filter_ClassesToPlot)):
 					indici_ToPlot = [k['index']-1 for k in self.reactions_all if not k['reactiontype'] == None if filter_ClassesToPlot[j] in k['reactiontype']]
-					if indici[i] in indici_ToPlot:
+					if index in indici_ToPlot:
 						ToPlot = ToPlot + 1
 				
 				if ToPlot == 0:
 					reaction_rate_ = [0] * len(reaction_rate_)
 
-			if ToPlot == 1:
-				nomi.append(self.kinetic_map.ReactionNameFromIndex(indici[i]-1)[:30])
+			if ToPlot == 1 and rxn_type == rate_type or rate_type == 'TOT': # add for plotting only allowed rate type
+				nomi.append(self.kinetic_map.ReactionNameFromIndex(index-1)[:30])
 				matrix_of_rates_all.append(reaction_rate_)
+				# print(self.kinetic_map.ReactionNameFromIndex(index-1)[:30])
 				if len(nomi) == 1:
-					reaction_rate_all = reaction_rate_
+					reaction_rate_all = map(abs, reaction_rate_)
 				else:
-					reaction_rate_all = list( map(add, reaction_rate_all, reaction_rate_))
+					reaction_rate_all = list( map(add, reaction_rate_all, list( map(abs, reaction_rate_)))) # sum absolute values
 				
 		nomi_ret = []
 		total_rate_area = np.trapz(y = reaction_rate_all, x = x_axis)
-		for i in range(len(nomi)):
-			single_rate_area = np.trapz(y = matrix_of_rates_all[i], x = x_axis)
+		for i, _ in enumerate(nomi):
+			single_rate_area = np.trapz(y = list(map(abs, matrix_of_rates_all[i])), x = x_axis) # compare absolute values to set the threshold
 			rate_percentage_contribution.append(single_rate_area / total_rate_area * 100)	
 			if rate_percentage_contribution[-1]/100 > threshold:
 				nomi_ret.append(nomi[i] + ' ' + str(round(rate_percentage_contribution[-1],1))+ ' %')
@@ -262,7 +244,7 @@ class FluxByClass:
 	
 		if verbose == True:
 			print("rate percentage contribution: \n", rate_percentage_contribution)
-
+		
 		return x_axis, matrix_of_rates, nomi_ret
 
 def merge_maps_onespecies(sorted_dfs_dct):
