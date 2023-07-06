@@ -94,6 +94,7 @@ def GetReactionRatesIndex(kinetic_folder: str, output_folder: str, reaction_inde
 	rate would be the sum of the desired rates. This will be probably changed in the future however for the moment
 	keep this.
 	"""
+   
 	out = OpenSMOKEppXMLFile(kineticFolder = kinetic_folder, 
 							OutputFolder = output_folder)
         
