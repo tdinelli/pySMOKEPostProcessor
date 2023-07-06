@@ -151,10 +151,11 @@ class FluxByClass:
 	def process_cumulative_reaction_rate(self, results_folder: str,
 				      					x_axis_name: str,
 										species: str,
-										n_of_rxns: int,
 										rate_type: str,
-										filter_ClassesToPlot: list,
-										threshold: float):
+										filter_ClassesToPlot = [],
+										threshold = 5e-2,
+          								n_of_rxns = 20,
+          								verbose = False):
 
 		# distinguish pp input based on ropa type
 		loc_low_up = np.array([0, 0, 0, ], dtype=float)
@@ -192,7 +193,7 @@ class FluxByClass:
 		indici_production = [tot_rop_sorted_pos_df.index[i] for i in range(len(tot_rop_sorted_pos_df))]
 		indici_consumption = [tot_rop_sorted_neg_df.index[i] for i in range(len(tot_rop_sorted_neg_df))]
 		
-		print(tot_rop_df)
+		# print(tot_rop_df)
 
 		if rate_type == 'P':
 			indici = indici_production
@@ -207,7 +208,7 @@ class FluxByClass:
 		rate_percentage_contribution = []
 		nomi = []
 
-		print(indici)
+		# print(indici)
 		for i in range(len(indici)):
 			x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism, 
 				output_folder=results_folder, 
@@ -253,13 +254,14 @@ class FluxByClass:
 		for i in range(len(nomi)):
 			single_rate_area = np.trapz(y = matrix_of_rates_all[i], x = x_axis)
 			rate_percentage_contribution.append(single_rate_area / total_rate_area * 100)	
-			if rate_percentage_contribution[-1] > threshold:
+			if rate_percentage_contribution[-1]/100 > threshold:
 				nomi_ret.append(nomi[i] + ' ' + str(round(rate_percentage_contribution[-1],1))+ ' %')
 				matrix_of_rates.append(matrix_of_rates_all[:][i])
 			else:
 				rate_percentage_contribution.pop(-1)
 	
-		print(rate_percentage_contribution)
+		if verbose == True:
+			print("rate percentage contribution: \n", rate_percentage_contribution)
 
 		return x_axis, matrix_of_rates, nomi_ret
 
