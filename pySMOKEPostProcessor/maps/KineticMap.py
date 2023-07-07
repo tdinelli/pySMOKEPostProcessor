@@ -73,6 +73,9 @@ class KineticMap:
             if (elem == 'AR'): 
                 self.iAR = elements.index('AR')
                 mwe.append(39.948001861572270)
+            if (elem == 'S'): 
+                self.iS = elements.index('S')
+                mwe.append(32.065)
         mwe = np.array(mwe)
         
         # Species molecular weights

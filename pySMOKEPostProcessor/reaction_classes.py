@@ -20,16 +20,17 @@ class FluxByClass:
 		reactions_all = []
 		for i in range(kinetics.NumberOfReactions):
 
-			reaction = {'index': i+1,
-                        'name': kinetics.reaction_names[i],
-                        'class': kinetics.rxnclass[i+1],
-                        'reactiontype': kinetics.rxnsubclass[i+1]}
+			reaction = {
+				'index': i+1,
+                'name': kinetics.reaction_names[i],
+                'class': kinetics.rxnclass[i+1],
+                'reactiontype': kinetics.rxnsubclass[i+1]
+			}
 			
 			reactions_all.append(reaction)
 
 		# parse classes
-		_, subcl_grp_dct = ReadReactionsGroups(
-		    classes_definition)
+		_, subcl_grp_dct = ReadReactionsGroups(classes_definition)
 
         # sort
 		rxns_sorted = reaction_classes(reactions_all, verbose=False)
@@ -37,7 +38,7 @@ class FluxByClass:
 
 		# assign to self
 		self.rxns_sorted = rxns_sorted
-		self.flux_sorted = reaction_fluxes(rxns_sorted.rxn_class_df, verbose) #needed for cumulative reaction rates - but should be removed
+		self.flux_sorted = reaction_fluxes(rxns_sorted.rxn_class_df, verbose) # needed for cumulative reaction rates - but should be removed
 		self.kinetic_mechanism = kinetic_mechanism
 		self.classes_definition = classes_definition
 		self.verbose = verbose

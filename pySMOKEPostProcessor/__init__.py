@@ -7,7 +7,8 @@ from .reaction_classes import FluxByClass
 from .reaction_classes import merge_maps_onespecies
 from .plotting_utilities.heat_maps import plot_heatmap, save_fig
 from .plotting_utilities.bar_plot import plot_bars
-
+from .maps.KineticMap import KineticMap
+from .maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
 def load(lib_file_path: str):
 	"""
 	Attempt to load the pySMOKEPostProcessor back-end from the file at lib_file_path.
@@ -24,7 +25,9 @@ __all__ = [
 	"flux_analysis",
 	"reaction_classes",
 	"plotting_utilities.heat_maps",
-	"plotting_utilities.bar_plot"
+	"plotting_utilities.bar_plot",
+	"maps.KineticMap",
+	"maps.OpenSMOKEppXMLFile"
 ]
 
 try:
