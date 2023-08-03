@@ -15,8 +15,9 @@ MODULE: KineticMechanism
     - This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
       Please report any bug to: alberto.cuoci@polimi.it
     - This is a modified class frome the original one KineticMechanism.py inside PyTools4OpenSMOKE 
-      modified by Timoteo Dinelli to handle gas-phase only to post-process data in order to perform 
-      Rate Of Production Analysis
+      modified by Timoteo Dinelli to handle gas-phase only to post-process data
+      in order to integrate the entire capability of post-processing
+      simulations inside the pySMOKEPostProcessor.
     - Luna Pratali Maffei add utilities to perform post processing of reaction classes
 '''
 
@@ -54,6 +55,9 @@ class KineticMap:
         
         # Elements molecular weights
         mwe = []
+        """
+        This values are taken from OpenSMOKEpp library 'kernel/thermo/AtomicElementMap.hpp'
+        """
         for elem in elements:
             if (elem == 'C'): 
                 self.iC = elements.index('C')
@@ -80,7 +84,7 @@ class KineticMap:
         
         # Species molecular weights
         mws = atomic.dot(mwe)
-                
+        
         # Soot classes (if they exists)
         # This is for postprocessing soot (currently not implemented)
         # reaction_class_name = []
@@ -174,26 +178,22 @@ class KineticMap:
                                     classes[classname][subclassname].append(i)
                                     self.rxnclass[i] = classname
                                     self.rxnsubclass[i] = subclassname
-
             self.classes = classes
-            
+        else:
+            raise Exception('The kinetic mechanism provided does not contain any reaction class!')
+   
     def ReactionNameFromIndex(self, reactionIndex: int):
         # reactionIndex 0-based
-
         if(reactionIndex + 1 <= self.NumberOfReactions):
-
             name = "R" + str(reactionIndex + 1) + ": " + self.reaction_names[reactionIndex]
             return name
         else:
-
             local_index = reactionIndex + 1 - self.NumberOfReactions
             if(local_index <= self.NumberOfFallOffReactions):
-
                 global_index = self.IndicesOfFallOffReactions[local_index - 1]
                 name = "R" + str(global_index) + "(inf): " + self.reaction_names[global_index - 1]
                 return name
             else:
-
                 global_index = self.IndicesOfCabrReactions[local_index - self.NumberOfReactions - 1]
                 name = "R" + str(global_index) + "(inf): " + self.reaction_names[global_index - 1]
                 return name
@@ -201,8 +201,7 @@ class KineticMap:
     def ReactionIndexFromName(self, name: str):
         for i in range(0, len(self.reaction_names)):
             if(name == self.reaction_names[i]):
-                return i # this is the index of the reaction 0-based 
-                         # pay attention to cabr and falloff reactions 
+                return i # this is the index of the reaction 0-based pay attention to cabr and falloff reactions 
         
     def SpeciesNameFromIndex(self, speciesIndex: int):
         return self.species[speciesIndex]

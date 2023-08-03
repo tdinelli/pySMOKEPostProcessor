@@ -43,7 +43,6 @@ class StoichiometricMap:
         return np.float64(subvector), pos+length+1
 
     def ReadMechFile(self, kinetics_xml):
-
         tree = ET.parse(kinetics_xml)
         root = tree.getroot()
         kinetics_element = root.find('Kinetics')
@@ -145,7 +144,6 @@ class StoichiometricMap:
             lambda_valueRevEq5 = valueRevEq5
             
         else:
-
             sys.exit("Non-elementary reactions cannot be processed")
 
         
@@ -214,7 +212,6 @@ class StoichiometricMap:
         self.lambda_valueRevEq5 = lambda_valueRevEq5
 
     def StoichiometryCoeffReactants(self, kinetics):
-
         react_species = []
         react_reaction = []
         react_nu = []
@@ -225,7 +222,6 @@ class StoichiometricMap:
         count4=0
         count5=0
         for i in range(kinetics.NumberOfSpecies):
-
             for k in range(self.numDir1[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir1[count1])
@@ -261,7 +257,6 @@ class StoichiometricMap:
         return self.nur
 
     def StoichiometryCoeffProducts(self, kinetics):  
-
         react_species = []
         react_reaction = []
         react_nu = []
@@ -308,7 +303,6 @@ class StoichiometricMap:
         return self.nup
 
     def ReactionOrderReactants(self,kinetics):
-
         react_species = []
         react_reaction = []
         react_lambda = []
@@ -319,7 +313,6 @@ class StoichiometricMap:
         count4=0
         count5=0
         for i in range(kinetics.NumberOfSpecies):
-
             for k in range(self.lambda_numDir1[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir1[count1])
@@ -355,7 +348,6 @@ class StoichiometricMap:
         return self.lambdar
 
     def ReactionOrderProducts(self,kinetics):  
-
         react_species = []
         react_reaction = []
         react_lambda = []
@@ -366,7 +358,6 @@ class StoichiometricMap:
         count4=0
         count5=0
         for i in range(kinetics.NumberOfSpecies):
-
             for k in range(self.lambda_numRevEq1[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq1[count1])

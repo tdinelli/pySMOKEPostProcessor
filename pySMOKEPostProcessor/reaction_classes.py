@@ -294,9 +294,4 @@ def merge_maps_onespecies(sorted_dfs_dct):
 	dftot = dftot.sort_index()
  
 	return dftot
-			
-			
- 
- 
-	
  
