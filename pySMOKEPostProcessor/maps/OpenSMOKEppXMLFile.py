@@ -29,12 +29,10 @@ class OpenSMOKEppXMLFile:
     Description of the OpenSMOKEppXMLFile class
     TODO
     '''
-    
+
     def __init__(self, OutputFolder: str, kineticFolder: str):
-    
         kin = KineticMap(kineticFolder)
         xml_file_name = os.path.join(OutputFolder, 'Output.xml')
-
         tree = ET.parse(xml_file_name)
         root = tree.getroot()
         
@@ -44,14 +42,11 @@ class OpenSMOKEppXMLFile:
             systemType != "Flamelet" and 
             systemType != "Flame1D" and 
             systemType != "Flame2D"):
-
             if(systemType == "BatchReactor" or 
                systemType == "PlugFlowReactor" or 
                systemType == "PerfectlyStirredReactor"):
-            
                 print(" * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained!\n",
-                      "          Some of the functions in this class may not work!")
-            
+                      "          Some of the functions in this class may not work!")    
             else:
                 sys.exit(f"Unknown system type: {systemType}")
         
@@ -113,7 +108,7 @@ class OpenSMOKEppXMLFile:
         z_coord = profiles[:, index_z]
         fvSOOT = profiles[:, index_fv]
        
-        #Q = profiles[:,index_Q]
+        Q = profiles[:,index_Q]
         
         if (systemType == 'Flame1D'):
             csi = profiles[:,index_csi]
@@ -142,7 +137,7 @@ class OpenSMOKEppXMLFile:
         self.P = P
         self.mw = mw
         self.rho = rho
-        #self.Q = Q
+        self.Q = Q
         self.csi = csi
         
         if (systemType == 'Flame1D'):
@@ -160,12 +155,11 @@ class OpenSMOKEppXMLFile:
         self.additional_variable = additional_variable
         self.add_var_idx = add_var_idx
         self.kin = kin
-        self.x_coord = x_coord
-        self.y_coord = y_coord
+
         self.z_coord = z_coord
         self.fvSOOT  = fvSOOT
-    def getProfile(self, name: str):
 
+    def getProfile(self, name: str):
         if ('time' in name):
             return self.time
         elif ('temperature' in name):
@@ -177,7 +171,7 @@ class OpenSMOKEppXMLFile:
         elif ('density' in name):
             return self.rho
         elif ('heat-release' in name):
-            return 'self.Q'
+            return self.Q
         elif ('csi' in name):
             return self.csi
         elif ('mixture-fraction' in name):

@@ -7,10 +7,10 @@ library_files_dir_name = 'lib'  # Path to the compiled library files
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-    
+
 with open(version_file_name, "r") as fv:
     version = fv.read()
-    
+
 # Get the absolute path of the directory containing this file
 setup_py_dir_path = os.path.dirname(os.path.realpath(__file__))
 os.chdir(setup_py_dir_path)  # In case this script is being run from another directory
@@ -61,17 +61,16 @@ for operating_system, arch in get_available_backends(library_files_dir_path):
 setuptools.setup(
     name="pySMOKEPostProcessor",
 	version = version,
-	author='Timoteo Dinelli',
+	author='Timoteo Dinelli, Edoardo Ramalli, Luna Pratali Maffei, Andrea Nobili',
 	author_email= 'timoteo.dinelli@polimi.it',
-	description='Python Binder of the OpenSMOKE post processor',
+	description='Python Binder of the OpenSMOKE Post Processor',
 	long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Titodinelli/pySMOKEPostProcessor",
 	packages=setuptools.find_packages(exclude=['__pycache__']),
 	install_requires=['numpy', 'pandas', 'matplotlib', 'networkx', 'pydot', 'graphviz', 'scipy', 'jupyter'],
-	package_data={interface_package_name: package_data},
 	classifiers=[
-		"Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Chemistry",
@@ -79,8 +78,8 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Software Development :: Libraries :: Application Frameworks",
 	],
-    
 	include_package_data=True,
+	package_data={interface_package_name: package_data},
 )
 
 '''

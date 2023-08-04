@@ -10,19 +10,20 @@ SCRIPT: rxnclasses
     Please report any bug to: luna.pratali@polimi.it
 '''
 
-# Import main libraries
 import pandas as pd
 import sys
 import numpy as np
 import copy
 
+# TODO Think to move the following two lists in a separate place
+# maybe also the function check bimol type
 R = ['R', 'H', 'OH', 'O2', 'O', 'CH3', 'HO2', 'HCO', 'C2H3']
 RSR = ['C5H5', 'C7H7', 'C6H5O']
 
-
 def check_bimol_type(speciestype, reactiontype):
     """
-    check if rxn is M+M, RSR+M, R+M, R+R, RSR+RSR
+        check if a reaction is of a type M+M, RSR+M, R+M, R+R, RSR+RSR
+        e.g. TODO
     """
     try:
         species_type_1 = speciestype.split('-')[-1]
@@ -56,36 +57,38 @@ def check_bimol_type(speciestype, reactiontype):
 class reaction_classes:
 
     def __init__(self, reactions, verbose: bool):
-        """ allocate dataframe 
+        """ 
+        allocate dataframe 
         """
-
         # turn reactions into a dataframe
         # index = rxn index, columns = [classtype, class, reactiontype, flux]
-        self.rxn_class_df = pd.DataFrame(index=np.arange(1, len(reactions)+1),
-                                         columns=np.array([
-                                             'name', 'classtype', 'speciestype', 'reactiontype', 'bimoltype']),
+        self.rxn_class_df = pd.DataFrame(index = np.arange(1, len(reactions)+1),
+                                         columns = np.array([
+                                             'name', 'classtype', 'speciestype', 'reactiontype', 'bimoltype'
+                                         ]),
                                          dtype=object)
         self.reactions = reactions
         self.verbose = verbose
-        """ assign class and sublcass
-		"""
+        """ 
+        assign class and sublcass
+        """
         for rxn in self.reactions:
             idx = rxn['index']
             self.rxn_class_df['name'][idx] = rxn['name']
             self.rxn_class_df['speciestype'][idx] = rxn['class']
             self.rxn_class_df['reactiontype'][idx] = rxn['reactiontype']
             self.rxn_class_df['bimoltype'][idx] = check_bimol_type(
-                rxn['class'], rxn['reactiontype'])
+                rxn['class'], rxn['reactiontype']
+            )
 
         self.rxn_class_df = self.rxn_class_df.replace('None', np.nan)
-        self.rxn_class_df['speciestype'] = self.rxn_class_df['speciestype'].replace(
-            np.nan, 'UNSORTED')
-        self.rxn_class_df['reactiontype'] = self.rxn_class_df['reactiontype'].replace(
-            np.nan, 'UNSORTED')
+        self.rxn_class_df['speciestype'] = self.rxn_class_df['speciestype'].replace(np.nan, 'UNSORTED')
+        self.rxn_class_df['reactiontype'] = self.rxn_class_df['reactiontype'].replace(np.nan, 'UNSORTED')
 
     def assign_class_grp(self, subcl_grp_dct):
-        """ assign class group if available
-                """
+        """ 
+        assign class group if available
+        """
         for subcl, subset in self.rxn_class_df.groupby('reactiontype'):
             # None values are automatically discarded
             rxns = subset.index
@@ -124,12 +127,12 @@ class reaction_fluxes:
     def sum_fwbw(self):
         """
         sum flux for fw and bw rxns
-                if '2INDENYL=>C18H14' in self.rxn_class_df['name'].values and 'C18H14=>2INDENYL' in self.rxn_class_df['name'].values:
-                idx0 = self.rxn_class_df.index[self.rxn_class_df['name'] == '2INDENYL=>C18H14'][0]
-                idx1 = self.rxn_class_df.index[self.rxn_class_df['name'] == 'C18H14=>2INDENYL'][0]
-                self.rxn_class_df.loc[idx0, flux_sp_name] += self.rxn_class_df.loc[idx1, flux_sp_name]
-                self.rxn_class_df.loc[idx1, flux_sp_name] *= 0
-                # self.rxn_class_df = self.rxn_class_df.drop(idx1, axis = 0)
+        if '2INDENYL=>C18H14' in self.rxn_class_df['name'].values and 'C18H14=>2INDENYL' in self.rxn_class_df['name'].values:
+        idx0 = self.rxn_class_df.index[self.rxn_class_df['name'] == '2INDENYL=>C18H14'][0]
+        idx1 = self.rxn_class_df.index[self.rxn_class_df['name'] == 'C18H14=>2INDENYL'][0]
+        self.rxn_class_df.loc[idx0, flux_sp_name] += self.rxn_class_df.loc[idx1, flux_sp_name]
+        self.rxn_class_df.loc[idx1, flux_sp_name] *= 0
+        # self.rxn_class_df = self.rxn_class_df.drop(idx1, axis = 0)
         """
 
         self.flux_cols = np.array(
@@ -182,8 +185,7 @@ class reaction_fluxes:
                     print('* merging flux {} and removing {}'.format(self.rxn_class_df['name'][idxkeep],
                                                                      self.rxn_class_df['name'][idxrem]))
 
-                self.rxn_class_df.loc[idxkeep,
-                                      self.flux_cols] += self.rxn_class_df.loc[idxrem, self.flux_cols]
+                self.rxn_class_df.loc[idxkeep,self.flux_cols] += self.rxn_class_df.loc[idxrem, self.flux_cols]
                 self.rxn_class_df = self.rxn_class_df.drop(idxrem, axis=0)
                 rxns_irrev_series = rxns_irrev_series.drop(idxrem, axis=0)
 
@@ -194,13 +196,16 @@ class reaction_fluxes:
         """
         dict_indexes = dict.fromkeys(filter_dct.keys())
         for criterion, values in filter_dct.items():
-            dict_indexes[criterion] = np.array(list(self.rxn_class_df[[any(
-                v in val for v in values) for val in self.rxn_class_df[criterion]]].index))
+            dict_indexes[criterion] = np.array(
+                    list(
+                        self.rxn_class_df[
+                            [any(v in val for v in values) for val in self.rxn_class_df[criterion]]
+                        ].index
+                    )
+            )
 
-        indexes_filter = np.array(list(set.intersection(
-            *[set(val) for val in dict_indexes.values()])))
-        self.rxn_class_df = self.rxn_class_df.loc[np.array(
-            list(set(indexes_filter)))]
+        indexes_filter = np.array(list(set.intersection(*[set(val) for val in dict_indexes.values()])))
+        self.rxn_class_df = self.rxn_class_df.loc[np.array(list(set(indexes_filter)))]
 
     def filter_flux(self, threshold=1e-3):
         """ delete all reactions with contributions below a threshold 
@@ -217,27 +222,24 @@ class reaction_fluxes:
         self.rxn_class_df = self.rxn_class_df.loc[np.array(list(set(indexes_filter)))]
 
     def sortby(self, sortlist, weigheach=True):
-        """ sum fluxes by criteria in sortlist
+        """ 
+        sum fluxes by criteria in sortlist
         """
     # check that all criteria are columns
         if not all(criterion in self.rxn_class_df.columns for criterion in sortlist):
             print(' * Error: criteria not all present in dataframe columns - exiting')
             sys.exit()
-
     # group and sum
         new_sort_df = pd.DataFrame(index=self.flux_cols)
         if len(sortlist) == 1:
             sortlist = sortlist[0]  # avoid pandas warning for single grouper
-
         for grp_idx, grp_df in self.rxn_class_df.groupby(sortlist):
             if isinstance(grp_idx, str):
                 name = grp_idx
             else:
                 name = '['+']['.join(grp_idx)+']'
-
             if self.verbose:
                 print(grp_idx, '\n', grp_df, '\n')
-
             new_sort_df[name] = grp_df[self.flux_cols].sum()
 
     # renormalize by species
