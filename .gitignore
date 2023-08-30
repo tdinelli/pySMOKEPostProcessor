@@ -60,3 +60,6 @@ build/
 pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
 examples-old
+
+.cache
+c_interfaceold
