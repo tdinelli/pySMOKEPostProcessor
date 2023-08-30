@@ -35,33 +35,60 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#ifndef POST_PROCESSOR_FLUX_MAP
-#define POST_PROCESSOR_FLUX_MAP
+#ifndef SENSITIVITIES_H
+#define SENSITIVITIES_H
 
-namespace pySMOKEPostProcessor
+#include "ProfilesDatabase.h"
+#include "Sensitivities_Database.h"
+
+class Sensitivities
 {
-    class PostProcessorFluxMap : public OpenSMOKE::FluxAnalysisMap
-    {
-    public:
 
-        PostProcessorFluxMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML,OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML);
+  public:
+    Sensitivities();
 
-        void ComputeFluxAnalysis();
+    ~Sensitivities();
 
-        void ComputeValues( const unsigned int index_j,
-                            std::vector<unsigned int>& local_indices,
-                            std::vector<double>& local_thickness,
-                            std::vector<double>& local_normal_fluxes,
-                            std::vector<double>& local_fluxes);
+    void SetDatabase(ProfilesDatabase *data);
 
-        std::vector<int> IndexFirstName;
-        std::vector<int> IndexSecondName;
-        std::vector<double> ComputedLabelValue;
-        std::vector<double> ComputedThicknessValue;
+    void SetNormalizationType(std::string normalizationType);
 
+    void SetSensitivityType(std::string sensitivityType);
 
-    };
-}
+    void SetOrderingType(std::string orderingType);
 
-#include "PostProcessorFluxMap.hpp"
-#endif // POST_PROCESSOR_FLUX_MAP
+    void SetTarget(std::string target);
+
+    void SetLocalValue(double localValue);
+
+    void SetLowerBound(double lowerBound);
+
+    void SetUpperBound(double upperBound);
+
+    void Prepare();
+
+    void Sensitivity_Analysis(double *sensitivity_coefficients, int *reactions, int len);
+
+    void ReadSensitvityCoefficients();
+
+    void GetSensitivityProfile(int reaction_index, double *coefficient);
+
+  private:
+    ProfilesDatabase *data_;
+
+    Sensitivities_Database *sensitivities;
+
+    std::string normalizationType_;
+    std::string sensitivityType_;
+    std::string orderingType_;
+    std::string target_;
+
+    double localValue_;
+    double lowerBound_;
+    double upperBound_;
+
+    bool iLocalNormalization = false;
+};
+
+#include "Sensitivities.hpp"
+#endif // SENSITIVITIES_H

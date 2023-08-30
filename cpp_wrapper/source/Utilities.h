@@ -34,65 +34,21 @@
 |   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
 |                                                                         |
 \*-----------------------------------------------------------------------*/
+#ifndef UTILITIES_H
+#define UTILITIES_H
 
-#ifndef PROFILESDATABASE_H
-#define PROFILESDATABASE_H
+void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
+                                  const std::vector<unsigned int> &negative_indices,
+                                  const std::vector<double> &positive_coefficients,
+                                  const std::vector<double> &negative_coefficients, std::vector<int> &indices,
+                                  std::vector<double> &coefficients);
 
-class ProfilesDatabase
-{
-public:
-	ProfilesDatabase(void);
-	~ProfilesDatabase(void);
+void MergeBars(const std::vector<unsigned int> &total_indices, const std::vector<double> &total_coefficients,
+               std::vector<int> &indices, std::vector<double> &coefficients);
 
-	bool ReadKineticMechanism(const std::string& folder_name);
-	
-	bool ReadFileResults(const std::string& folder_name);
-	
-	void Prepare();
-	
-	void SpeciesCoarsening(const double threshold);
+void MergeBars(const std::vector<unsigned int> &total_indices, const std::vector<double> &total_coefficients,
+               const std::vector<double> &total_peaks, std::vector<int> &indices, std::vector<double> &coefficients,
+               std::vector<double> &peaks);
 
-	int number_of_abscissas_;
-	int number_of_ordinates_;
-
-	std::vector<int> column_index_of_massfractions_profiles;
-	std::vector<std::string> string_list_additional;
-	std::vector<int> list_of_conversion_species_;
-
-	std::vector<std::string> string_list_massfractions_sorted;
-	std::vector<int> sorted_index;
-	std::vector<int> current_sorted_index;
-	std::vector<double> sorted_max;
-
-	std::vector< std::vector<double> > omega;
-	std::vector< std::vector<double> > additional;
-
-	unsigned int index_T;
-	unsigned int index_P;
-	unsigned int index_MW;
-	unsigned int index_density;
-	unsigned int index_velocity;
-	unsigned int index_mass_flow_rate;
-
-	std::vector<double> mw_species_;
-
-	boost::property_tree::ptree xml_main_input;
-
-	OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML;
-	OpenSMOKE::KineticsMap_CHEMKIN* kineticsMapXML;
-
-	bool iSensitivityEnabled_;
-	bool iROPAEnabled_;
-	bool is_kinetics_available_;
-
-	boost::filesystem::path path_folder_results_;
-	boost::filesystem::path path_folder_mechanism_;
-
-	void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int>& indices);
-
-	std::string name_reactions_;
-	std::vector<std::string> reaction_strings_;
-};
-
-#include "ProfilesDatabase.hpp"
-#endif // PROFILESDATABASE_H
+#include "Utilities.hpp"
+#endif // UTILITIES_H

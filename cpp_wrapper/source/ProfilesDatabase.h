@@ -35,90 +35,64 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#ifndef ROPA_H
-#define ROPA_H
+#ifndef PROFILESDATABASE_H
+#define PROFILESDATABASE_H
 
-#include "ProfilesDatabase.h"
-
-class ROPA 
+class ProfilesDatabase
 {
-public:
+  public:
+    ProfilesDatabase(void);
+    ~ProfilesDatabase(void);
 
-    ROPA();
+    bool ReadKineticMechanism(const std::string &folder_name);
 
-	void SetDatabase(ProfilesDatabase* data);
+    bool ReadFileResults(const std::string &folder_name);
 
-    void RateOfProductionAnalysis(double* coefficients, int* reactions, int len);
+    void Prepare();
 
-	void MergePositiveAndNegativeBars (const std::vector<unsigned int>& positive_indices,
-		const std::vector<unsigned int>& negative_indices,
-		const std::vector<double>& positive_coefficients,
-		const std::vector<double>& negative_coefficients,
-		std::vector<int>& indices,
-		std::vector<double>& coefficients);
-	
-	void FluxAnalysis(int* indexFirstName, int* indexSecondName, 
-					double* computedThickness, double* computedLabel, int* lenght);
+    void SpeciesCoarsening(const double threshold);
 
-	void GetReactionRates(int* index, int size_of_index, double* reaction_rate);
+    int number_of_abscissas_;
+    int number_of_ordinates_;
 
-	void GetFormationRates(std::string specie, std::string units, std::string type, double* rate);
-	
-	void SetKineticFolder(const std::string kineticFolder);
+    std::vector<int> column_index_of_massfractions_profiles;
+    std::vector<std::string> string_list_additional;
+    std::vector<int> list_of_conversion_species_;
 
-	void SetOutputFolder(const std::string outputFolder);
+    std::vector<std::string> string_list_massfractions_sorted;
+    std::vector<int> sorted_index;
+    std::vector<int> current_sorted_index;
+    std::vector<double> sorted_max;
 
-	void SetROPAType(const std::string kineticFolder);
+    std::vector<std::vector<double>> omega;
+    std::vector<std::vector<double>> additional;
 
-	void SetSpecies(const std::string kineticFolder);
+    unsigned int index_T;
+    unsigned int index_P;
+    unsigned int index_MW;
+    unsigned int index_density;
+    unsigned int index_velocity;
+    unsigned int index_mass_flow_rate;
 
-	void SetLocalValue(double localValue);
-	
-	void SetLowerBound(double lowerBound);
+    std::vector<double> mw_species_;
 
-	void SetUpperBound(double upperBound);
+    boost::property_tree::ptree xml_main_input;
 
-	void SetElement(const std::string element);
+    OpenSMOKE::ThermodynamicsMap_CHEMKIN *thermodynamicsMapXML;
+    OpenSMOKE::KineticsMap_CHEMKIN *kineticsMapXML;
 
-	void SetThickness(const std::string thickness);
+    bool iSensitivityEnabled_;
+    bool iROPAEnabled_;
+    bool is_kinetics_available_;
 
-	void SetFluxAnalysisType(const std::string type);
+    boost::filesystem::path path_folder_results_;
+    boost::filesystem::path path_folder_mechanism_;
 
-	void SetWidth(const int width);
+    void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int> &indices);
 
-	void SetDepth(const int depth);
-
-	void SetThreshold(const double threshold);
-
-	void SetThicknessLogScale(bool thicknesslogscale);
-
-	void SetLabelType(std::string type);
-	
-private:
-
-	ProfilesDatabase* data_;
-	std::vector<unsigned int> indices_coarse_reactions_;
-	std::vector<std::string> string_list_reactions;
-
-	std::string ropaType_;
-	std::string kineticFolder_;
-	std::string outputFolder_;
-	std::string species_;
-
-	double localValue_;
-	double upperBound_;
-	double lowerBound_;
-	bool speciesIsSelected;
-
-	std::string element_;
-	std::string thickness_;
-	std::string flux_type_;
-	int width_;
-	int depth_;
-	double threshold_;
-	bool thicknesslogscale_;
-	std::string label_type_;
+    std::string name_reactions_;
+    std::vector<std::string> reaction_strings_;
 };
 
-#include "ROPA.hpp"
-#endif // ROPA_H
+#include "ProfilesDatabase.hpp"
+#endif // PROFILESDATABASE_H

@@ -7,7 +7,7 @@
 |        |_|                                                              |
 |                                                                         |
 |   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
-|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>				  |
+|			       Edoardo Ramalli <edoardo.ramalli@polimi.it>			  |
 |   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
 |   Department of Chemistry, Materials and Chemical Engineering           |
 |   Politecnico di Milano                                                 |
@@ -35,72 +35,87 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-namespace pySMOKEPostProcessor
+#ifndef ROPA_H
+#define ROPA_H
+
+#include "ProfilesDatabase.h"
+
+class ROPA
 {
-    PostProcessorFluxMap::PostProcessorFluxMap( OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML,
-                            OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML) : OpenSMOKE::FluxAnalysisMap(thermodynamicsMapXML, kineticsMapXML)
-	{}
+  public:
+    ROPA();
 
-    void PostProcessorFluxMap::ComputeFluxAnalysis()
-    {
+    void SetDatabase(ProfilesDatabase *data);
 
-		for (unsigned int j=0;j<list_of_analyzed_species_.size();j++)
-		{
-			const unsigned int index_j = list_of_analyzed_species_[j];
-			ComputeValues(index_j,	global_important_indices_[index_j], global_relative_thickness_[index_j],
-											global_important_normal_fluxes_[index_j], global_important_fluxes_[index_j]);
+    void RateOfProductionAnalysis(double *coefficients, int *reactions, int len);
 
+    void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
+                                      const std::vector<unsigned int> &negative_indices,
+                                      const std::vector<double> &positive_coefficients,
+                                      const std::vector<double> &negative_coefficients, std::vector<int> &indices,
+                                      std::vector<double> &coefficients);
 
-            for(unsigned int k=0;k<global_important_indices_[index_j].size();k++)
-		    {
-                IndexFirstName.push_back(index_j);
-                IndexSecondName.push_back(global_important_indices_[index_j][k]);
-            }
-		}
-        /* TO BE REMOVED (Testing only)
-        std::cout << IndexFirstName.size() << std::endl;
-        std::cout << IndexSecondName.size() << std::endl;
-        std::cout << ComputedLabelValue.size() << std::endl;
-        std::cout << ComputedThicknessValue.size() << std::endl;
-        for (unsigned int i=0;i<ComputedThicknessValue.size();i++)
-        {
-            std::cout << ComputedThicknessValue[i] << std::endl;
-        }
-        */
-    }
-    
-    void PostProcessorFluxMap::ComputeValues(const unsigned int index_j, 
-                        std::vector<unsigned int>& local_indices,
-                        std::vector<double>& local_thickness,
-                        std::vector<double>& local_normal_fluxes,
-                        std::vector<double>& local_fluxes)
-    {
-        for(unsigned int j=0;j<local_indices.size();j++)
-		{
-			if (normal_tags_ == true)
-			{
+    void FluxAnalysis(int *indexFirstName, int *indexSecondName, double *computedThickness, double *computedLabel,
+                      int *lenght);
 
-				if (local_normal_fluxes[j]>10.)		std::setprecision(1);
-				else if (local_normal_fluxes[j]>1.)	std::setprecision(2);
-				else if (local_normal_fluxes[j]>0.1)	std::setprecision(3);
-				else std::setprecision(3);
-				
-				ComputedLabelValue.push_back(local_normal_fluxes[j]);
-			}
-			else
-			{
-				std::setprecision(2);
-						
-				ComputedLabelValue.push_back(local_fluxes[j]);
-			}
-            
-            // Thickness
-			
-            double thickness;
-			if (logarithmic_thickness_ == false)	thickness =  0.5 + 15.*local_thickness[j];	
-			else									thickness =  0.5 + 5.*std::max(0.,3.+log10(local_thickness[j]));
+    void GetReactionRates(int *index, int size_of_index, double *reaction_rate);
 
-            ComputedThicknessValue.push_back(thickness);
-        }    
-    }
-}
+    void GetFormationRates(std::string specie, std::string units, std::string type, double *rate);
+
+    void SetKineticFolder(const std::string kineticFolder);
+
+    void SetOutputFolder(const std::string outputFolder);
+
+    void SetROPAType(const std::string kineticFolder);
+
+    void SetSpecies(const std::string kineticFolder);
+
+    void SetLocalValue(double localValue);
+
+    void SetLowerBound(double lowerBound);
+
+    void SetUpperBound(double upperBound);
+
+    void SetElement(const std::string element);
+
+    void SetThickness(const std::string thickness);
+
+    void SetFluxAnalysisType(const std::string type);
+
+    void SetWidth(const int width);
+
+    void SetDepth(const int depth);
+
+    void SetThreshold(const double threshold);
+
+    void SetThicknessLogScale(bool thicknesslogscale);
+
+    void SetLabelType(std::string type);
+
+  private:
+    ProfilesDatabase *data_;
+    std::vector<unsigned int> indices_coarse_reactions_;
+    std::vector<std::string> string_list_reactions;
+
+    std::string ropaType_;
+    std::string kineticFolder_;
+    std::string outputFolder_;
+    std::string species_;
+
+    double localValue_;
+    double upperBound_;
+    double lowerBound_;
+    bool speciesIsSelected;
+
+    std::string element_;
+    std::string thickness_;
+    std::string flux_type_;
+    int width_;
+    int depth_;
+    double threshold_;
+    bool thicknesslogscale_;
+    std::string label_type_;
+};
+
+#include "ROPA.hpp"
+#endif // ROPA_H

@@ -17,7 +17,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License																  |
+|	License								                                  |
 |                                                                         |
 |   Copyright(C) 2016-2012  Alberto Cuoci                                 |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -35,61 +35,28 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#ifndef SENSITIVITIES_H
-#define SENSITIVITIES_H
+#ifndef POST_PROCESSOR_FLUX_MAP
+#define POST_PROCESSOR_FLUX_MAP
 
-#include "ProfilesDatabase.h"
-#include "Sensitivities_Database.h"
-
-class Sensitivities
+namespace pySMOKEPostProcessor
 {
+class PostProcessorFluxMap : public OpenSMOKE::FluxAnalysisMap
+{
+  public:
+    PostProcessorFluxMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN &thermodynamicsMapXML,
+                         OpenSMOKE::KineticsMap_CHEMKIN &kineticsMapXML);
 
-public:
+    void ComputeFluxAnalysis();
+    void ComputeValues(const unsigned int index_j, std::vector<unsigned int> &local_indices,
+                       std::vector<double> &local_thickness, std::vector<double> &local_normal_fluxes,
+                       std::vector<double> &local_fluxes);
 
-	Sensitivities();
-
-	~Sensitivities();
-
-	void SetDatabase(ProfilesDatabase* data);
-	
-	void SetNormalizationType(std::string normalizationType);
-
-	void SetSensitivityType(std::string sensitivityType);
-	
-	void SetOrderingType(std::string orderingType);
-	
-	void SetTarget(std::string target);
-
-	void SetLocalValue(double localValue);
-	
-	void SetLowerBound(double lowerBound);
-
-	void SetUpperBound(double upperBound);
-
-	void Prepare();
-
-	void Sensitivity_Analysis(double* sensitivity_coefficients, int* reactions, int len);
-
-	void ReadSensitvityCoefficients();
-
-	void GetSensitivityProfile(int reaction_index, double* coefficient);
-
-private:
-	ProfilesDatabase* data_;
-	
-	Sensitivities_Database* sensitivities;
-
-	std::string normalizationType_;
-	std::string sensitivityType_;
-	std::string orderingType_;
-	std::string target_;
-
-	double localValue_;
-	double lowerBound_;
-	double upperBound_;
-
-	bool iLocalNormalization = false;
+    std::vector<int> IndexFirstName;
+    std::vector<int> IndexSecondName;
+    std::vector<double> ComputedLabelValue;
+    std::vector<double> ComputedThicknessValue;
 };
+} // namespace pySMOKEPostProcessor
 
-#include "Sensitivities.hpp"
-#endif // SENSITIVITIES_H
+#include "PostProcessorFluxMap.hpp"
+#endif // POST_PROCESSOR_FLUX_MAP
