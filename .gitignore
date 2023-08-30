@@ -61,5 +61,8 @@ pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
 examples-old
 
+# ignore neovim stuff
 .cache
+
+# ignoring c_interface old just for sake of development
 c_interfaceold

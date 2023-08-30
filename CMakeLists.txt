@@ -4,7 +4,7 @@
 
 cmake_minimum_required (VERSION 3.16)
 
-project (pySMOKEpostprocessor)
+project (pySMOKEPostProcessor)
 
 set(DEFAULT_BUILD_TYPE "Release")
 
@@ -84,7 +84,7 @@ target_link_libraries(${PROJECT_NAME}
 # Install directory
 #--------------------------------------------------------------------
 
-# TODO
+# install(${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 #--------------------------------------------------------------------
 # Packing options
