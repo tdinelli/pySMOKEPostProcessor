@@ -130,7 +130,7 @@ void ROPA::SetLabelType(std::string type)
     label_type_ = type;
 }
 
-void ROPA::RateOfProductionAnalysis(double *coefficients, int *reactions, int len)
+void ROPA::RateOfProductionAnalysis(const unsigned int number_of_reactions)
 {
     // Select y variables among the species
     if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(),
@@ -305,10 +305,13 @@ void ROPA::RateOfProductionAnalysis(double *coefficients, int *reactions, int le
                                      reaction_coefficients);
     }
 
-    for (int i = 0; i < std::min<int>(len, reaction_coefficients.size()); i++)
+    coefficients_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
+    reactions_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
+
+    for (int i = 0; i < std::min<int>(number_of_reactions, reaction_coefficients.size()); i++)
     {
-        coefficients[i] = reaction_coefficients[i];
-        reactions[i] = reaction_indices[i];
+        coefficients_[i] = reaction_coefficients[i];
+        reactions_[i] = reaction_indices[i];
     }
 }
 

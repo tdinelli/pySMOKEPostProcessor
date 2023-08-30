@@ -116,7 +116,7 @@ void Sensitivities::Prepare()
     }
 }
 
-void Sensitivities::Sensitivity_Analysis(double *sensitivity_coefficients, int *reactions, int len)
+void Sensitivities::Sensitivity_Analysis(const unsigned int number_of_reactions)
 {
     std::vector<int> indices;
     std::vector<double> coefficients;
@@ -269,12 +269,14 @@ void Sensitivities::Sensitivity_Analysis(double *sensitivity_coefficients, int *
         for (unsigned int i = 0; i < indices.size(); i++)
             reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
     }
-
+    
     // indices it's 1-based since we have to postprocess here it is returned 0-based
-    for (int i = 0; i < std::min<int>(len, coefficients.size()); i++)
+    sensitivity_coefficients_.resize(std::min<int>(number_of_reactions, coefficients.size()));
+    reactions_.resize(std::min<int>(number_of_reactions, coefficients.size()));
+    for (int i = 0; i < std::min<int>(number_of_reactions, coefficients.size()); i++)
     {
-        sensitivity_coefficients[i] = coefficients[i];
-        reactions[i] = indices[i] - 1;
+        sensitivity_coefficients_[i] = coefficients[i];
+        reactions_[i] = indices[i] - 1;
     }
 }
 

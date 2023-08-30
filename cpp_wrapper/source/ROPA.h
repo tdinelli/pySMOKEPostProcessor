@@ -47,7 +47,7 @@ class ROPA
 
     void SetDatabase(ProfilesDatabase *data);
 
-    void RateOfProductionAnalysis(double *coefficients, int *reactions, int len);
+    void RateOfProductionAnalysis(const unsigned int number_of_reactions);
 
     void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
                                       const std::vector<unsigned int> &negative_indices,
@@ -59,8 +59,10 @@ class ROPA
                       int *lenght);
 
     void GetReactionRates(int *index, int size_of_index, double *reaction_rate);
+    // void GetReactionRates(std::vector<unsigned int> indices);
 
     void GetFormationRates(std::string specie, std::string units, std::string type, double *rate);
+    // void GetFormationRates(std::vector<unsigned int> indices);
 
     void SetKineticFolder(const std::string kineticFolder);
 
@@ -92,7 +94,12 @@ class ROPA
 
     void SetLabelType(std::string type);
 
+    inline const std::vector<unsigned int>& reactions() const {return reactions_;};
+    
+    inline const std::vector<double>& coefficients() const {return coefficients_;};
+
   private:
+
     ProfilesDatabase *data_;
     std::vector<unsigned int> indices_coarse_reactions_;
     std::vector<std::string> string_list_reactions;
@@ -115,6 +122,9 @@ class ROPA
     double threshold_;
     bool thicknesslogscale_;
     std::string label_type_;
+    
+    std::vector<unsigned int> reactions_;
+    std::vector<double> coefficients_;
 };
 
 #include "ROPA.hpp"

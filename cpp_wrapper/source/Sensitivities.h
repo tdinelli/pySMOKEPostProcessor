@@ -67,11 +67,15 @@ class Sensitivities
 
     void Prepare();
 
-    void Sensitivity_Analysis(double *sensitivity_coefficients, int *reactions, int len);
+    void Sensitivity_Analysis(const unsigned int number_of_reactions);
 
     void ReadSensitvityCoefficients();
 
     void GetSensitivityProfile(int reaction_index, double *coefficient);
+    
+    inline const std::vector<unsigned int>& reactions() const {return reactions_;};
+    
+    inline const std::vector<double>& coefficients() const {return sensitivity_coefficients_;};
 
   private:
     ProfilesDatabase *data_;
@@ -88,6 +92,8 @@ class Sensitivities
     double upperBound_;
 
     bool iLocalNormalization = false;
+    std::vector<double> sensitivity_coefficients_;
+    std::vector<unsigned int> reactions_;
 };
 
 #include "Sensitivities.hpp"

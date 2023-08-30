@@ -24,3 +24,9 @@ TODO
 # LICENSE
 
 See the [LICENSE](LICENSE.md) file for license rights and limitations (GPL-3.0).
+
+# DEVELOPMENT
+
+- Refactoring python
+- Refactoring examples
+- Update installation
