@@ -96,16 +96,17 @@ def plot_bars(data: dict):
     for idx, i in enumerate(bar):
         x = i.get_width()
         y = i.get_y()+0.5*i.get_height()
+        coefficient_value = "  (" + str('{:6.4e}'.format(data['coefficients'][idx])) + ")"
         if (x < 0):
             ax.text(0,
                     y,
-                    data['reaction_names'][idx] + "  (" + str('{:6.4e}'.format(data['coefficients'][idx])) + ")",
+                    data['reaction_names'][idx] + coefficient_value,
                     va='center',
                     fontsize=11)
         else:
             ax.text(0,
                     y,
-                    data['reaction_names'][idx] + "  (" + str('{:6.4e}'.format(data['coefficients'][idx])) + ")",
+                    data['reaction_names'][idx] + coefficient_value,
                     va='center',
                     ha='right',
                     fontsize=11)

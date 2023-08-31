@@ -51,21 +51,6 @@ class PostProcessor:
                             upper_value: float = 0,
                             number_of_reactions: int = 10) -> dict:
 
-        allowed_sensitivity_types = ['global', 'local', 'region']
-        allowed_ordering_types = ['peak-values', 'area', 'absolute-area']
-        allowed_normalization_types = ['local', 'max-value']
-
-        # TODO
-        # Move this check in c++
-        if (sensitivity_type not in allowed_sensitivity_types):
-            raise ValueError('Please select one of the available Sensitivity analysis type global | local | region')
-
-        if (ordering_type not in allowed_ordering_types):
-            raise ValueError('Please select one of the available ordering type: peak-values | area | absolute-area')
-
-        if (normalization_type not in allowed_normalization_types):
-            raise ValueError('Please select one of the available normalization: local | max-value')
-
         # SENSITIVITY HERE
         widget = Sensitivity()
 
@@ -99,21 +84,6 @@ class PostProcessor:
                      label_type: str, depth: int = 2, width: int = 5,
                      threshold: float = 0, local_value: float = 0.01):
 
-        allowed_flux_analysis_type = ['production', 'destruction']
-        allowed_thickness = ['absolute', 'relative']
-        allowed_label_type = ['absolute', 'relative']
-
-        # TODO
-        # Move this check in c++
-        if (flux_analysis_type not in allowed_flux_analysis_type):
-            raise ValueError("The available type for the flux analysis are: production | destruction")
-
-        if (thickness not in allowed_thickness):
-            raise ValueError("The available type for the caluclation of the thicknsss are: absolute | relative(%)")
-
-        if (label_type not in allowed_label_type):
-            raise ValueError("The available type for the labeling are: absolute | relative(%)")
-
         widget = ROPA()
 
         widget.setDataBase(self.db)
@@ -141,7 +111,7 @@ class PostProcessor:
             firstNames.append(self.km.SpeciesNameFromIndex(j))
             secondNames.append(self.km.SpeciesNameFromIndex(indexSecondName[i]))
 
-        Graph = GraphWriter(flux_analysis_type)
+        Graph = GraphWriter(flux_analysis_type, species, element)
         Graph = Graph.CreateGraph(firstNames, secondNames, computedThickness, computedLabel)
 
         return Graph

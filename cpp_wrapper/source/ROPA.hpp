@@ -62,6 +62,8 @@ void ROPA::SetOutputFolder(const std::string outputFolder)
 
 void ROPA::SetROPAType(const std::string ropaType)
 {
+    if (ropaType != "global" && ropaType != "local" && ropaType != "region")
+        throw std::invalid_argument("Available ROPA types are: global | local | region");
     ropaType_ = ropaType;
 }
 
@@ -97,11 +99,15 @@ void ROPA::SetElement(const std::string element)
 
 void ROPA::SetThickness(const std::string thickness)
 {
+    if (thickness != "absolute" && thickness != "relative")
+        throw std::invalid_argument("Available thickness types are: absolute | relative(%)");
     thickness_ = thickness;
 }
 
 void ROPA::SetFluxAnalysisType(const std::string type)
 {
+    if (type != "production" && type != "destruction")
+        throw std::invalid_argument("Available flux analysis types are: production | destruction");
     flux_type_ = type;
 }
 
@@ -127,6 +133,8 @@ void ROPA::SetThicknessLogScale(bool thicknesslogscale)
 
 void ROPA::SetLabelType(std::string type)
 {
+    if (type != "absolute" && type != "relative")
+        throw std::invalid_argument("Available label types are: absolute | relative(%)");
     label_type_ = type;
 }
 

@@ -62,6 +62,9 @@ void Sensitivities::SetDatabase(ProfilesDatabase *data)
 
 void Sensitivities::SetNormalizationType(std::string normalizationType)
 {
+    if(normalizationType != "local" && normalizationType != "max-value")
+        throw std::invalid_argument("Available normalization types are: local | max-value");
+
     normalizationType_ = normalizationType;
     if (normalizationType_ == "local")
         iLocalNormalization = true;
@@ -69,11 +72,16 @@ void Sensitivities::SetNormalizationType(std::string normalizationType)
 
 void Sensitivities::SetSensitivityType(std::string sensitivityType)
 {
+    if(sensitivityType != "global" && sensitivityType != "local" && sensitivityType != "region")
+        throw std::invalid_argument("Available sensitivity types are: global | local | region");
+
     sensitivityType_ = sensitivityType;
 }
 
 void Sensitivities::SetOrderingType(std::string orderingType)
 {
+    if(orderingType != "peak-values" && orderingType != "area" && orderingType != "absolute-area")
+        throw std::invalid_argument("Available sensitivity types are: peak-values | area | absolute-area");
     orderingType_ = orderingType;
 }
 
