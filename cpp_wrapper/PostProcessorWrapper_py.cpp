@@ -45,7 +45,11 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
         .def("setThicknessLogScale", &ROPA::SetThicknessLogScale, py::call_guard<py::gil_scoped_release>())
         .def("setLabelType", &ROPA::SetLabelType, py::call_guard<py::gil_scoped_release>())
         .def("reactions", &ROPA::reactions, py::call_guard<py::gil_scoped_release>())
-        .def("coefficients", &ROPA::coefficients, py::call_guard<py::gil_scoped_release>());
+        .def("coefficients", &ROPA::coefficients, py::call_guard<py::gil_scoped_release>())
+        .def("indexFirstName", &ROPA::indexFirstName, py::call_guard<py::gil_scoped_release>())
+        .def("indexSecondName", &ROPA::indexSecondName, py::call_guard<py::gil_scoped_release>())
+        .def("computedThickness", &ROPA::computedThickness, py::call_guard<py::gil_scoped_release>())
+        .def("computedLabel", &ROPA::computedLabel, py::call_guard<py::gil_scoped_release>());
 
     py::class_<Sensitivities>(m, "Sensitivity")
         .def(py::init<>())
@@ -64,5 +68,4 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
         .def("getSensitivityProfile", &Sensitivities::GetSensitivityProfile, py::call_guard<py::gil_scoped_release>())
         .def("reactions", &Sensitivities::reactions, py::call_guard<py::gil_scoped_release>())
         .def("coefficients", &Sensitivities::coefficients, py::call_guard<py::gil_scoped_release>());
-
 }

@@ -9,7 +9,6 @@ Generate re patterns for text parsing.
 from re import escape as re_escape
 
 
-
 def escape(pattern):
     """ escape special characters in pattern
 
@@ -243,5 +242,3 @@ def padded(pattern, fill_pattern=LINESPACE):
     """ a pattern allowing optional linespaces to the right
     """
     return zero_or_more(fill_pattern) + pattern + zero_or_more(fill_pattern)
-
-

@@ -55,8 +55,7 @@ class ROPA
                                       const std::vector<double> &negative_coefficients, std::vector<int> &indices,
                                       std::vector<double> &coefficients);
 
-    void FluxAnalysis(int *indexFirstName, int *indexSecondName, double *computedThickness, double *computedLabel,
-                      int *lenght);
+    void FluxAnalysis();
 
     void GetReactionRates(int *index, int size_of_index, double *reaction_rate);
     // void GetReactionRates(std::vector<unsigned int> indices);
@@ -97,6 +96,14 @@ class ROPA
     inline const std::vector<unsigned int>& reactions() const {return reactions_;};
     
     inline const std::vector<double>& coefficients() const {return coefficients_;};
+    
+    inline const std::vector<int>& indexFirstName() const {return indexFirstName_;};
+
+    inline const std::vector<int>& indexSecondName() const {return indexSecondName_;}; 
+    
+    inline const std::vector<double>& computedThickness() const {return computedThickness_;};
+    
+    inline const std::vector<double>& computedLabel() const {return computedLabel_;};
 
   private:
 
@@ -125,6 +132,11 @@ class ROPA
     
     std::vector<unsigned int> reactions_;
     std::vector<double> coefficients_;
+
+    std::vector<int> indexFirstName_;
+    std::vector<int> indexSecondName_;
+    std::vector<double> computedThickness_;
+    std::vector<double> computedLabel_;
 };
 
 #include "ROPA.hpp"

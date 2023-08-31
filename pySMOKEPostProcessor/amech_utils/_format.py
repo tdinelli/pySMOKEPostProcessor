@@ -1,14 +1,8 @@
 """ Various formatting functions used by each I/O module
 """
-
-import os
-# from mako.template import Template
-# import more_itertools as mit
 from pySMOKEPostProcessor.amech_utils import pattern as app
 from pySMOKEPostProcessor.amech_utils import find as apf
 
-
-# Build formatted strings
 
 def indent(string, nspaces):
     """ Indents each of the lines of a multiline string.

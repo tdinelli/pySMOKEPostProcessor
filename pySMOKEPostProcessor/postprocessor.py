@@ -1,5 +1,6 @@
 from pySMOKEPostProcessor import ProfilesDatabase, ROPA, Sensitivity
 from maps.KineticMap import KineticMap
+from graph_writer import GraphWriter
 
 
 class PostProcessor:
@@ -54,6 +55,8 @@ class PostProcessor:
         allowed_ordering_types = ['peak-values', 'area', 'absolute-area']
         allowed_normalization_types = ['local', 'max-value']
 
+        # TODO
+        # Move this check in c++
         if (sensitivity_type not in allowed_sensitivity_types):
             raise ValueError('Please select one of the available Sensitivity analysis type global | local | region')
 
@@ -90,6 +93,58 @@ class PostProcessor:
                               'reaction_indices': reaction_indices}
 
         return sensitivity_result
+
+    def FluxAnalysis(self, species: str, element: str, flux_analysis_type: str,
+                     thickness: str, thickness_log_scale: bool,
+                     label_type: str, depth: int = 2, width: int = 5,
+                     threshold: float = 0, local_value: float = 0.01):
+
+        allowed_flux_analysis_type = ['production', 'destruction']
+        allowed_thickness = ['absolute', 'relative']
+        allowed_label_type = ['absolute', 'relative']
+
+        # TODO
+        # Move this check in c++
+        if (flux_analysis_type not in allowed_flux_analysis_type):
+            raise ValueError("The available type for the flux analysis are: production | destruction")
+
+        if (thickness not in allowed_thickness):
+            raise ValueError("The available type for the caluclation of the thicknsss are: absolute | relative(%)")
+
+        if (label_type not in allowed_label_type):
+            raise ValueError("The available type for the labeling are: absolute | relative(%)")
+
+        widget = ROPA()
+
+        widget.setDataBase(self.db)
+        widget.setSpecies(species)
+        widget.setElement(element)
+        widget.setFluxAnalysisType(flux_analysis_type)
+        widget.setLocalValue(local_value)
+        widget.setThickness(thickness)
+        widget.setThicknessLogScale(thickness_log_scale)
+        widget.setLabelType(label_type)
+        widget.setDepth(depth)
+        widget.setWidth(width)
+        widget.setThreshold(threshold)
+
+        widget.fluxAnalysis()
+
+        indexFirstName = widget.indexFirstName()
+        indexSecondName = widget.indexSecondName()
+        computedThickness = widget.computedThickness()
+        computedLabel = widget.computedLabel()
+
+        firstNames = []
+        secondNames = []
+        for i, j in enumerate(indexFirstName):
+            firstNames.append(self.km.SpeciesNameFromIndex(j))
+            secondNames.append(self.km.SpeciesNameFromIndex(indexSecondName[i]))
+
+        Graph = GraphWriter(flux_analysis_type)
+        Graph = Graph.CreateGraph(firstNames, secondNames, computedThickness, computedLabel)
+
+        return Graph
 
     def GetReactionRates(self, reaction_name: list = None,
                          reaction_index: list = None):

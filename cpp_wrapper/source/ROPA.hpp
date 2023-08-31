@@ -315,8 +315,7 @@ void ROPA::RateOfProductionAnalysis(const unsigned int number_of_reactions)
     }
 }
 
-void ROPA::FluxAnalysis(int *indexFirstName, int *indexSecondName, double *computedThickness, double *computedLabel,
-                        int *lenght)
+void ROPA::FluxAnalysis()
 {
     // Select y variables among the species
     if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(),
@@ -435,19 +434,10 @@ void ROPA::FluxAnalysis(int *indexFirstName, int *indexSecondName, double *compu
 
     flux_analysis.ComputeFluxAnalysis();
 
-    std::vector<int> firstName = flux_analysis.IndexFirstName;
-    std::vector<int> secondName = flux_analysis.IndexSecondName;
-    std::vector<double> thicknessValues = flux_analysis.ComputedThicknessValue;
-    std::vector<double> labelValues = flux_analysis.ComputedLabelValue;
-
-    for (int i = 0; i <= std::min<int>(firstName.size(), 1000); i++)
-    {
-        indexFirstName[i] = firstName[i];
-        indexSecondName[i] = secondName[i];
-        computedThickness[i] = thicknessValues[i];
-        computedLabel[i] = labelValues[i];
-        lenght[i] = std::min<int>(firstName.size(), 1000);
-    }
+    indexFirstName_ = flux_analysis.IndexFirstName;
+    indexSecondName_ = flux_analysis.IndexSecondName;
+    computedThickness_ = flux_analysis.ComputedThicknessValue;
+    computedLabel_ = flux_analysis.ComputedLabelValue;
 }
 
 void ROPA::MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,

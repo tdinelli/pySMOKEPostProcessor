@@ -20,28 +20,28 @@ class GraphWriter:
         self.AddNodes(NodesNames)
         self.AddEdges(edgeStart, edgeEnd, thickness, label)
         self.G.graph['graph'] = {"fontsize": 14,
-                                 "overlap": "false",
-                                 "rankdir": "TB"}
+                                 "overlap": "false"}
+                                 # "rankdir": "TB"}
         self.G.graph['node'] = {"shape": "circle"}
         return self.G
 
     def AddNodes(self, NodesNames):
         for name in NodesNames:
             print(name)
-            if name == "H2":
-                self.G.add_nodes_from([
-                    (name, {"color": "black",
-                            "rank": 0})
-                ])
-            if name == "H2O":
-                self.G.add_nodes_from([
-                    (name, {"color": "black",
-                            "rank": "last"})
-                ])
-            else:
-                self.G.add_nodes_from([
-                    (name, {"color": "black"})
-                ])
+            # if name == "H2":
+            #     self.G.add_nodes_from([
+            #         (name, {"color": "black",
+            #                 "rank": 0})
+            #     ])
+            # if name == "H2O":
+            #     self.G.add_nodes_from([
+            #         (name, {"color": "black",
+            #                 "rank": "last"})
+            #     ])
+            # else:
+            self.G.add_nodes_from([
+                (name, {"color": "black"})
+            ])
 
     def AddEdges(self, edgeStart, edgeEnd, tck, edgeLabel):
         for j in range(len(edgeStart)):
