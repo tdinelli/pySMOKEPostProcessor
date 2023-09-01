@@ -117,35 +117,75 @@ class PostProcessor:
         return Graph
 
     def GetReactionRates(self, reaction_name: list = None,
-                         reaction_index: list = None):
+                         reaction_index: list = None,
+                         sum_rates: bool = False):
+        if reaction_name is not None:
+            reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
+
+        widget = ROPA()
+        widget.setDataBase(self.db)
+        widget.getReactionRates(reaction_index, sum_rates)
+        reaction_rates = widget.reactionRates()
+
+        return reaction_rates
+
+    def GetFormationRates(self, formation_rate_type: str,
+                          species: str,
+                          units: str = "mole"):
+        widget = ROPA()
+        widget.setDataBase(self.db)
+        widget.getFormationRates(species, units, formation_rate_type)
+        formationRates = widget.formationRates()
+
+        return formationRates
+
+    def SensitivityCoefficients(self,
+                                target: str,
+                                normalization_type: str,
+                                reaction_name: str = None,
+                                reaction_index: int = None):
 
         if reaction_name is not None:
             reaction_index = self.km.ReactionIndexFromName(name=reaction_name)
 
+        widget = Sensitivity()
+        widget.setDataBase(self.db)
+        widget.setSensitivityType("global")
+        widget.setOrderingType("peak-values")
+        widget.setNormalizationType(normalization_type)
+        widget.setTarget(target)
+        widget.setLocalValue(0.)
+        widget.setLowerBound(0.)
+        widget.setUpperBound(0.)
+        widget.prepare()
+        widget.readSensitivityCoefficients()
+        widget.getSensitivityProfiles(reaction_index)
+        sensitivity_coefficients = widget.sensitivityCoefficients()
+
+        return sensitivity_coefficients
+
+    def ropa(self, species: str, ropa_type: str, local_x: float = 0,
+             local_y: float = 0, lower_value: float = 0,
+             upper_value: float = 0, number_of_reactions: int = 10) -> dict:
         widget = ROPA()
-        widget.setDatabase(self.db)
-        # TODO Refactor the cpp function getReactionRates
-        # widget.getReactionRates(reaction_index)
-        # return None
+        widget.setDataBase(self.db)
+        widget.setROPAType(ropa_type)
+        widget.setSpecies(species)
+        widget.setLocalValue(local_x)
+        widget.setLowerBound(lower_value)
+        widget.setUpperBound(upper_value)
 
-    def GetFormationRates(self, formation_rate_type: str,
-                          species_names: list = None,
-                          species_index: list = None):
+        widget.ropa(number_of_reactions, local_x, local_y)
 
-        allowed_types = ['net', 'production', 'destruction', 'characteristic-time']
-        if formation_rate_type not in allowed_types:
-            raise ValueError('Available types for the formation rate are: net | production | destruction | characteristic-time')
+        reaction_indices = widget.reactions()
+        ropa_coefficients = widget.coefficients()
 
-        widget = ROPA()
-        widget.setDatabase(self.db)
-        # TODO Refactor the cpp function getFormationRates
-        # widget.getReactionRates(reaction_index)
-        # return None
+        reaction_names = []
+        for i in reaction_indices:
+            reaction_names.append(self.km.ReactionNameFromIndex(i))
 
-    def SensitivityCoefficients(self, target: str, reaction_name: str,
-                                normalization_type: str):
+        ropa_result = {'coefficients': ropa_coefficients,
+                       'reaction_names': reaction_names,
+                       'reaction_indices': reaction_indices}
 
-        if (normalization_type != 'local' and normalization_type != 'max-value'):
-            raise ValueError('Please select one of the available normalization: local | max-value')
-
-        # TODO refactor of the function
+        return ropa_result

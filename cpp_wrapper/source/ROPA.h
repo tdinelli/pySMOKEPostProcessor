@@ -49,6 +49,8 @@ class ROPA
 
     void RateOfProductionAnalysis(const unsigned int number_of_reactions);
 
+    void ropa(const unsigned int number_of_reactions, const double local_x, const double local_z); //const unsigned int number_of_reactions, 
+
     void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
                                       const std::vector<unsigned int> &negative_indices,
                                       const std::vector<double> &positive_coefficients,
@@ -57,11 +59,9 @@ class ROPA
 
     void FluxAnalysis();
 
-    void GetReactionRates(int *index, int size_of_index, double *reaction_rate);
-    // void GetReactionRates(std::vector<unsigned int> indices);
+    void GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates);
 
-    void GetFormationRates(std::string specie, std::string units, std::string type, double *rate);
-    // void GetFormationRates(std::vector<unsigned int> indices);
+    void GetFormationRates(std::string specie, std::string units, std::string type);
 
     void SetKineticFolder(const std::string kineticFolder);
 
@@ -104,6 +104,10 @@ class ROPA
     inline const std::vector<double>& computedThickness() const {return computedThickness_;};
     
     inline const std::vector<double>& computedLabel() const {return computedLabel_;};
+    
+    inline const std::vector<double>& formationRates() const {return formationRates_;};
+    
+    inline const std::vector<double>& reactionRates() const {return reactionRates_;};
 
   private:
 
@@ -137,6 +141,9 @@ class ROPA
     std::vector<int> indexSecondName_;
     std::vector<double> computedThickness_;
     std::vector<double> computedLabel_;
+
+    std::vector<double> formationRates_;
+    std::vector<double> reactionRates_;
 };
 
 #include "ROPA.hpp"

@@ -7,27 +7,30 @@ cmake_minimum_required (VERSION 3.16)
 project (pySMOKEPostProcessor)
 
 set(DEFAULT_BUILD_TYPE "Release")
-
 # --- Set build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE ${DEFAULT_BUILD_TYPE})
 endif()
 message (STATUS "Compiling in mode: ${CMAKE_BUILD_TYPE}")
 
-string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+# --- Checking for working compilers
+include(CheckCCompilerFlag)
+include(CheckCSourceCompiles)
 
 # --- Set module path in order to use custom CMake modules
+set (CMAKE_COLOR_MAKEFILE ON)
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 set (CMAKE_CXX_STANDARD 17)
+
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{EIGEN_LIBRARY_PATH}/cmake)
-set (CMAKE_COLOR_MAKEFILE ON)
+
 set (PROJECT_VERSION_MAJOR 0)
 set (PROJECT_VERSION_MINOR 3)
 set (PROJECT_VERSION_PATCH 0)
-set (INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Installation directory for executables")
+set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 #--------------------------------------------------------------------
 # Compulsory libraries
@@ -54,6 +57,7 @@ set(COMPULSORY_LIBRARIES ${Boost_LIBRARIES})
 set(COMPULSORY_INCLUDE ${Boost_INCLUDE_DIRS}
                        ${EIGEN3_INCLUDE_DIR}
                        ${OpenSMOKEpp_INCLUDE_DIR})
+
 #--------------------------------------------------------------------
 # Compilation flags and options
 #--------------------------------------------------------------------
@@ -66,8 +70,6 @@ add_link_options(-fPIC -m64 -w)
 #--------------------------------------------------------------------
 
 pybind11_add_module(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/cpp_wrapper/PostProcessorWrapper_py.cpp)
-
-#target_compile_definitions(${PROJECT_NAME})# PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 
 target_include_directories(${PROJECT_NAME} 
     PRIVATE 
@@ -84,7 +86,8 @@ target_link_libraries(${PROJECT_NAME}
 # Install directory
 #--------------------------------------------------------------------
 
-# install(${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(TARGETS ${PROJECT_NAME} 
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 #--------------------------------------------------------------------
 # Packing options

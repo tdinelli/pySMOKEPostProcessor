@@ -296,7 +296,7 @@ void Sensitivities::ReadSensitvityCoefficients()
     sensitivities->ReadFromChildFile(target_);
 }
 
-void Sensitivities::GetSensitivityProfile(int reaction_index, double *coefficient)
+void Sensitivities::GetSensitivityProfile(unsigned int reaction_index)
 {
     std::string selected_y = target_;
     if (target_ == "")
@@ -308,8 +308,6 @@ void Sensitivities::GetSensitivityProfile(int reaction_index, double *coefficien
     std::vector<double> senscoeff = sensitivities->NormalizedProfile(
         sensitivities->current_coarse_index()[selected_reaction_indices] - 1, iLocalNormalization);
 
-    for (unsigned int i = 0; i < senscoeff.size(); i++)
-    {
-        coefficient[i] = senscoeff[i];
-    }
+    sensitivity_coefficients_.resize(senscoeff.size());
+    sensitivity_coefficients_ = senscoeff;
 }

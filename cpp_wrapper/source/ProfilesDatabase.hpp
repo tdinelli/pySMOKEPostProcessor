@@ -170,6 +170,7 @@ void ProfilesDatabase::Prepare()
             stream >> number_of_additional_profiles;
 
             string_list_additional.reserve(number_of_additional_profiles);
+
             for (unsigned int j = 0; j < number_of_additional_profiles; j++)
             {
                 std::string unit;
@@ -177,13 +178,16 @@ void ProfilesDatabase::Prepare()
                 stream >> dummy;
                 stream >> unit;
                 string_list_additional.push_back(dummy + " " + unit);
-
                 if (dummy == "density")
-                    index_density = j + 1;
+                    index_density = j;
                 if (dummy == "velocity")
-                    index_velocity = j + 1;
+                    index_velocity = j;
                 if (dummy == "mass-flow-rate")
-                    index_mass_flow_rate = j + 1;
+                    index_mass_flow_rate = j;
+                if (dummy == "x-coord")
+                    index_x_coord = j;
+                if (dummy == "z-coord")
+                    index_z_coord = j;
 
                 stream >> dummy;
             }
@@ -193,8 +197,6 @@ void ProfilesDatabase::Prepare()
             throw std::invalid_argument("Corrupted xml file: missing the additional leaf");
         }
     }
-
-    index_mass_flow_rate = 7;
 
     // Species (mass fractions)
     std::vector<std::string> string_list_massfractions_unsorted;

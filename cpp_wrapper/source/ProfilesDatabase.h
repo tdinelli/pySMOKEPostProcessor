@@ -74,6 +74,9 @@ class ProfilesDatabase
     unsigned int index_velocity;
     unsigned int index_mass_flow_rate;
 
+    unsigned int index_x_coord;
+    unsigned int index_z_coord;
+
     std::vector<double> mw_species_;
 
     boost::property_tree::ptree xml_main_input;

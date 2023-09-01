@@ -26,6 +26,7 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
         .def(py::init<>())
         .def("setDataBase", &ROPA::SetDatabase, py::call_guard<py::gil_scoped_release>())
         .def("rateOfProductionAnalysis", &ROPA::RateOfProductionAnalysis, py::call_guard<py::gil_scoped_release>())
+        .def("ropa", &ROPA::ropa, py::call_guard<py::gil_scoped_release>())
         .def("fluxAnalysis", &ROPA::FluxAnalysis, py::call_guard<py::gil_scoped_release>())
         .def("getReactionRates", &ROPA::GetReactionRates, py::call_guard<py::gil_scoped_release>())
         .def("getFormationRates", &ROPA::GetFormationRates, py::call_guard<py::gil_scoped_release>())
@@ -49,7 +50,9 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
         .def("indexFirstName", &ROPA::indexFirstName, py::call_guard<py::gil_scoped_release>())
         .def("indexSecondName", &ROPA::indexSecondName, py::call_guard<py::gil_scoped_release>())
         .def("computedThickness", &ROPA::computedThickness, py::call_guard<py::gil_scoped_release>())
-        .def("computedLabel", &ROPA::computedLabel, py::call_guard<py::gil_scoped_release>());
+        .def("computedLabel", &ROPA::computedLabel, py::call_guard<py::gil_scoped_release>())
+        .def("formationRates", &ROPA::formationRates, py::call_guard<py::gil_scoped_release>())
+        .def("reactionRates", &ROPA::reactionRates, py::call_guard<py::gil_scoped_release>());
 
     py::class_<Sensitivities>(m, "Sensitivity")
         .def(py::init<>())
@@ -67,5 +70,5 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
              py::call_guard<py::gil_scoped_release>())
         .def("getSensitivityProfile", &Sensitivities::GetSensitivityProfile, py::call_guard<py::gil_scoped_release>())
         .def("reactions", &Sensitivities::reactions, py::call_guard<py::gil_scoped_release>())
-        .def("coefficients", &Sensitivities::coefficients, py::call_guard<py::gil_scoped_release>());
+        .def("sensitivityCoefficients", &Sensitivities::senitivityCoefficients, py::call_guard<py::gil_scoped_release>());
 }

@@ -71,11 +71,11 @@ class Sensitivities
 
     void ReadSensitvityCoefficients();
 
-    void GetSensitivityProfile(int reaction_index, double *coefficient);
+    void GetSensitivityProfile(unsigned int reaction_index);
     
     inline const std::vector<unsigned int>& reactions() const {return reactions_;};
     
-    inline const std::vector<double>& coefficients() const {return sensitivity_coefficients_;};
+    inline const std::vector<double>& senitivityCoefficients() const {return sensitivity_coefficients_;};
 
   private:
     ProfilesDatabase *data_;
