@@ -121,7 +121,6 @@ class PostProcessor:
                          sum_rates: bool = False):
         if reaction_name is not None:
             reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
-
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.getReactionRates(reaction_index, sum_rates)

@@ -19,7 +19,7 @@ import sys
 import os
 
 # Import internal modules
-from pySMOKEPostProcessor.maps.KineticMap import KineticMap
+from .KineticMap import KineticMap
 
 
 class StoichiometricMap:
