@@ -60,6 +60,7 @@ build/
 pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
 examples-old
+compile_commands.json
 
 # ignore neovim stuff
 .cache
