@@ -491,7 +491,9 @@ void ROPA::MergePositiveAndNegativeBars(const std::vector<unsigned int> &positiv
 void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates)
 {
     unsigned int numberOfReactions = reaction_indices.size();
-    // Calculate the formation rates
+    std::vector<double> multiplication_factors;
+    data_->isReactantProduct(reaction_indices[0], multiplication_factors);
+    // Calculate the reaction rates
     {
         std::vector<double> tmp;
         tmp.resize(data_->number_of_abscissas_);
@@ -504,7 +506,6 @@ void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bo
         for (unsigned int i = 0; i < data_->number_of_abscissas_; i++)
         {
             // Recovers mass fractions
-            // possible bug
             for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
                 omega[k + 1] = data_->omega[k][i];
 
@@ -516,6 +517,7 @@ void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bo
             const double P_Pa = data_->additional[data_->index_P][i];
             const double T = data_->additional[data_->index_T][i];
             const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+
             Product(cTot, x, &c);
 
             // Calculate reaction rates
@@ -528,23 +530,29 @@ void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bo
             data_->kineticsMapXML->ReactionRates(c.GetHandle());
             data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 
+            OpenSMOKE::ROPA_Data ropa;
+            data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
+
             // At the moment I allow only to query one rate at a time or just the sum
             // of a list of reactions in the future maybe I will add the query of multiple
             // rates at a time
             if (sum_rates)
             {
-                double sum_rate = 0.;
-                for (unsigned int j = 0; j < numberOfReactions; j++)
-                {
-                    const unsigned int k = reaction_indices[j] + 1;
-                    sum_rate += r[k];
-                }
-                tmp[i] = sum_rate;
+                // double sum_rate = 0.;
+                // for (unsigned int j = 0; j < numberOfReactions; j++)
+                // {
+                //     const unsigned int k = reaction_indices[j] + 1;
+                //     sum_rate += r[k];
+                // }
+                // tmp[i] = sum_rate;
             }
             else
             {
                 const unsigned int k = reaction_indices[0] + 1;
-                tmp[i] = r[k];
+                double multiplication_factor = 1;
+                if(!multiplication_factors.empty())
+                    multiplication_factor = multiplication_factors[0];
+                tmp[i] = multiplication_factor * r[k];
             }
         }
         reactionRates_.resize(tmp.size());
@@ -569,7 +577,7 @@ void ROPA::GetFormationRates(std::string specie, std::string units, std::string 
         for (unsigned int j = 0; j < n_selected_species; j++)
         {
             for (unsigned int k = 0; k < data_->string_list_massfractions_sorted.size(); k++)
-            { // CHECKKCKKKC
+            { 
                 if (selected_species == data_->string_list_massfractions_sorted[k])
                 {
                     formation_rates_to_plot[j + 1] = k;
@@ -721,6 +729,31 @@ void ROPA::ropa(const unsigned int number_of_reactions, const double local_x, co
         // Ropa
         OpenSMOKE::ROPA_Data ropa;
         data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
+
+
+        // std::cout << ropa.production_reaction_indices[index_of_species].size() << std::endl;
+        auto it = std::find(ropa.production_reaction_indices[index_of_species].begin(),
+                ropa.production_reaction_indices[index_of_species].end(), 11603);
+        int idx = std::distance(ropa.production_reaction_indices[index_of_species].begin(), it);
+        // std::cout << "ropa.production_reaction_indices[index_of_species]" << std::endl;
+        // std::cout << ropa.production_reaction_indices[index_of_species][idx] << std::endl;
+        // for(auto& ciao : ropa.production_reaction_indices[index_of_species])
+        //     std::cout << ciao << std::endl;
+        //
+        // std::cout << ropa.destruction_reaction_indices[index_of_species][idx] << std::endl;
+        // std::cout << "ropa.destruction_reaction_indices[index_of_species]" << std::endl;
+        // for(auto& ciao : ropa.destruction_reaction_indices[index_of_species])
+        //     std::cout << ciao << std::endl;
+        //
+        // std::cout << ropa.production_coefficients[index_of_species][idx] << std::endl;
+        // std::cout << "ropa.production_coefficients[index_of_species]" << std::endl;
+        // for(auto& ciao : ropa.production_coefficients[index_of_species])
+        //     std::cout << ciao << std::endl;
+        //
+        // std::cout << ropa.destruction_coefficients[index_of_species][idx] << std::endl;
+        // std::cout << "ropa.destruction_coefficients[index_of_species]" << std::endl;
+        // for(auto& ciao : ropa.destruction_coefficients[index_of_species])
+        //     std::cout << ciao << std::endl;
 
         MergePositiveAndNegativeBars(
             ropa.production_reaction_indices[index_of_species], ropa.destruction_reaction_indices[index_of_species],

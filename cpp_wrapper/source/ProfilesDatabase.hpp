@@ -353,3 +353,84 @@ void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index, st
 
     std::sort(indices.begin(), indices.end());
 }
+
+void ProfilesDatabase::isReactantProduct(const unsigned int reaction_index, std::vector<double> &netStoichiometry)
+{
+    kineticsMapXML->stoichiometry().BuildStoichiometricMatrix();
+
+    std::vector<double> reactants_stoich;
+    std::vector<double> products_stoich;
+    std::vector<double> reactants_indices;
+    std::vector<double> products_indices;
+    std::vector<double> duplicate_species_indices;
+
+    Eigen::SparseMatrix<double> reactants = kineticsMapXML->stoichiometry().stoichiometric_matrix_reactants();
+    Eigen::SparseMatrix<double> products = kineticsMapXML->stoichiometry().stoichiometric_matrix_products();
+
+    // TODO
+    // Here there is a large room for improvement in terms of computational
+    // efficency keep in mind that the loops repeted can be easily condensed
+    // into one but I don't have time now
+    for (int k=0; k<reactants.outerSize(); ++k)
+    {
+        for (Eigen::SparseMatrix<double>::InnerIterator it(reactants, k); it; ++it)
+        {
+            if(it.row() == reaction_index)
+            {
+                reactants_stoich.push_back(it.value());
+                reactants_indices.push_back(it.col());
+            }
+        }
+    }
+    
+    for (int k=0; k < products.outerSize(); ++k)
+    {
+        for (Eigen::SparseMatrix<double>::InnerIterator it(products, k); it; ++it)
+        {
+            if(it.row() == reaction_index)
+            {
+                products_stoich.push_back(it.value());
+                products_indices.push_back(it.col());
+            }
+        }
+    }
+
+    // Find if some of the species for the selected reactions appears
+    // on the both side of the reaction
+    
+    //1. sorting the vectors
+    std::sort(reactants_indices.begin(), reactants_indices.end());
+    std::sort(products_indices.begin(), products_indices.end());
+
+    //2. declaring result vector to store the common elements
+    std::vector<double> common_species(reactants_indices.size() + products_indices.size());
+
+    //3. iterator to store return type
+    std::vector<double>::iterator it, end;
+
+    end = std::set_intersection(reactants_indices.begin(), reactants_indices.end(),
+            products_indices.begin(), products_indices.end(),
+            common_species.begin());
+
+    for (it = common_species.begin(); it != end; it++)
+        duplicate_species_indices.push_back(*it);
+
+    for(unsigned int i = 0; i < duplicate_species_indices.size(); i++)
+    {
+        double idx = duplicate_species_indices[i];
+        int pos_r, pos_p;
+
+        std::vector<double>::iterator it_r;
+        std::vector<double>::iterator it_p;
+
+        it_r = std::find(reactants_indices.begin(), reactants_indices.end(), idx);
+        if(it_r != reactants_indices.end())
+            pos_r = it_r - reactants_indices.begin();
+
+        it_p = std::find(products_indices.begin(), products_indices.end(), idx);
+        if(it_r != products_indices.end())
+            pos_p = it_p - products_indices.begin();
+
+        netStoichiometry.push_back(-reactants_stoich[pos_r] + products_stoich[pos_p]);
+    } 
+}

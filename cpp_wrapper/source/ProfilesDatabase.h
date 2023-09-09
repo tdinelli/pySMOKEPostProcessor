@@ -38,6 +38,8 @@
 #ifndef PROFILESDATABASE_H
 #define PROFILESDATABASE_H
 
+#include <Eigen/Sparse>
+
 class ProfilesDatabase
 {
   public:
@@ -92,6 +94,8 @@ class ProfilesDatabase
     boost::filesystem::path path_folder_mechanism_;
 
     void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int> &indices);
+
+    void isReactantProduct(const unsigned int reaction_index, std::vector<double> &netStoichiometry);
 
     std::string name_reactions_;
     std::vector<std::string> reaction_strings_;
