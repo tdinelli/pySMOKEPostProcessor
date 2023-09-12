@@ -48,7 +48,7 @@ message (STATUS "Eigen_LIBRARIES: ${EIGEN3_INCLUDE_DIR}")
 
 # --- OpenSmoke++ (Compulsory)
 find_package(OpenSMOKEpp REQUIRED)
-message (STATUS "OpenSmoke++: ${OpenSMOKEpp_INCLUDE_DIR}")
+message (STATUS "OpenSmoke++: ${OPENSMOKE_INCLUDE_DIR}")
 
 # --- pybind11 (Compulsory)
 find_package(pybind11 REQUIRED)
@@ -57,7 +57,7 @@ set(COMPULSORY_LIBRARIES ${Boost_LIBRARIES})
 
 set(COMPULSORY_INCLUDE ${Boost_INCLUDE_DIRS}
                        ${EIGEN3_INCLUDE_DIR}
-                       ${OpenSMOKEpp_INCLUDE_DIR})
+                       ${OPENSMOKE_INCLUDE_DIR})
 
 #--------------------------------------------------------------------
 # Compilation flags and options
