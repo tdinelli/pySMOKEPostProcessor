@@ -79,6 +79,8 @@ def plot_heatmap(sort_df, symmetricaxis = False):
     # shift according to where the 0 is and compress the other axis
         midpoint = 1 - vmax/(vmax + abs(vmin))
         shifted_cmap = shiftedColorMap(orig_cmap, midpoint=midpoint, name='shifted')
+        #axes.get_yaxis().labelpad = 15
+        axes.set_label('# of contacts') #labelpad = 15, y=0.45
         image = axes.imshow(sort_df.values,
             interpolation='none', 
             cmap=shifted_cmap)  # coolwarm, RdBu, seismic, bwr
