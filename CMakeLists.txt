@@ -21,7 +21,7 @@ include(CheckCSourceCompiles)
 set (CMAKE_COLOR_MAKEFILE ON)
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 11)
 
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -37,6 +37,7 @@ set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJEC
 #--------------------------------------------------------------------
 
 # --- Boost (Compulsory)
+set(Boost_USE_STATIC_LIBS   ON)
 find_package (Boost REQUIRED COMPONENTS date_time filesystem program_options system regex timer chrono)
 message (STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
 message (STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
