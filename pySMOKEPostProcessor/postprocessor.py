@@ -21,16 +21,59 @@ class PostProcessor:
                                  local_value: float = 0,
                                  lower_value: float = 0,
                                  upper_value: float = 0,
-                                 number_of_reactions: int = 10) -> dict:
+                                 number_of_reactions: int = 10,
+                                 two_dimensions: bool = False,
+                                 region_location: dict = None) -> dict:
+        if (two_dimensions is False):
+            widget = ROPA()
+            widget.setDataBase(self.db)
+            widget.setROPAType(ropa_type)
+            widget.setSpecies(species)
+            widget.setLocalValue(local_value)
+            widget.setLowerBound(lower_value)
+            widget.setUpperBound(upper_value)
+
+            widget.rateOfProductionAnalysis(number_of_reactions)
+
+            reaction_indices = widget.reactions()
+            ropa_coefficients = widget.coefficients()
+
+            reaction_names = []
+            for i in reaction_indices:
+                reaction_names.append(self.km.ReactionNameFromIndex(i))
+
+            ropa_result = {'coefficients': ropa_coefficients,
+                           'reaction_names': reaction_names,
+                           'reaction_indices': reaction_indices}
+
+            return ropa_result
+        else:
+            return self.RateOfProductionAnalysis2D(species, ropa_type,
+                                                   number_of_reactions,
+                                                   region_location)
+
+    def RateOfProductionAnalysis2D(self, species: str, ropa_type: str,
+                                   number_of_reactions: int = 10,
+                                   region_location: dict = None) -> dict:
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.setROPAType(ropa_type)
         widget.setSpecies(species)
-        widget.setLocalValue(local_value)
-        widget.setLowerBound(lower_value)
-        widget.setUpperBound(upper_value)
+        widget.setLocalValue(0)
+        widget.setLowerBound(0)
+        widget.setUpperBound(0)
 
-        widget.rateOfProductionAnalysis(number_of_reactions)
+        local_value_x = region_location['local_value_x']
+        local_value_z = region_location['local_value_z']
+        lower_value_x = region_location['lower_value_x']
+        lower_value_z = region_location['lower_value_z']
+        upper_value_x = region_location['upper_value_x']
+        upper_value_z = region_location['upper_value_z']
+
+        widget.RateOfProductionAnalysis2D(number_of_reactions, local_value_x,
+                                          local_value_z, lower_value_x,
+                                          upper_value_x, lower_value_z,
+                                          upper_value_z)
 
         reaction_indices = widget.reactions()
         ropa_coefficients = widget.coefficients()
@@ -67,7 +110,7 @@ class PostProcessor:
         widget.sensitivityAnalysis(number_of_reactions)
 
         reaction_indices = widget.reactions()
-        sensitivity_coefficients = widget.coefficients()
+        sensitivity_coefficients = widget.sensitivityCoefficients()
 
         reaction_names = []
         for i in reaction_indices:
@@ -124,7 +167,11 @@ class PostProcessor:
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.getReactionRates(reaction_index, sum_rates)
-        reaction_rates = widget.reactionRates()
+
+        if (sum_rates):
+            reaction_rates = widget.sumOfRates()
+        else:
+            reaction_rates = widget.reactionRates()
 
         return reaction_rates
 
@@ -162,29 +209,3 @@ class PostProcessor:
         sensitivity_coefficients = widget.sensitivityCoefficients()
 
         return sensitivity_coefficients
-
-    def ropa(self, species: str, ropa_type: str, local_x: float = 0,
-             local_y: float = 0, lower_value: float = 0,
-             upper_value: float = 0, number_of_reactions: int = 10) -> dict:
-        widget = ROPA()
-        widget.setDataBase(self.db)
-        widget.setROPAType(ropa_type)
-        widget.setSpecies(species)
-        widget.setLocalValue(local_x)
-        widget.setLowerBound(lower_value)
-        widget.setUpperBound(upper_value)
-
-        widget.ropa(number_of_reactions, local_x, local_y)
-
-        reaction_indices = widget.reactions()
-        ropa_coefficients = widget.coefficients()
-
-        reaction_names = []
-        for i in reaction_indices:
-            reaction_names.append(self.km.ReactionNameFromIndex(i))
-
-        ropa_result = {'coefficients': ropa_coefficients,
-                       'reaction_names': reaction_names,
-                       'reaction_indices': reaction_indices}
-
-        return ropa_result

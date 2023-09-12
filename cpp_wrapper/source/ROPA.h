@@ -49,7 +49,9 @@ class ROPA
 
     void RateOfProductionAnalysis(const unsigned int number_of_reactions);
 
-    void ropa(const unsigned int number_of_reactions, const double local_x, const double local_z); //const unsigned int number_of_reactions, 
+    void RateOfProductionAnalysis2D(const unsigned int number_of_reactions, const double local_x,
+            const double local_z,const double region_low_x, const double region_up_x,
+            const double region_low_z, const double region_up_z);
 
     void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
                                       const std::vector<unsigned int> &negative_indices,
@@ -107,7 +109,9 @@ class ROPA
     
     inline const std::vector<double>& formationRates() const {return formationRates_;};
     
-    inline const std::vector<double>& reactionRates() const {return reactionRates_;};
+    inline const std::vector<std::vector<double>>& reactionRates() const {return reactionRates_;};
+
+    inline const std::vector<double>& sumOfRates() const {return sumOfRates_;};
 
   private:
 
@@ -143,7 +147,8 @@ class ROPA
     std::vector<double> computedLabel_;
 
     std::vector<double> formationRates_;
-    std::vector<double> reactionRates_;
+    std::vector<std::vector<double>> reactionRates_;
+    std::vector<double> sumOfRates_;
 };
 
 #include "ROPA.hpp"

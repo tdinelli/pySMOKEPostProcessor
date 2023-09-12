@@ -26,7 +26,7 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
         .def(py::init<>())
         .def("setDataBase", &ROPA::SetDatabase, py::call_guard<py::gil_scoped_release>())
         .def("rateOfProductionAnalysis", &ROPA::RateOfProductionAnalysis, py::call_guard<py::gil_scoped_release>())
-        .def("ropa", &ROPA::ropa, py::call_guard<py::gil_scoped_release>())
+        .def("ropa", &ROPA::RateOfProductionAnalysis2D, py::call_guard<py::gil_scoped_release>())
         .def("fluxAnalysis", &ROPA::FluxAnalysis, py::call_guard<py::gil_scoped_release>())
         .def("getReactionRates", &ROPA::GetReactionRates, py::call_guard<py::gil_scoped_release>())
         .def("getFormationRates", &ROPA::GetFormationRates, py::call_guard<py::gil_scoped_release>())
@@ -52,7 +52,8 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
         .def("computedThickness", &ROPA::computedThickness, py::call_guard<py::gil_scoped_release>())
         .def("computedLabel", &ROPA::computedLabel, py::call_guard<py::gil_scoped_release>())
         .def("formationRates", &ROPA::formationRates, py::call_guard<py::gil_scoped_release>())
-        .def("reactionRates", &ROPA::reactionRates, py::call_guard<py::gil_scoped_release>());
+        .def("reactionRates", &ROPA::reactionRates, py::call_guard<py::gil_scoped_release>())
+        .def("sumOfRates", &ROPA::sumOfRates, py::call_guard<py::gil_scoped_release>());
 
     py::class_<Sensitivities>(m, "Sensitivity")
         .def(py::init<>())

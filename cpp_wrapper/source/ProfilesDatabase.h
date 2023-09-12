@@ -75,6 +75,7 @@ class ProfilesDatabase
     unsigned int index_density;
     unsigned int index_velocity;
     unsigned int index_mass_flow_rate;
+    unsigned int index_volume;
 
     unsigned int index_x_coord;
     unsigned int index_z_coord;
@@ -95,7 +96,7 @@ class ProfilesDatabase
 
     void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int> &indices);
 
-    void isReactantProduct(const unsigned int reaction_index, std::vector<double> &netStoichiometry);
+    void isReactantProduct(const unsigned int reaction_index, double &netStoichiometry);
 
     std::string name_reactions_;
     std::vector<std::string> reaction_strings_;

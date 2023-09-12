@@ -35,6 +35,7 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
+#include <string>
 ProfilesDatabase::ProfilesDatabase(void)
 {
     iSensitivityEnabled_ = false;
@@ -178,6 +179,7 @@ void ProfilesDatabase::Prepare()
                 stream >> dummy;
                 stream >> unit;
                 string_list_additional.push_back(dummy + " " + unit);
+
                 if (dummy == "density")
                     index_density = j;
                 if (dummy == "velocity")
@@ -188,6 +190,8 @@ void ProfilesDatabase::Prepare()
                     index_x_coord = j;
                 if (dummy == "z-coord")
                     index_z_coord = j;
+                if (dummy == "volume")
+                    index_volume = j;
 
                 stream >> dummy;
             }
@@ -354,7 +358,7 @@ void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index, st
     std::sort(indices.begin(), indices.end());
 }
 
-void ProfilesDatabase::isReactantProduct(const unsigned int reaction_index, std::vector<double> &netStoichiometry)
+void ProfilesDatabase::isReactantProduct(const unsigned int reaction_index, double &netStoichiometry)
 {
     kineticsMapXML->stoichiometry().BuildStoichiometricMatrix();
 
@@ -415,9 +419,13 @@ void ProfilesDatabase::isReactantProduct(const unsigned int reaction_index, std:
     for (it = common_species.begin(); it != end; it++)
         duplicate_species_indices.push_back(*it);
 
-    for(unsigned int i = 0; i < duplicate_species_indices.size(); i++)
+    if(reactants_indices.size() != 1)
     {
-        double idx = duplicate_species_indices[i];
+        netStoichiometry = 1;
+    }
+    else if(duplicate_species_indices.size() == 1)
+    {
+        double idx = duplicate_species_indices[0];
         int pos_r, pos_p;
 
         std::vector<double>::iterator it_r;
@@ -431,6 +439,16 @@ void ProfilesDatabase::isReactantProduct(const unsigned int reaction_index, std:
         if(it_r != products_indices.end())
             pos_p = it_p - products_indices.begin();
 
-        netStoichiometry.push_back(-reactants_stoich[pos_r] + products_stoich[pos_p]);
-    } 
+        netStoichiometry = -reactants_stoich[pos_r] + products_stoich[pos_p];
+    }
+    else if(duplicate_species_indices.size() == 0)
+    {
+        netStoichiometry = 1;
+    }
+    else
+    {
+        std::string msg = "Something is wrong with the reaction you are asking for!";
+        msg += "Reaction id: " + std::to_string(reaction_index);
+        throw std::invalid_argument(msg);
+    }
 }

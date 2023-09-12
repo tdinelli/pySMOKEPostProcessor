@@ -29,6 +29,7 @@ class GraphWriter:
         # can generate bugs when for instance end nodes
         # are just accumulation point
         NodesNames = list(set(edgeStart))
+        print(NodesNames)
         # this is not the best
         idx_first = NodesNames.index(self._first)
         NodesNames.insert(0, NodesNames.pop(idx_first))

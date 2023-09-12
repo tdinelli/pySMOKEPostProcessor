@@ -491,12 +491,10 @@ void ROPA::MergePositiveAndNegativeBars(const std::vector<unsigned int> &positiv
 void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates)
 {
     unsigned int numberOfReactions = reaction_indices.size();
-    std::vector<double> multiplication_factors;
-    data_->isReactantProduct(reaction_indices[0], multiplication_factors);
     // Calculate the reaction rates
     {
-        std::vector<double> tmp;
-        tmp.resize(data_->number_of_abscissas_);
+        sumOfRates_.resize(data_->number_of_abscissas_);
+        reactionRates_.resize(numberOfReactions, std::vector<double>(data_->number_of_abscissas_, 1));
 
         OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
         OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
@@ -509,7 +507,7 @@ void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bo
             for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
                 omega[k + 1] = data_->omega[k][i];
 
-            // Calculates mole fractions
+            // Calculate mole fractions
             double MWmix;
             data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
 
@@ -517,7 +515,6 @@ void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bo
             const double P_Pa = data_->additional[data_->index_P][i];
             const double T = data_->additional[data_->index_T][i];
             const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
-
             Product(cTot, x, &c);
 
             // Calculate reaction rates
@@ -526,37 +523,34 @@ void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices, const bo
             data_->thermodynamicsMapXML->SetTemperature(T);
             data_->thermodynamicsMapXML->SetPressure(P_Pa);
 
-            data_->kineticsMapXML->KineticConstants();
+            // data_->kineticsMapXML->KineticConstants();
             data_->kineticsMapXML->ReactionRates(c.GetHandle());
             data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 
-            OpenSMOKE::ROPA_Data ropa;
-            data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
-
-            // At the moment I allow only to query one rate at a time or just the sum
-            // of a list of reactions in the future maybe I will add the query of multiple
-            // rates at a time
             if (sum_rates)
             {
-                // double sum_rate = 0.;
-                // for (unsigned int j = 0; j < numberOfReactions; j++)
-                // {
-                //     const unsigned int k = reaction_indices[j] + 1;
-                //     sum_rate += r[k];
-                // }
-                // tmp[i] = sum_rate;
+                double sum_rate = 0.;
+                for (unsigned int k = 0; k < numberOfReactions; k++)
+                {
+                    double multiplication_factor = 1;
+                    // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
+                    const unsigned int j = reaction_indices[k] + 1;
+                    sum_rate += multiplication_factor * r[j];
+                }
+                sumOfRates_[i] = sum_rate;
             }
             else
             {
-                const unsigned int k = reaction_indices[0] + 1;
-                double multiplication_factor = 1;
-                if(!multiplication_factors.empty())
-                    multiplication_factor = multiplication_factors[0];
-                tmp[i] = multiplication_factor * r[k];
+                for (unsigned int k = 0; k < numberOfReactions; k++)
+                {
+                    double multiplication_factor = 1;
+                    // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
+                    const unsigned int j = reaction_indices[k] + 1;
+                    // reactionRates_[k][i] = multiplication_factor * r[j];
+                    reactionRates_[k][i] = r[j];
+                }
             }
         }
-        reactionRates_.resize(tmp.size());
-        reactionRates_ = tmp;
     }
 }
 
@@ -589,8 +583,7 @@ void ROPA::GetFormationRates(std::string specie, std::string units, std::string 
 
     // Calculate the formation rates
     {
-        std::vector<double> tmp;
-        tmp.resize(data_->number_of_abscissas_);
+        formationRates_.resize(data_->number_of_abscissas_);
 
         OpenSMOKE::OpenSMOKEVectorDouble P(data_->thermodynamicsMapXML->NumberOfSpecies());
         OpenSMOKE::OpenSMOKEVectorDouble D(data_->thermodynamicsMapXML->NumberOfSpecies());
@@ -627,7 +620,7 @@ void ROPA::GetFormationRates(std::string specie, std::string units, std::string 
             if (type == "characteristic-time")
             {
                 const unsigned k = data_->sorted_index[formation_rates_to_plot[1]] + 1;
-                tmp[i] = c[k] / (D[k] + 1.e-32);
+                formationRates_[i] = c[k] / (D[k] + 1.e-32);
             }
             else
             {
@@ -641,25 +634,24 @@ void ROPA::GetFormationRates(std::string specie, std::string units, std::string 
 
                 const unsigned k = data_->sorted_index[formation_rates_to_plot[1]] + 1;
                 if (type == "net")
-                    tmp[i] = P[k] - D[k];
+                    formationRates_[i] = P[k] - D[k];
                 else if (type == "production")
-                    tmp[i] = P[k];
+                    formationRates_[i] = P[k];
                 else if (type == "destruction")
-                    tmp[i] = D[k];
+                    formationRates_[i] = D[k];
                 else
                     throw std::invalid_argument(
                         "Available Formation Rates types are: net | production | destruction | characteristic-time");
             }
         }
-        formationRates_.resize(tmp.size());
-        formationRates_ = tmp;
     }
 }
 
-void ROPA::ropa(const unsigned int number_of_reactions, const double local_x, const double local_z)
-        // const double region_low_x, const double region_up_x, 
-        // const double region_low_z, const double region_up_z)
+void ROPA::RateOfProductionAnalysis2D(const unsigned int number_of_reactions, double local_x, double local_z,
+        double region_low_x, double region_up_x, 
+        double region_low_z, double region_up_z)
 {
+    // This function is totally inefficent and by far the worst code I have evere written
     // Select y variables among the species
     if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(),
                   species_) != data_->string_list_massfractions_sorted.end())
@@ -730,84 +722,229 @@ void ROPA::ropa(const unsigned int number_of_reactions, const double local_x, co
         OpenSMOKE::ROPA_Data ropa;
         data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
 
-
-        // std::cout << ropa.production_reaction_indices[index_of_species].size() << std::endl;
-        auto it = std::find(ropa.production_reaction_indices[index_of_species].begin(),
-                ropa.production_reaction_indices[index_of_species].end(), 11603);
-        int idx = std::distance(ropa.production_reaction_indices[index_of_species].begin(), it);
-        // std::cout << "ropa.production_reaction_indices[index_of_species]" << std::endl;
-        // std::cout << ropa.production_reaction_indices[index_of_species][idx] << std::endl;
-        // for(auto& ciao : ropa.production_reaction_indices[index_of_species])
-        //     std::cout << ciao << std::endl;
-        //
-        // std::cout << ropa.destruction_reaction_indices[index_of_species][idx] << std::endl;
-        // std::cout << "ropa.destruction_reaction_indices[index_of_species]" << std::endl;
-        // for(auto& ciao : ropa.destruction_reaction_indices[index_of_species])
-        //     std::cout << ciao << std::endl;
-        //
-        // std::cout << ropa.production_coefficients[index_of_species][idx] << std::endl;
-        // std::cout << "ropa.production_coefficients[index_of_species]" << std::endl;
-        // for(auto& ciao : ropa.production_coefficients[index_of_species])
-        //     std::cout << ciao << std::endl;
-        //
-        // std::cout << ropa.destruction_coefficients[index_of_species][idx] << std::endl;
-        // std::cout << "ropa.destruction_coefficients[index_of_species]" << std::endl;
-        // for(auto& ciao : ropa.destruction_coefficients[index_of_species])
-        //     std::cout << ciao << std::endl;
-
         MergePositiveAndNegativeBars(
             ropa.production_reaction_indices[index_of_species], ropa.destruction_reaction_indices[index_of_species],
             ropa.production_coefficients[index_of_species], ropa.destruction_coefficients[index_of_species],
             reaction_indices, reaction_coefficients);
-    } // Global | Region
-    else
+    } // Region
+    else if (ropaType_ == "region")
     {
-        // // data_->additional[data_->index_x_coord][j]
-        // unsigned int index_min_x = 0;
-        // unsigned int index_max_x = data_->number_of_abscissas_ - 1;
-        // unsigned int index_min_z = 0;
-        // unsigned int index_max_z = data_->number_of_abscissas_ - 1;
-        // 
-        // if (ropaType_ == "region")
+        std::vector<double> global_production_coefficients;
+        std::vector<double> global_destruction_coefficients;
+        std::vector<unsigned int> global_production_reaction_indices;
+        std::vector<unsigned int> global_destruction_reaction_indices;
+        
+        unsigned int index_ll;
+        unsigned int index_lr;
+        unsigned int index_ul;
+        unsigned int index_ur;
+        
+        for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
+        {
+            if (data_->additional[data_->index_x_coord][j] >= region_low_x && 
+                data_->additional[data_->index_z_coord][j] >= region_low_z)
+            {
+                index_ll = j;
+                break;
+            }
+        }
+        
+        for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
+        {
+            if (data_->additional[data_->index_x_coord][j] >= region_low_x &&
+                data_->additional[data_->index_z_coord][j] >= region_up_z)
+            {
+                index_ul = j;
+                break;
+            }
+        }
+        
+        for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
+        {
+            if (data_->additional[data_->index_x_coord][j] >= region_up_x &&
+                data_->additional[data_->index_z_coord][j] >= region_low_z)
+            {
+                index_lr = j;
+                break;
+            }
+        }
+       
+        for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
+        {
+            if (data_->additional[data_->index_x_coord][j] >= region_up_x &&
+                data_->additional[data_->index_z_coord][j] >= region_up_z)
+            {
+                index_ur = j;
+                break;
+            }
+        }
+        // TODO ADD CHECK on idices
+        // if (index_min == index_max)
         // {
-        //     for (unsigned int j = 0; j < data_->number_of_abscissas_; j++)
-        //     {
-        //         if (data_->additional[data_->index_x_coord][j] >= region_low_x &&
-        //             data_->additional[data_->index_z_coord][j] >= region_low_z &&   )
-        //         {
-        //             index_min_x = j;
-        //             index_min_z = j; 
-        //             break;
-        //         }
-        //     }
-        //     for (unsigned int j = index_min; j < data_->number_of_abscissas_; j++)
-        //     {
-        //         if (data_->additional[data_->index_x_coord][j] >= region_up_x &&
-        //             data_->additional[data_->index_z_coord][j] >= region_up_z &&   )
-        //         {
-        //             index_min_x = j;
-        //             index_min_z = j; 
-        //             break;
-        //         }
-        //     }
-        //
-            // if (index_min_x == index_max_x)
-            // {
-            //     if (index_max_x == data_->number_of_abscissas_ - 1)
-            //         index_min_x = index_max_x - 1;
-            //     else
-            //         index_max_x = index_min_x + 1;
-            // }
-            //
-            // if (index_min_z == index_max_z)
-            // {
-            //     if (index_max_z == data_->number_of_abscissas_ - 1)
-            //         index_min_z = index_max_z - 1;
-            //     else
-            //         index_max_z = index_min_z + 1;
-            // }
+        //     if (index_max == data_->number_of_abscissas_ - 1)
+        //         index_min = index_max - 1;
+        //     else
+        //         index_max = index_min + 1;
         // }
+        //
+
+        std::vector<double> volume = data_->additional[data_->index_volume];
+        double total_volume;
+        for(unsigned int i = 0; i < data_->number_of_abscissas_; i++)
+        {
+            if (data_->additional[data_->index_x_coord][i] >= data_->additional[data_->index_x_coord][index_ll] &&
+                data_->additional[data_->index_x_coord][i] <= data_->additional[data_->index_x_coord][index_lr])
+            {
+                if (data_->additional[data_->index_z_coord][i] >= data_->additional[data_->index_z_coord][index_ll] &&
+                    data_->additional[data_->index_z_coord][i] <= data_->additional[data_->index_z_coord][index_ul])
+                {
+                    total_volume += volume[i];
+                }
+            }
+        }
+        
+        int counter = 0;
+        
+        for(unsigned int i = 0; i < data_->number_of_abscissas_; i++)
+        {
+            if (data_->additional[data_->index_x_coord][i] >= data_->additional[data_->index_x_coord][index_ll] &&
+                data_->additional[data_->index_x_coord][i] <= data_->additional[data_->index_x_coord][index_lr])
+            {
+                if (data_->additional[data_->index_z_coord][i] >= data_->additional[data_->index_z_coord][index_ll] &&
+                    data_->additional[data_->index_z_coord][i] <= data_->additional[data_->index_z_coord][index_ul])
+                {
+                    // Recovers mass fractions
+                    for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+                        omega[k + 1] = data_->omega[k][i];
+
+                    // Calculates mole fractions
+                    double MWmix;
+                    data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+
+                    // Calculates concentrations
+                    const double P_Pa = data_->additional[data_->index_P][i];
+                    const double T = data_->additional[data_->index_T][i];
+                    const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+                    Product(cTot, x, &c);
+
+                    // Calculates formations rates
+                    data_->kineticsMapXML->SetTemperature(T);
+                    data_->kineticsMapXML->SetPressure(P_Pa);
+                    data_->thermodynamicsMapXML->SetTemperature(T);
+                    data_->thermodynamicsMapXML->SetPressure(P_Pa);
+
+                    data_->kineticsMapXML->KineticConstants();
+                    data_->kineticsMapXML->ReactionRates(c.GetHandle());
+
+                    // Ropa
+                    OpenSMOKE::ROPA_Data ropa;
+                    data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
+
+                    if (ropa.production_coefficients[index_of_species].size() !=
+                            ropa.production_reaction_indices[index_of_species].size() ||
+                        ropa.destruction_coefficients[index_of_species].size() !=
+                            ropa.destruction_reaction_indices[index_of_species].size())
+                    {
+                        throw std::invalid_argument("SSS");
+                    }
+
+                    if (counter == 0)
+                    {
+                        global_production_coefficients.resize(ropa.production_coefficients[index_of_species].size());
+                        global_destruction_coefficients.resize(ropa.destruction_coefficients[index_of_species].size());
+                        global_production_reaction_indices = ropa.production_reaction_indices[index_of_species];
+                        global_destruction_reaction_indices = ropa.destruction_reaction_indices[index_of_species];
+                    }
+
+                    double integral_contribution = volume[i] / total_volume;
+
+                    for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size(); k++)
+                        global_production_coefficients[k] += integral_contribution * ropa.production_coefficients[index_of_species][k];
+
+                    for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++)
+                        global_destruction_coefficients[k] += integral_contribution * ropa.destruction_coefficients[index_of_species][k];
+
+                    counter += 1;
+                }
+            }
+        }
+        MergePositiveAndNegativeBars(global_production_reaction_indices, global_destruction_reaction_indices,
+                global_production_coefficients, global_destruction_coefficients, reaction_indices,
+                reaction_coefficients);
     }
+    else // Global
+    {
+        double tmp = 0;
+        unsigned int index_min = 0;
+        unsigned int index_max = data_->number_of_abscissas_;
+
+        std::vector<double> volume = data_->additional[data_->index_volume];
+        double total_volume = std::accumulate(volume.begin(), volume.end(), 0.0d);
+
+        std::vector<double> global_production_coefficients;
+        std::vector<double> global_destruction_coefficients;
+        std::vector<unsigned int> global_production_reaction_indices;
+        std::vector<unsigned int> global_destruction_reaction_indices;
+
+        for (unsigned int j = index_min; j < index_max; j++)
+        {
+            // Recovers mass fractions
+            for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+                omega[k + 1] = data_->omega[k][j];
+
+            // Calculates mole fractions
+            double MWmix;
+            data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+
+            // Calculates concentrations
+            const double P_Pa = data_->additional[data_->index_P][j];
+            const double T = data_->additional[data_->index_T][j];
+            const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+            Product(cTot, x, &c);
+
+            // Calculates formations rates
+            data_->kineticsMapXML->SetTemperature(T);
+            data_->kineticsMapXML->SetPressure(P_Pa);
+            data_->thermodynamicsMapXML->SetTemperature(T);
+            data_->thermodynamicsMapXML->SetPressure(P_Pa);
+
+            data_->kineticsMapXML->KineticConstants();
+            data_->kineticsMapXML->ReactionRates(c.GetHandle());
+
+            // Ropa
+            OpenSMOKE::ROPA_Data ropa;
+            data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
+
+            if (ropa.production_coefficients[index_of_species].size() !=
+                ropa.production_reaction_indices[index_of_species].size() ||
+                ropa.destruction_coefficients[index_of_species].size() !=
+                ropa.destruction_reaction_indices[index_of_species].size())
+            {
+                throw std::invalid_argument("SSS");
+            }
+
+            if (j == index_min)
+            {
+                global_production_coefficients.resize(ropa.production_coefficients[index_of_species].size());
+                global_destruction_coefficients.resize(ropa.destruction_coefficients[index_of_species].size());
+                global_production_reaction_indices = ropa.production_reaction_indices[index_of_species];
+                global_destruction_reaction_indices = ropa.destruction_reaction_indices[index_of_species];
+            }
+
+            double integral_contribution = volume[j] / total_volume;
+
+            for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size(); k++)
+                global_production_coefficients[k] += integral_contribution * ropa.production_coefficients[index_of_species][k];
+
+            for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++)
+                global_destruction_coefficients[k] += integral_contribution * ropa.destruction_coefficients[index_of_species][k];
+        }
+
+        MergePositiveAndNegativeBars(global_production_reaction_indices, global_destruction_reaction_indices,
+                                     global_production_coefficients, global_destruction_coefficients, reaction_indices,
+                                     reaction_coefficients);
+    }
+
     coefficients_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
     reactions_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
 
