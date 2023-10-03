@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from .styles import *
+# from .styles import *
 
 
 def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
@@ -94,7 +94,7 @@ def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
     return ax
 
 
-def plot_bars(data: dict):
+def plot_bars(data: dict, ax = None):
     index = np.arange(0, len(data['coefficients']), 1)
     colors = []
 
@@ -104,8 +104,10 @@ def plot_bars(data: dict):
         else:
             colors.append('blue')
 
-    fig = plt.figure()
-    ax = plt.subplot()
+    if ax is None:
+        fig = plt.figure()
+        ax = plt.subplot()
+
     bar = ax.barh(index, data['coefficients'], color=colors)
 
     for idx, i in enumerate(bar):
@@ -141,4 +143,4 @@ def plot_bars(data: dict):
     ax.get_yaxis().set_ticks([])
     ax.invert_yaxis()
 
-    return fig, ax
+    return ax

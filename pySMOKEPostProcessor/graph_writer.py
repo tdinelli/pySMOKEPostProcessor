@@ -28,8 +28,7 @@ class GraphWriter:
         # on list edgeStart edgeEnd intersection cause it
         # can generate bugs when for instance end nodes
         # are just accumulation point
-        NodesNames = list(set(edgeStart))
-        print(NodesNames)
+        NodesNames = list(set(edgeStart + edgeEnd))
         # this is not the best
         idx_first = NodesNames.index(self._first)
         NodesNames.insert(0, NodesNames.pop(idx_first))
@@ -47,7 +46,7 @@ class GraphWriter:
             self.G.node(str(i), name)
 
     def AddEdges(self, edgeStart, edgeEnd, tck, edgeLabel):
-        print(self._map_node_names)
+        # print(self._map_node_names)
         for i, start in enumerate(edgeStart):
             tickness = tck[i]
             map_name_start = str(self._map_node_names[start])

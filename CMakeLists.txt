@@ -37,7 +37,7 @@ set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJEC
 #--------------------------------------------------------------------
 
 # --- Boost (Compulsory)
-set(Boost_USE_STATIC_LIBS   ON)
+# set(Boost_USE_STATIC_LIBS   ON)
 find_package (Boost REQUIRED COMPONENTS date_time filesystem program_options system regex timer chrono)
 message (STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
 message (STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
