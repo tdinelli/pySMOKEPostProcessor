@@ -4,7 +4,8 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib
 from mpl_toolkits.axes_grid1 import AxesGrid
-#from .styles import *
+# from .styles import *
+
 
 def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     '''
@@ -40,7 +41,7 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
 
     # shifted index to match the data
     shift_index = np.hstack([
-        np.linspace(0.0, midpoint, 128, endpoint=False), 
+        np.linspace(0.0, midpoint, 128, endpoint=False),
         np.linspace(midpoint, 1.0, 129, endpoint=True)
     ])
 
@@ -57,58 +58,64 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
 
     return newcmap
 
-def plot_heatmap(sort_df, symmetricaxis = False):
+
+def plot_heatmap(sort_df, symmetricaxis=False):
     """
     heat maps of x: df.columns, y: df.index 
     """
     # generate the figure
-    fig, axes = plt.subplots(figsize = [len(sort_df.columns), len(sort_df.index)])
- 
-	# shift axes based on maximum and minimum values. 0 is always in the middle
+    fig, axes = plt.subplots(
+        figsize=[len(sort_df.columns), len(sort_df.index)])
+
+    # shift axes based on maximum and minimum values. 0 is always in the middle
     orig_cmap = matplotlib.cm.RdBu_r
-    vmin = sort_df.min(numeric_only=True).min() 
+    vmin = sort_df.min(numeric_only=True).min()
     vmax = sort_df.max(numeric_only=True).max()
-    
+
     if symmetricaxis:
-    # always get symmetric axes
+        # always get symmetric axes
         vmaxabs = max([abs(vmin), vmax])
-        image = axes.imshow(sort_df.values, 
-            cmap=orig_cmap,
-            vmin=-vmaxabs, 
-            vmax=vmaxabs)  # coolwarm, RdBu,
-    else:
-    # shift according to where the 0 is and compress the other axis
-        midpoint = 1 - vmax/(vmax + abs(vmin))
-        shifted_cmap = shiftedColorMap(orig_cmap, midpoint=midpoint, name='shifted')
         image = axes.imshow(sort_df.values,
-            interpolation='none', 
-            cmap=shifted_cmap)  # coolwarm, RdBu, seismic, bwr
-    
-    axes.set_yticks(np.arange(0, len(sort_df.index)))    
+                            cmap=orig_cmap,
+                            vmin=-vmaxabs,
+                            vmax=vmaxabs)  # coolwarm, RdBu,
+    else:
+        # shift according to where the 0 is and compress the other axis
+        midpoint = 1 - vmax/(vmax + abs(vmin))
+        shifted_cmap = shiftedColorMap(
+            orig_cmap, midpoint=midpoint, name='shifted')
+        image = axes.imshow(sort_df.values,
+                            interpolation='none',
+                            cmap=shifted_cmap)  # coolwarm, RdBu, seismic, bwr
+
+    axes.set_yticks(np.arange(0, len(sort_df.index)))
     axes.set_xticks(np.arange(0, len(sort_df.columns)))
 
-    size_for_lbl = 'xx-large'*(len(sort_df.index) > 3) + 'medium'*(len(sort_df.index) <= 3)
+    size_for_lbl = 'xx-large'*(len(sort_df.index) > 3) + \
+        'medium'*(len(sort_df.index) <= 3)
 
-    axes.set_yticklabels([idx.split('flux_')[1] for idx in sort_df.index], fontsize=size_for_lbl)
+    axes.set_yticklabels([idx.split('flux_')[1]
+                         for idx in sort_df.index], fontsize=size_for_lbl)
     axes.set_xticklabels(sort_df.columns, rotation=90, fontsize=size_for_lbl)
-
 
     plt.colorbar(image)
     fig.tight_layout()
 
     return fig
 
-def save_fig(fig, plt_fld, sortlist, simul_name):          
-    
-	if len(sortlist) > 1:
-		criteria_str = '-'.join(sortlist)
-	else:
-		criteria_str = sortlist[0]
-    
-	savepath = os.path.join(plt_fld, '{}_{}.png'.format(simul_name, criteria_str))  
-    
-	# save the figure
-	if os.path.isfile(savepath):
-		os.remove(savepath)
-    
-	fig.savefig(savepath, dpi=200)
+
+def save_fig(fig, plt_fld, sortlist, simul_name):
+
+    if len(sortlist) > 1:
+        criteria_str = '-'.join(sortlist)
+    else:
+        criteria_str = sortlist[0]
+
+    savepath = os.path.join(
+        plt_fld, '{}_{}.png'.format(simul_name, criteria_str))
+
+    # save the figure
+    if os.path.isfile(savepath):
+        os.remove(savepath)
+
+    fig.savefig(savepath, dpi=200)

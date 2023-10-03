@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
-             single_width=1, y_names=None, legend=True):
+                       single_width=1, y_names=None, legend=True):
     """Draws a bar plot with multiple bars per data point.
 
     Parameters
@@ -71,9 +71,12 @@ def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
 
             if i == 1:
                 if (y < 0):
-                    ax.text(0, x + x_offset, y_names[x], va='center')  #, fontsize=18)
+                    # , fontsize=18)
+                    ax.text(0, x + x_offset, y_names[x], va='center')
                 else:
-                    ax.text(0, x + x_offset, y_names[x], va='center', ha='right')  #,fontsize=18)  
+                    # ,fontsize=18)
+                    ax.text(0, x + x_offset,
+                            y_names[x], va='center', ha='right')
 
         # Add a handle to the last drawn bar, which we'll need for the legend
         bars.append(bar[0])
@@ -94,7 +97,7 @@ def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
     return ax
 
 
-def plot_bars(data: dict, ax = None):
+def plot_bars(data: dict, ax=None):
     index = np.arange(0, len(data['coefficients']), 1)
     colors = []
 
@@ -113,7 +116,8 @@ def plot_bars(data: dict, ax = None):
     for idx, i in enumerate(bar):
         x = i.get_width()
         y = i.get_y()+0.5*i.get_height()
-        coefficient_value = "  (" + str('{:6.4e}'.format(data['coefficients'][idx])) + ")"
+        coefficient_value = "  (" + \
+            str('{:6.4e}'.format(data['coefficients'][idx])) + ")"
         if (x < 0):
             ax.text(0,
                     y,
@@ -143,4 +147,4 @@ def plot_bars(data: dict, ax = None):
     ax.get_yaxis().set_ticks([])
     ax.invert_yaxis()
 
-    return ax
+    return fig, ax

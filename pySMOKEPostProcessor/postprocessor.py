@@ -1,6 +1,6 @@
-from pySMOKEPostProcessor import ProfilesDatabase, ROPA, Sensitivity
-from maps.KineticMap import KineticMap
-from graph_writer import GraphWriter
+from .pySMOKEPostProcessor import ProfilesDatabase, ROPA, Sensitivity
+from .maps.KineticMap import KineticMap
+from .graph_writer import GraphWriter
 
 
 class PostProcessor:
@@ -152,10 +152,12 @@ class PostProcessor:
         secondNames = []
         for i, j in enumerate(indexFirstName):
             firstNames.append(self.km.SpeciesNameFromIndex(j))
-            secondNames.append(self.km.SpeciesNameFromIndex(indexSecondName[i]))
+            secondNames.append(
+                self.km.SpeciesNameFromIndex(indexSecondName[i]))
 
         Graph = GraphWriter(flux_analysis_type, species, element)
-        Graph = Graph.CreateGraph(firstNames, secondNames, computedThickness, computedLabel)
+        Graph = Graph.CreateGraph(
+            firstNames, secondNames, computedThickness, computedLabel)
 
         return Graph
 
@@ -163,7 +165,8 @@ class PostProcessor:
                          reaction_index: list = None,
                          sum_rates: bool = False):
         if reaction_name is not None:
-            reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
+            reaction_index = [self.km.ReactionIndexFromName(
+                name=i) for i in reaction_name]
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.getReactionRates(reaction_index, sum_rates)

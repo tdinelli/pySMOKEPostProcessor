@@ -41,12 +41,12 @@ class KineticMap:
         # List of elements
         elements = root.find('NamesOfElements')
         elements = (elements.text).split()
-        NumberOfElements = len(elements) # ne
+        NumberOfElements = len(elements)  # ne
 
         # List of species
         species = root.find('NamesOfSpecies')
         species = (species.text).split()
-        NumberOfSpecies = len(species) # ns
+        NumberOfSpecies = len(species)  # ns
 
         # Elemental composition
         atomic = root.find('AtomicComposition')
@@ -96,19 +96,22 @@ class KineticMap:
         kinetics = root.find('Kinetics')
 
         # Number Of Reactions
-        NumberOfReactions = int( (kinetics.find('NumberOfReactions')).text ) # nr
+        NumberOfReactions = int(
+            (kinetics.find('NumberOfReactions')).text)  # nr
 
         # Fall Off reactions
         FallOff = ((kinetics.find("FallOff")).text).split()
         self.NumberOfFallOffReactions = int(FallOff[0])
         listIndicesOfFallOffReactions = FallOff[1:]
-        self.IndicesOfFallOffReactions = [int(i) for i in listIndicesOfFallOffReactions]
+        self.IndicesOfFallOffReactions = [
+            int(i) for i in listIndicesOfFallOffReactions]
 
         # Cabr Reactions
         Cabr = ((kinetics.find("CABR")).text).split()
         self.NumberOfCabrReactions = int(Cabr[0])
         listIndicesOfCabrReactions = Cabr[1:]
-        self.IndicesOfCabrReactions = [int(i) for i in listIndicesOfCabrReactions]
+        self.IndicesOfCabrReactions = [int(i)
+                                       for i in listIndicesOfCabrReactions]
 
         # Kinetic parameters
         kinetic_parameters = kinetics.find('KineticParameters')
@@ -153,7 +156,8 @@ class KineticMap:
         """
         reaction_classes = self.kinetics.find('ReactionClasses')
         self.rxnclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
-        self.rxnsubclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
+        self.rxnsubclass = dict.fromkeys(
+            np.arange(1, self.NumberOfReactions+1))
 
         if (reaction_classes is not None):
             # classes: {mainclass: {subclass: [indices]}}
@@ -165,7 +169,7 @@ class KineticMap:
                         # initialize
                         classes[classname] = {}
                     for subclass in child:
-                        #if (subclass.tag == 'SubClass'): # should only contain subclass type
+                        # if (subclass.tag == 'SubClass'): # should only contain subclass type
                         subclassname = subclass.attrib['name']
                         if subclassname not in list(classes[classname].keys()):
                             classes[classname][subclassname] = []
@@ -180,22 +184,27 @@ class KineticMap:
                                     self.rxnsubclass[i] = subclassname
             self.classes = classes
         else:
-            raise Exception('The kinetic mechanism provided does not contain any reaction class!')
+            raise Exception(
+                'The kinetic mechanism provided does not contain any reaction class!')
 
     def ReactionNameFromIndex(self, reactionIndex: int):
         # reactionIndex 0-based
         if (reactionIndex + 1 <= self.NumberOfReactions):
-            name = "R" + str(reactionIndex + 1) + ": " + self.reaction_names[reactionIndex]
+            name = "R" + str(reactionIndex + 1) + ": " + \
+                self.reaction_names[reactionIndex]
             return name
         else:
             local_index = reactionIndex + 1 - self.NumberOfReactions
             if (local_index <= self.NumberOfFallOffReactions):
                 global_index = self.IndicesOfFallOffReactions[local_index - 1]
-                name = "R" + str(global_index) + "(inf): " + self.reaction_names[global_index - 1]
+                name = "R" + str(global_index) + "(inf): " + \
+                    self.reaction_names[global_index - 1]
                 return name
             else:
-                global_index = self.IndicesOfCabrReactions[local_index - self.NumberOfReactions - 1]
-                name = "R" + str(global_index) + "(inf): " + self.reaction_names[global_index - 1]
+                global_index = self.IndicesOfCabrReactions[local_index -
+                                                           self.NumberOfReactions - 1]
+                name = "R" + str(global_index) + "(inf): " + \
+                    self.reaction_names[global_index - 1]
                 return name
 
     def ReactionIndexFromName(self, name: str):

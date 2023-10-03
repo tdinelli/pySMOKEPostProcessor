@@ -4,7 +4,9 @@
 
 cmake_minimum_required (VERSION 3.16)
 
-project (pySMOKEPostProcessor)
+project (pySMOKEPostProcessor
+    DESCRIPTION "Python binder of the OpenSMOKEpp Graphical Post Processor"
+    LANGUAGES CXX)
 
 set(DEFAULT_BUILD_TYPE "Release")
 # --- Set build type
@@ -13,9 +15,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message (STATUS "Compiling in mode: ${CMAKE_BUILD_TYPE}")
 
-# --- Checking for working compilers
-include(CheckCCompilerFlag)
-include(CheckCSourceCompiles)
+# --- install location
+set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor")
+message(STATUS "Install location: ${CMAKE_INSTALL_PREFIX}")
 
 # --- Set module path in order to use custom CMake modules
 set (CMAKE_COLOR_MAKEFILE ON)
@@ -25,7 +27,6 @@ set (CMAKE_CXX_STANDARD 11)
 
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{EIGEN_LIBRARY_PATH}/cmake)
 
 set (PROJECT_VERSION_MAJOR 0)
 set (PROJECT_VERSION_MINOR 4)
@@ -36,8 +37,8 @@ set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJEC
 # External modules
 #--------------------------------------------------------------------
 
-add_subdirectory(external)
 include(cmake/UpdateSubmodules.cmake)
+add_subdirectory(external)
 
 #--------------------------------------------------------------------
 # Compulsory libraries
@@ -58,7 +59,9 @@ find_package(OpenSMOKEpp REQUIRED)
 message (STATUS "OpenSmoke++: ${OPENSMOKE_INCLUDE_DIR}")
 
 # --- pybind11 (Compulsory)
-find_package(pybind11 REQUIRED)
+# Uncomment if you want to provide your installation directory
+# Just for distribution we will keep the things as easy as possible
+# find_package(pybind11 REQUIRED)
 
 set(COMPULSORY_LIBRARIES ${Boost_LIBRARIES})
 
