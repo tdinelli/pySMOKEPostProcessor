@@ -13,7 +13,7 @@ The installation is composed by the following steps:
 
 Clone this repository into your system
 ```bash
-> git clone https://github.com/Titodinelli/pySMOKEPostProcessor
+> git clone https://github.com/Titodinelli/pySMOKEPostProcessor --depth 1 --branch COFLOW-2D/3D
 ```
 
 # 2. Check the availability of the OpenSMOKEpp library.
@@ -24,7 +24,7 @@ The pySMOKEPostProcessor is a binder in python for a c/c++ code so it directly h
 - **Eigen** (https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - **Boost** (https://www.boost.org/)
 
-Eigen and Boost are automatically installed by creating the predefined conda environment, however the OpenSMOKEpp is distributed under request by A. Cuoci. If you already have access to the library in GitHub skip this part. In order to be able to compile the c++ interface of the post processor just set an environment variable pointing to the folder containing the source code of the library. In Linux this can be done as follow:
+Eigen and Boost are automatically installed by creating the predefined conda environment, however the OpenSMOKEpp is distributed under request by A. Cuoci. **If you already have access to the library in GitHub skip this part**. In order to be able to compile the c++ interface of the post processor just set an environment variable pointing to the folder containing the source code of the library. In Linux this can be done as follow:
 ```bash
 > export OpenSMOKEpp_ROOT=$my_path$
 ```
