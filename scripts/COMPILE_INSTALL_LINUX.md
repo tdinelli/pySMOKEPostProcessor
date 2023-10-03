@@ -3,7 +3,7 @@
 The installation is composed by the following steps:
 
 1. Cloning this repository.
-2. Check the availability of the OpenSMOKEpp library.
+2. Check the availability of the OpenSMOKEpp library. (Now this is optional the project is setted up in a way that if you already have acces to the GitHub repository of OpenSMOKEpp the private one it will be added automatically).
 3. Create the conda environment and run the installation script.
 4. Install python package via "pip".
 
@@ -24,7 +24,7 @@ The pySMOKEPostProcessor is a binder in python for a c/c++ code so it directly h
 - **Eigen** (https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - **Boost** (https://www.boost.org/)
 
-Eigen and Boost are automatically installed by creating the predefined conda environment, however the OpenSMOKEpp is distributed under request by A. Cuoci. In order to be able to compile the c-interface of the post processor just set an environment variable pointing to the folder containing the source code of the library. In Linux this can be done as follow:
+Eigen and Boost are automatically installed by creating the predefined conda environment, however the OpenSMOKEpp is distributed under request by A. Cuoci. If you already have access to the library in GitHub skip this part. In order to be able to compile the c++ interface of the post processor just set an environment variable pointing to the folder containing the source code of the library. In Linux this can be done as follow:
 ```bash
 > export OpenSMOKEpp_ROOT=$my_path$
 ```
@@ -45,11 +45,11 @@ Now that you have build and installed the shared library associated to the packa
 
 ```bash
 > python setup.py bdist_wheel
-> pip install dist/pySMOKEPostProcessor-0.3.0-py3-none-any.whl
+> pip install dist/pySMOKEPostProcessor-0.4.0-py3-none-any.whl
 ```
 
 If everything worked fine something like this should be on your screen:
 
 ```bash
-> Successfully installed pySMOKEPostProcessor-0.3.0
+> Successfully installed pySMOKEPostProcessor-0.4.0
 ```
