@@ -62,7 +62,7 @@ def build():
         os.mkdir(interface_build_directory)
 
     # Build the project
-    cmake_command = "export CXX=/opt/homebrew/bin/g++-13 && cmake -B {}".format(
+    cmake_command = "cmake -B {}".format(
         interface_build_directory)
     process = subprocess.Popen(
         cmake_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
