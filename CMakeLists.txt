@@ -28,9 +28,16 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{EIGEN_LIBRARY_PATH}/cmake)
 
 set (PROJECT_VERSION_MAJOR 0)
-set (PROJECT_VERSION_MINOR 3)
+set (PROJECT_VERSION_MINOR 4)
 set (PROJECT_VERSION_PATCH 0)
 set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+
+#--------------------------------------------------------------------
+# External modules
+#--------------------------------------------------------------------
+
+add_subdirectory(external)
+include(cmake/UpdateSubmodules.cmake)
 
 #--------------------------------------------------------------------
 # Compulsory libraries

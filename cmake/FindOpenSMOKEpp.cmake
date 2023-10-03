@@ -72,6 +72,7 @@ else ()
         ENV OpenSMOKEpp_ROOT
         ENV OpenSMOKEpp_DIR
         ENV OpenSMOKEpp_ROOT_DIR
+        ${PROJECT_SOURCE_DIR}/external/opensmoke
         PATH_SUFFIXES source
     )
   endif()
