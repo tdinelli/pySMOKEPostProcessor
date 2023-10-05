@@ -2,14 +2,9 @@
 import os
 import sys
 
-if os.path.isdir("/home/chimica2/tdinelli"):
-    sys.path.append('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/pySMOKEPostProcessor')
-elif os.path.isdir("/Users/tdinelli"):
-    sys.path.append('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/pySMOKEPostProcessor')
-
 import matplotlib.pyplot as plt
-from postprocessor import PostProcessor
-from plotting_utilities.bar_plot import plot_bars
+from pySMOKEPostProcessor.postprocessor import PostProcessor
+from pySMOKEPostProcessor.plotting_utilities.bar_plot import plot_bars
 
 kineticFolder = os.path.join("..", "data", "Sensitivity-01", "kinetics")
 resultsFolder = os.path.join("..", "data", "Sensitivity-01", "Output-01")

@@ -2,10 +2,6 @@
 import os
 # import sys
 #
-# if os.path.isdir("/home/chimica2/tdinelli"):
-#     sys.path.append('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/pySMOKEPostProcessor')
-# elif os.path.isdir("/Users/tdinelli"):
-#     sys.path.append('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/pySMOKEPostProcessor')
 
 from pySMOKEPostProcessor.postprocessor import PostProcessor
 import matplotlib.pyplot as plt

@@ -1,15 +1,9 @@
 # Only for dev purposes
 import os
-import sys
-
-if os.path.isdir("/home/chimica2/tdinelli"):
-    sys.path.append('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/pySMOKEPostProcessor')
-elif os.path.isdir("/Users/tdinelli"):
-    sys.path.append('/Users/tdinelli/Documents/GitHub/pySMOKEPostProcessor/pySMOKEPostProcessor')
 
 import matplotlib.pyplot as plt
-from postprocessor import PostProcessor
-from maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
+from pySMOKEPostProcessor.postprocessor import PostProcessor
+import pySMOKEPostProcessor.maps.OpenSMOKEppXMLFile as OpenSMOKEppXMLFile
 
 kineticFolder = os.path.join("..", "data", "ROPA-01", "kinetics")
 resultsFolder = os.path.join("..", "data", "ROPA-01", "Output")

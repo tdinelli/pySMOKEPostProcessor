@@ -98,7 +98,9 @@ def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
 
 
 def plot_bars(data: dict, ax=None):
-    index = np.arange(0, len(data['coefficients']), 1)
+    n_of_bars = len(data['coefficients'])
+    font = 11-5*int(n_of_bars>20)
+    index = np.arange(0, n_of_bars, 1)
     colors = []
 
     for i in data['coefficients']:
@@ -123,27 +125,24 @@ def plot_bars(data: dict, ax=None):
                     y,
                     data['reaction_names'][idx] + coefficient_value,
                     va='center',
-                    fontsize=11)
+                    fontsize=font)
         else:
             ax.text(0,
                     y,
                     data['reaction_names'][idx] + coefficient_value,
                     va='center',
                     ha='right',
-                    fontsize=11)
+                    fontsize=font)
 
     xabs_max = abs(max(ax.get_xlim(), key=abs))
     ax.set_xlim(xmin=-xabs_max, xmax=xabs_max)
 
-    # ax.set_yticklabels([])
-    # ax.set_xticklabels([])
     # ax.get_yaxis().set_visible("off")
     # ax.axis("off")
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     # ax.spines['bottom'].set_visible(False)
     ax.spines['left'].set_visible(False)
-    # ax.get_xaxis().set_ticks([])
     ax.get_yaxis().set_ticks([])
     ax.invert_yaxis()
 
