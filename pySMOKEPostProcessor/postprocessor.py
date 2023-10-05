@@ -15,6 +15,17 @@ class PostProcessor:
 
         self.km = KineticMap(self.kineticFolder)
 
+    def convert_tomass(self, 
+                       ropa_coefficients: list, 
+                       species: str):
+        # species index
+        sp_idx = self.km.IndexFromSpeciesName(species)
+        # molecular weight
+        mwi = self.km.mws[sp_idx]
+        # derive mass based ropa
+        ropa_coefficients = [c*mwi for c in ropa_coefficients]
+        return ropa_coefficients
+        
     def RateOfProductionAnalysis(self,
                                  species: str,
                                  ropa_type: str,
@@ -23,7 +34,8 @@ class PostProcessor:
                                  upper_value: float = 0,
                                  number_of_reactions: int = 10,
                                  two_dimensions: bool = False,
-                                 region_location: dict = None) -> dict:
+                                 region_location: dict = None,
+                                 mass_ropa: bool = False) -> dict:
         if (two_dimensions is False):
             widget = ROPA()
             widget.setDataBase(self.db)
@@ -42,6 +54,10 @@ class PostProcessor:
             for i in reaction_indices:
                 reaction_names.append(self.km.ReactionNameFromIndex(i))
 
+            if mass_ropa:
+                ropa_coefficients = self.convert_tomass(ropa_coefficients,
+                                                        species)
+                
             ropa_result = {'coefficients': ropa_coefficients,
                            'reaction_names': reaction_names,
                            'reaction_indices': reaction_indices}
@@ -50,11 +66,13 @@ class PostProcessor:
         else:
             return self.RateOfProductionAnalysis2D(species, ropa_type,
                                                    number_of_reactions,
-                                                   region_location)
+                                                   region_location,
+                                                   mass_ropa)
 
     def RateOfProductionAnalysis2D(self, species: str, ropa_type: str,
                                    number_of_reactions: int = 10,
-                                   region_location: dict = None) -> dict:
+                                   region_location: dict = None,
+                                   mass_ropa: bool = False) -> dict:
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.setROPAType(ropa_type)
@@ -82,6 +100,10 @@ class PostProcessor:
         for i in reaction_indices:
             reaction_names.append(self.km.ReactionNameFromIndex(i))
 
+        if mass_ropa:
+            ropa_coefficients = self.convert_tomass(ropa_coefficients,
+                                                    species)
+            
         ropa_result = {'coefficients': ropa_coefficients,
                        'reaction_names': reaction_names,
                        'reaction_indices': reaction_indices}
