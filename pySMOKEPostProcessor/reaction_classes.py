@@ -3,8 +3,6 @@ import numpy as np
 import copy
 from operator import add, neg
 
-from .ropa import RateOfProductionAnalysis, GetReactionRatesIndex
-from .maps.KineticMap import KineticMap
 from .reaction_classes_utilities.reaction_classes_groups import ReadReactionsGroups
 from .reaction_classes_utilities.reaction_classes import reaction_classes
 from .reaction_classes_utilities.reaction_classes import reaction_fluxes
@@ -12,19 +10,19 @@ from .reaction_classes_utilities.reaction_classes import reaction_fluxes
 
 class FluxByClass:
 
-    def __init__(self, kinetic_mechanism, classes_definition, verbose: bool):
+    def __init__(self, kinmap, classes_definition, verbose: bool = False):
         """
         read the kinetic mechanism and assign classes if available
+        kinmap: kinetic map already processed
         """
-        kinetics = KineticMap(kinetic_mechanism)
-        kinetics.Classes()
+        kinmap.Classes()
         reactions_all = []
-        for i in range(kinetics.NumberOfReactions):
+        for i in range(kinmap.NumberOfReactions):
             reaction = {
                 'index': i+1,
-                'name': kinetics.reaction_names[i],
-                'class': kinetics.rxnclass[i+1],
-                'reactiontype': kinetics.rxnsubclass[i+1]
+                'name': kinmap.reaction_names[i],
+                'class': kinmap.rxnclass[i+1],
+                'reactiontype': kinmap.rxnsubclass[i+1]
             }
             reactions_all.append(reaction)
 
@@ -36,58 +34,30 @@ class FluxByClass:
 
         # assign to self
         self.rxns_sorted = rxns_sorted
-        self.flux_sorted = reaction_fluxes(rxns_sorted.rxn_class_df, verbose) # needed for cumulative reaction rates - but should be removed
-        self.kinetic_mechanism = kinetic_mechanism
+        # was put for cumulative rxn rates # self.flux_sorted = reaction_fluxes(rxns_sorted.rxn_class_df, verbose) # needed for cumulative reaction rates - but should be removed
         self.classes_definition = classes_definition
         self.verbose = verbose
-        self.kinetic_map = kinetics
+        self.kinetic_map = kinmap
         self.reactions_all = reactions_all
 
-    def process_flux(self, species_list, results_folder, n_of_rxns=100, ropa_type='global', mass_ropa = False):
+    def process_flux(self, species_list, tot_rop_dct):
+        # input tot_rop_dct: dictionary with ROPA performed for a set of species {spc: {ropa dct}}
         # reinitialize
         self.flux_sorted = reaction_fluxes(self.rxns_sorted.rxn_class_df, self.verbose)
-        if self.verbose:
-            print('processing simul {}'.format(results_folder))
 
-        # distinguish pp input based on ropa type
-        loc_low_up = np.array([0, 0, 0, ], dtype=float)
-        if isinstance(ropa_type, dict):
-            if 'local' in ropa_type.keys():
-                loc_low_up[0] = ropa_type['local']
-                ropa_type = 'local'
-            elif 'region' in ropa_type.keys():
-                loc_low_up[1:] = ropa_type['region']
-                ropa_type = 'region'
-        # simul output
-        for sp in species_list:
-            if isinstance(sp, str):
-                sps = [sp]
-                spname = sp
-            elif isinstance(sp, dict):
-                spname = list(sp.keys())[0]
-                sps = sp[spname]
-                if isinstance(sps, list) == False:
-                    raise TypeError('in spc dictionary, the value must be a list of species')
-            else:
-                raise TypeError('species must be a single string or a dictionary with a list of species')
-    
+        # add fluxes
+        for species in species_list:
+            if isinstance(species, str):
+                sps = [species]
+                spname = species
+            elif isinstance(species, dict):
+                spname = list(species.keys())[0]
+                sps = species[spname]
+   
             tot_rop_df = None
             for sp in sps:
-                indice = self.kinetic_map.IndexFromSpeciesName(sp)
-                mwi = self.kinetic_map.mws[indice]
-                tot_rop, indexes, _ = RateOfProductionAnalysis(kinetic_folder=self.kinetic_mechanism, 
-                                                               output_folder=results_folder, 
-                                                               species = sp, 
-                                                               ropa_type = ropa_type,
-                                                               local_value = loc_low_up[0],
-                                                               lower_value = loc_low_up[1], 
-                                                               upper_value = loc_low_up[2], 
-                                                               number_of_reactions = n_of_rxns)
-				
-                if mass_ropa==True:
-                    tot_rop = [i * mwi for i in tot_rop]
-
-                tot_rop_df0 = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=['flux_{}'.format(spname)], dtype=float)
+                tot_rop_df0 = pd.DataFrame(tot_rop_dct[sp]['coefficients'], index=np.array(tot_rop_dct[sp]['reaction_indices'])+1, 
+                                           columns=['flux_{}'.format(spname)], dtype=float)
                 tot_rop_df0 = tot_rop_df0.groupby(level=0).sum() # sum rxns with same indexes
     
                 if isinstance(tot_rop_df, pd.DataFrame):
@@ -97,10 +67,11 @@ class FluxByClass:
                 else:
                     tot_rop_df = copy.deepcopy(tot_rop_df0)			
 
-                # CHECK TODO
+                # Luna: nego - ho controllato e mi sembra a posto
                 # check and ask luna why first row of tot_rop_df contains the first reaction 
                 # of the kinetic model even if it does not include the selected species
-            # assign flux
+                
+            # concatenate flux to the dataframe of rxn classes
             self.flux_sorted.assign_flux(tot_rop_df)
 
         self.flux_sorted.sum_fwbw()
@@ -126,7 +97,7 @@ class FluxByClass:
         # to be extended to all types (reactiontype, classtype, speciestype, bimoltype. requires a call to sort_and_filter first)
         # do it similar to sort_and_filter, with sortlist (which only provides criteria for getting the rates) and filter_dct
         indici = [i['index']-1 for i in self.reactions_all if not i['reactiontype'] == None if reactionclass_type in i['reactiontype']]
-
+        # versione precedente: era in ropa.py (ora tutto in postprocessor.py)
         x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism,
                                                        output_folder=results_folder,
                                                        reaction_index=indici,
@@ -197,6 +168,8 @@ class FluxByClass:
 
         print(indici)
         for i in range(len(indici)):
+            # INVECE DI CHIAMARE QUESTO, PRENDI DIRETTAMENETE GLI INDICI DELLA ROPA
+            # CHE DOVREBBERO ESSERE UGUALI. E POI CHIAMA GETREACTIONRATES
             x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism, 
                                                            output_folder=results_folder, 
                                                            reaction_index=[indici[i]-1], 
