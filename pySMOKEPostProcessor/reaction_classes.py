@@ -76,7 +76,12 @@ class FluxByClass:
 
         self.flux_sorted.sum_fwbw()
 
-    def sort_and_filter(self, sortlist, filter_dct = {}, thresh = 1e-3, weigheach = True):
+    def sort_and_filter(self, 
+                        sortlist, 
+                        filter_dct: dict = {}, 
+                        thresh: float = 1e-3, 
+                        weigh: str = 'false'):
+        # weight options: normbyspecies, omegaij, false
         # filter rxns
         rxns_sorted = copy.deepcopy(self.flux_sorted)
         if len(filter_dct) > 0:
@@ -84,12 +89,8 @@ class FluxByClass:
         # filter flux
         rxns_sorted.filter_flux(threshold=thresh)
         # sum same speciestype-classgroup-reactiontype together
-        sortdf = rxns_sorted.sortby(sortlist, weigheach = weigheach)
-        # drop unsorted cols
-        col_names = sortdf.columns
-        for col in col_names:
-            if 'UNSORTED' in col:
-                sortdf = sortdf.drop(col, axis=1)
+        sortdf = rxns_sorted.sortby(sortlist, weigh = weigh)
+
         return sortdf
 
     # new function to compute and plot reaction class rate profiles along axial coordinate
@@ -223,24 +224,25 @@ class FluxByClass:
         print(rate_percentage_contribution)
         return x_axis, matrix_of_rates, nomi_ret
 
-def merge_maps_onespecies(sorted_dfs_dct):
+def merge_maps_byspecies(sorted_dfs_dct):
     """ 
     combines the heatmaps of different simulations for the same set of species and puts them in a new dataframe
     Args:
         sorted_dfs ({idx: dataframe}): sorted dataframes with fluxes.
+    
     """
     # simul names
     sim_names = sorted_dfs_dct.keys()
     species_lists = np.concatenate([np.array(sorted_dfs_dct[sim_name].index) for sim_name in sim_names])
     classes_list = np.concatenate([np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names])
     # find common species and classes
-    common_sp = np.array(list(set(species_lists)))
-    common_cl = np.sort(np.array(list(set(classes_list))))
+    all_sp = np.array(list(set(species_lists)))
+    all_cl = np.sort(np.array(list(set(classes_list))))
     # for each species: rename according to simulation name and concatenate dataframes
-    dftot = pd.DataFrame(columns = common_cl)
+    dftot = pd.DataFrame(columns = all_cl)
     for sim_name, dffull in sorted_dfs_dct.items():
         # filter indexes
-        pdnew = dffull.loc[common_sp]
+        pdnew = dffull.loc[all_sp]
         # rename indexes according to simul name
         pdnew = pdnew.rename(index = lambda spname: spname + '-' + str(sim_name))
         # now concate to dftot
@@ -253,3 +255,70 @@ def merge_maps_onespecies(sorted_dfs_dct):
  
     return dftot
  
+
+def FDI(sorted_dfs_dct: dict, 
+        fditype: str = 'global',
+        speciesi: str = '',
+        classj: str = ''):
+    """ 
+    computes FDIs for a given set of flames
+    see https://doi.org/10.1016/j.combustflame.2022.112073
+    
+    Args:
+        sorted_dfs ({idx: dataframe}): sorted dataframes with fluxes.
+        fditype : global (sum over ij), species (sum over j), class (sum over i)
+        speciesi: species name (if type is species)
+        classj: class name (if type is class)
+    """
+    # simul names
+    sim_names = sorted_dfs_dct.keys()
+    species_lists = np.concatenate([np.array(sorted_dfs_dct[sim_name].index) for sim_name in sim_names])
+    classes_list = np.concatenate([np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names])
+    # list of all species and classes
+    all_sp = np.array(list(set(species_lists)))
+    all_cl = np.sort(np.array(list(set(classes_list))))
+    
+    # scan all dataframes and add 0 values where sp/cl not found
+    for _, df_sim in sorted_dfs_dct.items():
+        for cl in all_cl:
+            if cl not in df_sim.columns:
+                df_sim[cl] = 0.
+        for sp in all_sp:
+            if sp not in df_sim.index:
+                df_sim.loc[sp] = 0.
+        # unneeded ; automatically rewritten # sorted_dfs_dct[sim_name] = df_sim
+                
+    # dataframe of FDIs
+    df_FDI = pd.DataFrame(0, index=sim_names, columns=sim_names, dtype=np.float64)
+    
+    # calculate the differences in the omega: (om_ijn-om_ijm)^2
+    for nn, n in enumerate(df_FDI.index):
+        for mm, m in enumerate(df_FDI.columns):
+            if mm > nn: # only low triangular, no diagonal #DOMANDA PER AN DOVREI METTERE ANCHE M=N NON RICORDO
+                sim_m = sorted_dfs_dct[m]
+                sim_n = sorted_dfs_dct[n]
+                
+                df_diff_square = (sim_n-sim_m)**2 # operations by indices
+                # print(sim_n, df_diff_square)
+                # now calculate FDI based on type
+                if fditype == 'global':
+                    df_FDI[m][n] = np.power(np.sum(df_diff_square.values), 0.5)
+                elif fditype == 'species':
+                    df_FDI[m][n] = np.power(np.sum(df_diff_square.loc['flux_' + speciesi]), 0.5) # sum_j: all classes for one species
+                elif fditype == 'class':
+                    df_FDI[m][n] = np.power(np.sum(df_diff_square[classj]), 0.5) # sum_i: all species for one class
+                # print(df_FDI[m][n])
+    # print(df_FDI)
+    # compute mu = 1/N sum(n,m) (FDI), n != m
+    mu = np.sum(df_FDI.values)/len(sim_names)
+    # print(mu, len(sim_names))
+    # final FDI scaled by mu
+    for nn, n in enumerate(df_FDI.index):
+        for mm, m in enumerate(df_FDI.columns):
+            if mm > nn: # only low triangular, no diagonal 
+                df_FDI[m][n] -= mu
+    # print(df_FDI)
+    df_FDI.sort_index(axis=0, ascending=False, inplace=True)
+    df_FDI.sort_index(axis=1, inplace=True)
+
+    return df_FDI

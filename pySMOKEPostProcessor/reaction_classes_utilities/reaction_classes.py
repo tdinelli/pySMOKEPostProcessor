@@ -221,7 +221,7 @@ class reaction_fluxes:
 
         self.rxn_class_df = self.rxn_class_df.loc[np.array(list(set(indexes_filter)))]
 
-    def sortby(self, sortlist, weigheach=True):
+    def sortby(self, sortlist, weigh: str = 'false'):
         """ 
         sum fluxes by criteria in sortlist
         """
@@ -243,20 +243,59 @@ class reaction_fluxes:
             new_sort_df[name] = grp_df[self.flux_cols].sum()
 
     # renormalize by species
-        if weigheach:
+        if weigh == 'normbyspecies':
             for flux_sp_name in new_sort_df.index:
                 renorm_factor = max(abs(new_sort_df.loc[flux_sp_name]))
                 weight_factor = sum(abs(
                     self.rxn_class_df[flux_sp_name]))/sum(abs(self.rxn_class_df_all[flux_sp_name]))
                 # new_sort_df.loc[flux_sp_name] /= renorm_factor
                 new_sort_df.loc[flux_sp_name] *= (weight_factor/renorm_factor)
+        elif weigh == 'omegaij':
+            new_sort_df = self.omegaij(new_sort_df)
         # else: # unneeded - now plot function works with any kind of axis
             # renorm_factor = abs(self.rxn_class_df_all[new_sort_df.index]).max().max()
             # new_sort_df /= renorm_factor
-
+        elif weigh != 'false':
+            print('*Error: "weigh" can be (str) normbyspecies, omegaij, false')
+            # if weigh = false, you are doing nothing
+            
+        # drop unsorted columns
+        col_names = new_sort_df.columns
+        for col in col_names:
+            if 'UNSORTED' in col:
+                new_sort_df = new_sort_df.drop(col, axis=1)
+                
         if self.verbose:
             # questo print e probabilmente anche alcuni di quelli sopra forse hanno poco
             print(new_sort_df)
             # senso e magari potremmo dare la possibilità di stampare su file?
 
         return new_sort_df
+
+    def omegaij(self, sort_df):
+        """ 
+        takes a dataframe and computes the omegaijn coefficients
+        see https://doi.org/10.1016/j.combustflame.2022.112073
+        """
+        # new df with same indexes and columns as the original
+        df_omegaijn = pd.DataFrame(index=sort_df.index, columns=sort_df.columns, dtype=np.float64)
+        # omega min and omega max
+        omegamin = np.min(sort_df.values)
+        omegamax = np.max(sort_df.values)
+        
+        # if min and max are not as expected: print warning:
+        if omegamin > 0:
+            print('*Warning: value of omega min is > 0')
+        if omegamax < 0:
+            print('*Warning: value of omega max is < 0')
+            
+        # compute
+        for sp in sort_df.index:
+            for cl in sort_df.columns:
+                val = sort_df[cl][sp]
+                if val >= 0.:
+                    df_omegaijn[cl][sp] = val/omegamax
+                elif val < 0.:
+                    df_omegaijn[cl][sp] = val/omegamin
+
+        return df_omegaijn

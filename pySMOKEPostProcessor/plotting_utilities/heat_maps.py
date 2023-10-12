@@ -59,7 +59,7 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 
-def plot_heatmap(sort_df, symmetricaxis=False):
+def plot_heatmap(sort_df, symmetricaxis=False, dftype: str = 'generic'):
     """
     heat maps of x: df.columns, y: df.index 
     """
@@ -94,8 +94,11 @@ def plot_heatmap(sort_df, symmetricaxis=False):
     size_for_lbl = 'xx-large'*(len(sort_df.index) > 3) + \
         'medium'*(len(sort_df.index) <= 3)
 
-    axes.set_yticklabels([idx.split('flux_')[1]
-                         for idx in sort_df.index], fontsize=size_for_lbl)
+    if dftype == 'generic':
+        axes.set_yticklabels(sort_df.index, fontsize=size_for_lbl)        
+    elif dftype == 'flux':
+        axes.set_yticklabels([idx.split('flux_')[1]
+                            for idx in sort_df.index], fontsize=size_for_lbl)
     axes.set_xticklabels(sort_df.columns, rotation=90, fontsize=size_for_lbl)
 
     plt.colorbar(image)
