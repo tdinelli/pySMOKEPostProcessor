@@ -92,13 +92,12 @@ class reaction_classes:
         for subcl, subset in self.rxn_class_df.groupby('reactiontype'):
             # None values are automatically discarded
             rxns = subset.index
-            try:
+            if subcl in subcl_grp_dct.keys():
                 self.rxn_class_df['classtype'][rxns] = subcl_grp_dct[subcl]
-            except KeyError:
+            else:
                 self.rxn_class_df['classtype'][rxns] = 'UNSORTED'
                 print(
                     ' * Warning: reactiontype {} not found in class groups'.format(subcl))
-                continue
 
 
 class reaction_fluxes:
@@ -117,79 +116,71 @@ class reaction_fluxes:
         flux_sp_name = tot_rop_df.columns[0]
         self.rxn_class_df[flux_sp_name] = self.rxn_class_df[flux_sp_name].replace(
             np.nan, 0.0)
-
+        
     # renormalize
     # renorm_factor = sum(abs(self.rxn_class_df[flux_sp_name]))
 
     # renormalize
     # rxn_class_df = rxn_class_df.sort_values(by='absflux', ascending = False)
 
-    def sum_fwbw(self):
-        """
-        sum flux for fw and bw rxns
-        if '2INDENYL=>C18H14' in self.rxn_class_df['name'].values and 'C18H14=>2INDENYL' in self.rxn_class_df['name'].values:
-        idx0 = self.rxn_class_df.index[self.rxn_class_df['name'] == '2INDENYL=>C18H14'][0]
-        idx1 = self.rxn_class_df.index[self.rxn_class_df['name'] == 'C18H14=>2INDENYL'][0]
-        self.rxn_class_df.loc[idx0, flux_sp_name] += self.rxn_class_df.loc[idx1, flux_sp_name]
-        self.rxn_class_df.loc[idx1, flux_sp_name] *= 0
-        # self.rxn_class_df = self.rxn_class_df.drop(idx1, axis = 0)
-        """
 
+    def netfluxes(self):
+        """sum fluxes for forward and backward reactions;
+            this includes
+            - duplicate rxns
+            - rxns written as irreversible fw/bw
+        """
+        # Delete rows where all flux columns are zero
         self.flux_cols = np.array(
             [col for col in self.rxn_class_df.columns if 'flux' in col], dtype=str)
         # delete row if flux is 0, much faster :)
-        rows_todel = np.array([idx for idx in self.rxn_class_df.index if all(
-            self.rxn_class_df.loc[idx][self.flux_cols] == 0)])
-        self.rxn_class_df = self.rxn_class_df.drop(rows_todel)
-        # list of irrev rxns
-        # for rxn in self.rxn_class_df['name']:
-        #    print(rxn)
-        rxns_irrev = np.array(
-            [rxn for rxn in self.rxn_class_df['name'] if '=>' in rxn], dtype=str)
-        idxs_rxns_irrev = np.array(list(set(
-            [self.rxn_class_df.index[self.rxn_class_df['name'] == rxn][0] for rxn in rxns_irrev])))
-        rxns_irrev_series = pd.DataFrame(
-            index=idxs_rxns_irrev, columns=np.array(['name', 'rcts', 'prds']))
-        for idx in idxs_rxns_irrev:
-            rxn = self.rxn_class_df['name'][idx]
-            rxns_irrev_series['name'][idx] = rxn
-            rxns_irrev_series['rcts'][idx] = '+'.join(
-                sorted(rxn.split('=>')[0].split('+')))
-            rxns_irrev_series['prds'][idx] = '+'.join(
-                sorted(rxn.split('=>')[1].split('+')))
+        # rows_todel = np.array([idx for idx in self.rxn_class_df.index if all(
+        #     self.rxn_class_df.loc[idx][self.flux_cols] == 0)])
+        # self.rxn_class_df = self.rxn_class_df.drop(rows_todel)
+        self.rxn_class_df = self.rxn_class_df[~(self.rxn_class_df[self.flux_cols] == 0.).all(axis=1)]
+        
+        # list of rxns and corresponding indices
+        reactions_dict = {}
+        for idx, rxn in self.rxn_class_df.iterrows():
+            if '=>' in rxn['name']:
+                rcts, prds = sorted(rxn['name'].split('=>')[0].split('+')), sorted(rxn['name'].split('=>')[1].split('+'))
+            else: # reversible
+                rcts, prds = sorted(rxn['name'].split('=')[0].split('+')), sorted(rxn['name'].split('=')[1].split('+'))
+            
+            keyfw = '+'.join(rcts) + '=' + '+'.join(prds)
+            keybw = '+'.join(prds) + '=' + '+'.join(rcts)
 
-        for idx0 in idxs_rxns_irrev:
-            # continue if idx was removed
-            if idx0 not in rxns_irrev_series.index:
-                continue
+            if keyfw in reactions_dict:
+                reactions_dict[keyfw].append(idx)
+            elif keybw in reactions_dict:
+                reactions_dict[keybw].append(idx)
+            else:
+                reactions_dict[keyfw] = [idx]
+                
+        # Merge reactions with the same reactants and products (forward and backward)
+        # the line to keep is the one with the largest maximum flux
+        filtered_df = self.rxn_class_df[self.rxn_class_df['speciestype'] != 'UNSORTED']
+        for idxs in reactions_dict.values():
+            if len(idxs) > 1: # there are fluxes to merge
+                # maximum value of flux - excluding UNSORTED reactions
+                filtered_idxs = [idx for idx in idxs if idx in filtered_df.index]
+                if len(filtered_idxs) == 0: # keep the original idxs regardless of unsorted types
+                    filtered_idxs = idxs
+                # index of the maximum flux
+                max_flux_idx = filtered_idxs[np.argmax(np.abs(self.rxn_class_df.loc[filtered_idxs, self.flux_cols]).max(axis=1))]
+                # remove idx of the max flux and sum the rest of the fluxes to it
+                idxs.remove(max_flux_idx)
 
-            rcts, prds = rxns_irrev_series[['rcts', 'prds']].loc[idx0]
-            idx1s = np.array(list(set(rxns_irrev_series.index[rxns_irrev_series['rcts'] == prds]) & set(
-                rxns_irrev_series.index[rxns_irrev_series['prds'] == rcts])))
-            for idx1 in idx1s:
-                if self.rxn_class_df['speciestype'][idx1] == 'UNSORTED':
-                    idxkeep = copy.deepcopy(idx0)
-                    idxrem = copy.deepcopy(idx1)
-                elif self.rxn_class_df['speciestype'][idx0] == 'UNSORTED':
-                    idxkeep = copy.deepcopy(idx1)
-                    idxrem = copy.deepcopy(idx0)
-                else:
-                    # pick the highest flux
-                    fl0 = max(abs(self.rxn_class_df.loc[idx0, self.flux_cols]))
-                    fl1 = max(abs(self.rxn_class_df.loc[idx1, self.flux_cols]))
-                    maxfl = max([fl0, fl1])
-                    idxkeep = [idx0, idx1][[fl0, fl1].index(maxfl)]
-                    idxrem = [idx0, idx1][1-[idx0, idx1].index(idxkeep)]
-
+                for idx in idxs: # sum fluxes
+                    self.rxn_class_df.loc[max_flux_idx, self.flux_cols] += self.rxn_class_df.loc[idx, self.flux_cols]
+                    
                 if self.verbose:
-                    print('* merging flux {} and removing {}'.format(self.rxn_class_df['name'][idxkeep],
-                                                                     self.rxn_class_df['name'][idxrem]))
-
-                self.rxn_class_df.loc[idxkeep,self.flux_cols] += self.rxn_class_df.loc[idxrem, self.flux_cols]
-                self.rxn_class_df = self.rxn_class_df.drop(idxrem, axis=0)
-                rxns_irrev_series = rxns_irrev_series.drop(idxrem, axis=0)
-
-        self.rxn_class_df_all = copy.deepcopy(self.rxn_class_df)
+                    print('* merging flux {} and removing {}'.format(self.rxn_class_df['name'][max_flux_idx],
+                                                                        self.rxn_class_df['name'][idx]))
+                    
+                self.rxn_class_df = self.rxn_class_df.drop(idxs, axis=0)
+                
+        self.rxn_class_df_all = self.rxn_class_df.copy()
 
     def filter_class(self, filter_dct):
         """ only keep classes according to criteria listed in filter_dct

@@ -1,8 +1,7 @@
 from .postprocessor import PostProcessor
 from .graph_writer import GraphWriter
 from .reaction_classes import FluxByClass
-from .reaction_classes import FDI
-from .reaction_classes import merge_maps_byspecies
+from .reaction_classes import assignclass, FDI, merge_maps_byspecies
 
 # SubModules/Utilities
 from .plotting_utilities.bar_plot import plot_bars, plot_multiple_bars
