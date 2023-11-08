@@ -117,6 +117,7 @@ class reaction_fluxes:
         self.rxn_class_df[flux_sp_name] = self.rxn_class_df[flux_sp_name].replace(
             np.nan, 0.0)
         
+        print(self.rxn_class_df)
     # renormalize
     # renorm_factor = sum(abs(self.rxn_class_df[flux_sp_name]))
 
@@ -212,7 +213,7 @@ class reaction_fluxes:
 
         self.rxn_class_df = self.rxn_class_df.loc[np.array(list(set(indexes_filter)))]
 
-    def sortby(self, sortlist, weigh: str = 'false'):
+    def sortby(self, sortlist, weigh: str = 'false', dropunsorted: bool = True):
         """ 
         sum fluxes by criteria in sortlist
         """
@@ -233,7 +234,14 @@ class reaction_fluxes:
                 print(grp_idx, '\n', grp_df, '\n')
             new_sort_df[name] = grp_df[self.flux_cols].sum()
 
-    # renormalize by species
+        # drop unsorted columns
+        col_names = new_sort_df.columns
+        for col in col_names:
+            if 'UNSORTED' in col and dropunsorted:
+                new_sort_df = new_sort_df.drop(col, axis=1)
+                print('*Warning: dropping UNSORTED rxns prior to normalization')
+                
+        # renormalize by species
         if weigh == 'normbyspecies':
             for flux_sp_name in new_sort_df.index:
                 renorm_factor = max(abs(new_sort_df.loc[flux_sp_name]))
@@ -250,12 +258,7 @@ class reaction_fluxes:
             print('*Error: "weigh" can be (str) normbyspecies, omegaij, false')
             # if weigh = false, you are doing nothing
             
-        # drop unsorted columns
-        col_names = new_sort_df.columns
-        for col in col_names:
-            if 'UNSORTED' in col:
-                new_sort_df = new_sort_df.drop(col, axis=1)
-                
+               
         if self.verbose:
             # questo print e probabilmente anche alcuni di quelli sopra forse hanno poco
             print(new_sort_df)
@@ -284,7 +287,7 @@ class reaction_fluxes:
         for sp in sort_df.index:
             for cl in sort_df.columns:
                 val = sort_df[cl][sp]
-                if val >= 0.:
+                if val > 0.:
                     df_omegaijn[cl][sp] = val/omegamax
                 elif val < 0.:
                     df_omegaijn[cl][sp] = val/omegamin

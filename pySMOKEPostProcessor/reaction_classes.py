@@ -88,7 +88,8 @@ class FluxByClass:
                         sortlist, 
                         filter_dct: dict = {}, 
                         thresh: float = 1e-3, 
-                        weigh: str = 'false'):
+                        weigh: str = 'false',
+                        dropunsorted: bool = True):
         # weight options: normbyspecies, omegaij, false
         # filter rxns
         rxns_sorted = copy.deepcopy(self.flux_sorted)
@@ -97,7 +98,7 @@ class FluxByClass:
         # filter flux
         rxns_sorted.filter_flux(threshold=thresh)
         # sum same speciestype-classgroup-reactiontype together
-        sortdf = rxns_sorted.sortby(sortlist, weigh = weigh)
+        sortdf = rxns_sorted.sortby(sortlist, weigh = weigh, dropunsorted = dropunsorted)
 
         return sortdf
 
