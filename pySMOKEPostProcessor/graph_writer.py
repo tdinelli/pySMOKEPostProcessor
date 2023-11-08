@@ -7,7 +7,7 @@ DESCRIPTION: TODO
 
 class GraphWriter:
 
-    def __init__(self, fluxAnalysisType: str, first: str, last: str):
+    def __init__(self, fluxAnalysisType: str): #, first: str, last: str):
         self.G = Digraph('Flux Analysis',
                          node_attr={'shape': 'circle'},
                          engine='dot')  # filename=''
@@ -20,9 +20,6 @@ class GraphWriter:
         else:
             raise ValueError('Unknown type of flux analysis, available are: production | destruction')
 
-        self._first = first
-        self._last = last
-
     def CreateGraph(self, edgeStart, edgeEnd, thickness, label):
         # There is a possible bug I need to do a check
         # on list edgeStart edgeEnd intersection cause it
@@ -30,10 +27,10 @@ class GraphWriter:
         # are just accumulation point
         NodesNames = list(set(edgeStart + edgeEnd))
         # this is not the best
-        idx_first = NodesNames.index(self._first)
-        NodesNames.insert(0, NodesNames.pop(idx_first))
-        idx_last = NodesNames.index(self._last)
-        NodesNames.insert(len(NodesNames) - 1, NodesNames.pop(idx_last))
+        # idx_first = NodesNames.index(self._first)
+        # NodesNames.insert(0, NodesNames.pop(idx_first))
+        # idx_last = NodesNames.index(self._last)
+        # NodesNames.insert(len(NodesNames) - 1, NodesNames.pop(idx_last))
 
         self.AddNodes(NodesNames)
         self.AddEdges(edgeStart, edgeEnd, thickness, label)

@@ -176,8 +176,8 @@ class PostProcessor:
             firstNames.append(self.km.SpeciesNameFromIndex(j))
             secondNames.append(
                 self.km.SpeciesNameFromIndex(indexSecondName[i]))
-
-        Graph = GraphWriter(flux_analysis_type, species, element)
+        print(firstNames,'\n', secondNames, '\n', species, '\n', element)
+        Graph = GraphWriter(flux_analysis_type) #, species, element)
         Graph = Graph.CreateGraph(
             firstNames, secondNames, computedThickness, computedLabel)
 
