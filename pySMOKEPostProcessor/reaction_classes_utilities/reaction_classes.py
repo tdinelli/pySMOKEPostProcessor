@@ -13,12 +13,12 @@ SCRIPT: rxnclasses
 import pandas as pd
 import sys
 import numpy as np
-import copy
 
 # TODO Think to move the following two lists in a separate place
 # maybe also the function check bimol type
 R = ['R', 'H', 'OH', 'O2', 'O', 'CH3', 'HO2', 'HCO', 'C2H3']
 RSR = ['C5H5', 'C7H7', 'C6H5O']
+
 
 def check_bimol_type(speciestype, reactiontype):
     """
@@ -57,21 +57,23 @@ def check_bimol_type(speciestype, reactiontype):
 class reaction_classes:
 
     def __init__(self, reactions, verbose: bool):
-        """ 
-        allocate dataframe 
+        """
+        allocate dataframe
         """
         # turn reactions into a dataframe
         # index = rxn index, columns = [classtype, class, reactiontype, flux]
-        self.rxn_class_df = pd.DataFrame(index = np.arange(1, len(reactions)+1),
-                                         columns = np.array([
-                                             'name', 'classtype', 'speciestype', 'reactiontype', 'bimoltype'
+        self.rxn_class_df = pd.DataFrame(index=np.arange(1, len(reactions)+1),
+                                         columns=np.array([
+                                             'name',
+                                             'classtype',
+                                             'speciestype',
+                                             'reactiontype',
+                                             'bimoltype'
                                          ]),
                                          dtype=object)
         self.reactions = reactions
         self.verbose = verbose
-        """ 
-        assign class and sublcass
-        """
+        # --- assign class and sublcass
         for rxn in self.reactions:
             idx = rxn['index']
             self.rxn_class_df['name'][idx] = rxn['name']
@@ -82,11 +84,13 @@ class reaction_classes:
             )
 
         self.rxn_class_df = self.rxn_class_df.replace('None', np.nan)
-        self.rxn_class_df['speciestype'] = self.rxn_class_df['speciestype'].replace(np.nan, 'UNSORTED')
-        self.rxn_class_df['reactiontype'] = self.rxn_class_df['reactiontype'].replace(np.nan, 'UNSORTED')
+        self.rxn_class_df['speciestype'] = self.rxn_class_df['speciestype'].replace(
+            np.nan, 'UNSORTED')
+        self.rxn_class_df['reactiontype'] = self.rxn_class_df['reactiontype'].replace(
+            np.nan, 'UNSORTED')
 
     def assign_class_grp(self, subcl_grp_dct):
-        """ 
+        """
         assign class group if available
         """
         for subcl, subset in self.rxn_class_df.groupby('reactiontype'):
@@ -102,12 +106,15 @@ class reaction_classes:
 
 class reaction_fluxes:
     def __init__(self, rxn_class_df, verbose: bool):
-        """ initialize rxn class dataframe"""
+        """
+        initialize rxn class dataframe
+        """
         self.rxn_class_df = rxn_class_df
         self.verbose = verbose
 
     def assign_flux(self, tot_rop_df):
-        """ assign flux from the flux analysis
+        """
+        assign flux from the flux analysis
         """
         # print(self.rxn_class_df.loc[tot_rop_df.index])
         self.rxn_class_df = pd.concat([self.rxn_class_df, tot_rop_df], axis=1)
@@ -116,18 +123,17 @@ class reaction_fluxes:
         flux_sp_name = tot_rop_df.columns[0]
         self.rxn_class_df[flux_sp_name] = self.rxn_class_df[flux_sp_name].replace(
             np.nan, 0.0)
-        
-        print(self.rxn_class_df)
+
+        # print(self.rxn_class_df)
     # renormalize
     # renorm_factor = sum(abs(self.rxn_class_df[flux_sp_name]))
 
     # renormalize
     # rxn_class_df = rxn_class_df.sort_values(by='absflux', ascending = False)
 
-
     def netfluxes(self):
-        """sum fluxes for forward and backward reactions;
-            this includes
+        """
+        sum fluxes for forward and backward reactions; this includes
             - duplicate rxns
             - rxns written as irreversible fw/bw
         """
@@ -138,16 +144,19 @@ class reaction_fluxes:
         # rows_todel = np.array([idx for idx in self.rxn_class_df.index if all(
         #     self.rxn_class_df.loc[idx][self.flux_cols] == 0)])
         # self.rxn_class_df = self.rxn_class_df.drop(rows_todel)
-        self.rxn_class_df = self.rxn_class_df[~(self.rxn_class_df[self.flux_cols] == 0.).all(axis=1)]
-        
+        self.rxn_class_df = self.rxn_class_df[~(
+            self.rxn_class_df[self.flux_cols] == 0.).all(axis=1)]
+
         # list of rxns and corresponding indices
         reactions_dict = {}
         for idx, rxn in self.rxn_class_df.iterrows():
             if '=>' in rxn['name']:
-                rcts, prds = sorted(rxn['name'].split('=>')[0].split('+')), sorted(rxn['name'].split('=>')[1].split('+'))
-            else: # reversible
-                rcts, prds = sorted(rxn['name'].split('=')[0].split('+')), sorted(rxn['name'].split('=')[1].split('+'))
-            
+                rcts, prds = sorted(rxn['name'].split('=>')[0].split(
+                    '+')), sorted(rxn['name'].split('=>')[1].split('+'))
+            else:  # reversible
+                rcts, prds = sorted(rxn['name'].split('=')[0].split(
+                    '+')), sorted(rxn['name'].split('=')[1].split('+'))
+
             keyfw = '+'.join(rcts) + '=' + '+'.join(prds)
             keybw = '+'.join(prds) + '=' + '+'.join(rcts)
 
@@ -157,30 +166,33 @@ class reaction_fluxes:
                 reactions_dict[keybw].append(idx)
             else:
                 reactions_dict[keyfw] = [idx]
-                
+
         # Merge reactions with the same reactants and products (forward and backward)
         # the line to keep is the one with the largest maximum flux
         filtered_df = self.rxn_class_df[self.rxn_class_df['speciestype'] != 'UNSORTED']
         for idxs in reactions_dict.values():
-            if len(idxs) > 1: # there are fluxes to merge
+            if len(idxs) > 1:  # there are fluxes to merge
                 # maximum value of flux - excluding UNSORTED reactions
-                filtered_idxs = [idx for idx in idxs if idx in filtered_df.index]
-                if len(filtered_idxs) == 0: # keep the original idxs regardless of unsorted types
+                filtered_idxs = [
+                    idx for idx in idxs if idx in filtered_df.index]
+                if len(filtered_idxs) == 0:  # keep the original idxs regardless of unsorted types
                     filtered_idxs = idxs
                 # index of the maximum flux
-                max_flux_idx = filtered_idxs[np.argmax(np.abs(self.rxn_class_df.loc[filtered_idxs, self.flux_cols]).max(axis=1))]
+                max_flux_idx = filtered_idxs[np.argmax(
+                    np.abs(self.rxn_class_df.loc[filtered_idxs, self.flux_cols]).max(axis=1))]
                 # remove idx of the max flux and sum the rest of the fluxes to it
                 idxs.remove(max_flux_idx)
 
-                for idx in idxs: # sum fluxes
-                    self.rxn_class_df.loc[max_flux_idx, self.flux_cols] += self.rxn_class_df.loc[idx, self.flux_cols]
-                    
+                for idx in idxs:  # sum fluxes
+                    self.rxn_class_df.loc[max_flux_idx,
+                                          self.flux_cols] += self.rxn_class_df.loc[idx, self.flux_cols]
+
                 if self.verbose:
                     print('* merging flux {} and removing {}'.format(self.rxn_class_df['name'][max_flux_idx],
-                                                                        self.rxn_class_df['name'][idx]))
-                    
+                                                                     self.rxn_class_df['name'][idx]))
+
                 self.rxn_class_df = self.rxn_class_df.drop(idxs, axis=0)
-                
+
         self.rxn_class_df_all = self.rxn_class_df.copy()
 
     def filter_class(self, filter_dct):
@@ -189,18 +201,22 @@ class reaction_fluxes:
         dict_indexes = dict.fromkeys(filter_dct.keys())
         for criterion, values in filter_dct.items():
             dict_indexes[criterion] = np.array(
-                    list(
-                        self.rxn_class_df[
-                            [any(v in val for v in values) for val in self.rxn_class_df[criterion]]
-                        ].index
-                    )
+                list(
+                    self.rxn_class_df[
+                        [any(v in val for v in values)
+                         for val in self.rxn_class_df[criterion]]
+                    ].index
+                )
             )
 
-        indexes_filter = np.array(list(set.intersection(*[set(val) for val in dict_indexes.values()])))
-        self.rxn_class_df = self.rxn_class_df.loc[np.array(list(set(indexes_filter)))]
+        indexes_filter = np.array(list(set.intersection(
+            *[set(val) for val in dict_indexes.values()])))
+        self.rxn_class_df = self.rxn_class_df.loc[np.array(
+            list(set(indexes_filter)))]
 
     def filter_flux(self, threshold=1e-3):
-        """ delete all reactions with contributions below a threshold 
+        """
+        delete all reactions with contributions below a threshold
         """
 
         indexes_filter = np.array([])
@@ -208,13 +224,17 @@ class reaction_fluxes:
         for flux_sp_name in self.flux_cols:
             indexes_filter = np.append(indexes_filter,
                                        np.array(list(self.rxn_class_df[abs(self.rxn_class_df[flux_sp_name]) /
-                                        max(abs(self.rxn_class_df[flux_sp_name])) > threshold].index))
+                                                                       max(abs(self.rxn_class_df[flux_sp_name])) > threshold].index))
                                        )
 
-        self.rxn_class_df = self.rxn_class_df.loc[np.array(list(set(indexes_filter)))]
+        self.rxn_class_df = self.rxn_class_df.loc[np.array(
+            list(set(indexes_filter)))]
 
-    def sortby(self, sortlist, weigh: str = 'false', dropunsorted: bool = True):
-        """ 
+    def sortby(self,
+               sortlist,
+               weigh: str = 'false',
+               dropunsorted: bool = True):
+        """
         sum fluxes by criteria in sortlist
         """
     # check that all criteria are columns
@@ -240,7 +260,7 @@ class reaction_fluxes:
             if 'UNSORTED' in col and dropunsorted:
                 new_sort_df = new_sort_df.drop(col, axis=1)
                 print('*Warning: dropping UNSORTED rxns prior to normalization')
-                
+
         # renormalize by species
         if weigh == 'normbyspecies':
             for flux_sp_name in new_sort_df.index:
@@ -257,32 +277,32 @@ class reaction_fluxes:
         elif weigh != 'false':
             print('*Error: "weigh" can be (str) normbyspecies, omegaij, false')
             # if weigh = false, you are doing nothing
-            
-               
+
         if self.verbose:
             # questo print e probabilmente anche alcuni di quelli sopra forse hanno poco
-            print(new_sort_df)
             # senso e magari potremmo dare la possibilità di stampare su file?
+            print(new_sort_df)
 
         return new_sort_df
 
     def omegaij(self, sort_df):
-        """ 
+        """
         takes a dataframe and computes the omegaijn coefficients
         see https://doi.org/10.1016/j.combustflame.2022.112073
         """
         # new df with same indexes and columns as the original
-        df_omegaijn = pd.DataFrame(index=sort_df.index, columns=sort_df.columns, dtype=np.float64)
+        df_omegaijn = pd.DataFrame(
+            index=sort_df.index, columns=sort_df.columns, dtype=np.float64)
         # omega min and omega max
         omegamin = np.min(sort_df.values)
         omegamax = np.max(sort_df.values)
-        
+
         # if min and max are not as expected: print warning:
         if omegamin > 0:
-            print('*Warning: value of omega min is > 0')
+            print(' * Warning: value of omega min is > 0')
         if omegamax < 0:
-            print('*Warning: value of omega max is < 0')
-            
+            print(' * Warning: value of omega max is < 0')
+
         # compute
         for sp in sort_df.index:
             for cl in sort_df.columns:

@@ -15,8 +15,8 @@ class PostProcessor:
 
         self.km = KineticMap(self.kineticFolder)
 
-    def convert_tomass(self, 
-                       ropa_coefficients: list, 
+    def convert_tomass(self,
+                       ropa_coefficients: list,
                        species: str):
         # species index
         sp_idx = self.km.IndexFromSpeciesName(species)
@@ -25,7 +25,7 @@ class PostProcessor:
         # derive mass based ropa
         ropa_coefficients = [c*mwi for c in ropa_coefficients]
         return ropa_coefficients
-        
+
     def RateOfProductionAnalysis(self,
                                  species: str,
                                  ropa_type: str,
@@ -57,7 +57,7 @@ class PostProcessor:
             if mass_ropa:
                 ropa_coefficients = self.convert_tomass(ropa_coefficients,
                                                         species)
-                
+
             ropa_result = {'coefficients': ropa_coefficients,
                            'reaction_names': reaction_names,
                            'reaction_indices': reaction_indices}
@@ -103,7 +103,7 @@ class PostProcessor:
         if mass_ropa:
             ropa_coefficients = self.convert_tomass(ropa_coefficients,
                                                     species)
-            
+
         ropa_result = {'coefficients': ropa_coefficients,
                        'reaction_names': reaction_names,
                        'reaction_indices': reaction_indices}
@@ -176,8 +176,8 @@ class PostProcessor:
             firstNames.append(self.km.SpeciesNameFromIndex(j))
             secondNames.append(
                 self.km.SpeciesNameFromIndex(indexSecondName[i]))
-        print(firstNames,'\n', secondNames, '\n', species, '\n', element)
-        Graph = GraphWriter(flux_analysis_type) #, species, element)
+        print(firstNames, '\n', secondNames, '\n', species, '\n', element)
+        Graph = GraphWriter(flux_analysis_type)  # , species, element)
         Graph = Graph.CreateGraph(
             firstNames, secondNames, computedThickness, computedLabel)
 
@@ -230,7 +230,7 @@ class PostProcessor:
         widget.setUpperBound(0.)
         widget.prepare()
         widget.readSensitivityCoefficients()
-        widget.getSensitivityProfiles(reaction_index)
+        widget.getSensitivityProfile(reaction_index)
         sensitivity_coefficients = widget.sensitivityCoefficients()
 
         return sensitivity_coefficients

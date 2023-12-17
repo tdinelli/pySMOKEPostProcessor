@@ -28,9 +28,9 @@ class OpenSMOKEppXMLFile:
     TODO
     '''
 
-    def __init__(self, OutputFolder: str, kineticFolder: str):
+    def __init__(self, outputFolder: str, kineticFolder: str):
         kin = KineticMap(kineticFolder)
-        xml_file_name = os.path.join(OutputFolder, 'Output.xml')
+        xml_file_name = os.path.join(outputFolder, 'Output.xml')
         # xml_file_name = os.path.join(OutputFolder, 'overall.xml')
         # xml_file_name = os.path.join(OutputFolder, 'rectangle.xml')
         tree = ET.parse(xml_file_name)
@@ -41,11 +41,12 @@ class OpenSMOKEppXMLFile:
         if (systemType != "HomogeneousReactor" and
             systemType != "Flamelet" and
             systemType != "Flame1D" and
-            systemType != "Flame2D"):
-            if(systemType == "BatchReactor" or
+                systemType != "Flame2D"):
+            if (systemType == "BatchReactor" or
                systemType == "PlugFlowReactor" or
                systemType == "PerfectlyStirredReactor"):
-                warnings.warn(" * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained!\n,Some of the functions in this class may not work!")    
+                warnings.warn(
+                    " * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained!\n,Some of the functions in this class may not work!")
             else:
                 raise Exception(f"Unknown system type: {systemType}")
 
@@ -58,17 +59,20 @@ class OpenSMOKEppXMLFile:
             list_names.append(dummy[1+i*3])
             column_index_of_massfractions_profiles.append(int(dummy[3+i*3]))
         if (len(list_names) != kin.NumberOfSpecies):
-            raise Exception("The kinetic mechanism is not consistent with the simulation")
+            raise Exception(
+                "The kinetic mechanism is not consistent with the simulation")
         for i in range(kin.NumberOfSpecies):
             if (list_names[i] != kin.species[i]):
-                raise Exception("The kinetic mechanism is not consistent with the simulation")
+                raise Exception(
+                    "The kinetic mechanism is not consistent with the simulation")
 
         # Recover additional variables
         dummy = root.find('additional')
         dummy = (dummy.text).split('\n')
         dummy = [i for i in dummy if not i.isnumeric() and i != '']
         n_additional = len(dummy)
-        additional_variable = [i.split()[0] + ' ' + i.split()[1] for i in dummy]
+        additional_variable = [i.split()[0] + ' ' + i.split()[1]
+                               for i in dummy]
         index = [int(i.split()[-1]) for i in dummy]
         add_var_idx = index
 
@@ -123,31 +127,56 @@ class OpenSMOKEppXMLFile:
         index_fvSOOT = None
 
         for i, j in enumerate(additional_variable):
-            if ('temperature' in j): index_T = index[i] - 2
-            if ('pressure' in j): index_P = index[i] - 2
-            if ('mol-weight' in j): index_MW = index[i] - 2
-            if ('density' in j): index_rho = index[i] - 2
-            if ('heat-release' in j): index_Q = index[i] - 2
-            if ('x-coord' in j): index_x_coord = index[i] - 2
-            if ('y-coord' in j): index_y_coord = index[i] - 2
-            if ('z-coord' in j): index_z_coord = index[i] - 2
-            if ('x-vel' in j): index_x_vel = index[i] - 2
-            if ('y-vel' in j): index_y_vel = index[i] - 2
-            if ('z-vel' in j): index_z_vel = index[i] - 2
-            if ('volume' in j): index_V = index[i] - 2
-            if ('tau' in j): index_tau = index[i] - 2
-            if ('chi-st' in j): index_chi_st = index[i] - 2
-            if ('strain-rate' in j): index_strain_rate = index[i] - 2
-            if ('curvature' in j): index_curvature = index[i] - 2
-            if ('enthalpy-sens' in j): index_enthalpy_sens = index[i] - 2
-            if ('cp' in j): index_cp = index[i] - 2
-            if ('therm-cond' in j): index_therm_cond = index[i] - 2
-            if ('viscosity' in j): index_viscosity = index[i] - 2
-            if ('YSoot' in j): index_YSoot = index[i] - 2
-            if ('csi' in j): index_csi = index[i] - 2
-            if ('mixture-fraction' in j or 'mix-fract' in j): index_csi = index[i] - 2
-            if ('axial-coordinate' in j): index_csi = index[i] - 2
-            if ('fvSoot' in j): index_fvSOOT  = index[i] - 2
+            if ('temperature' in j):
+                index_T = index[i] - 2
+            if ('pressure' in j):
+                index_P = index[i] - 2
+            if ('mol-weight' in j):
+                index_MW = index[i] - 2
+            if ('density' in j):
+                index_rho = index[i] - 2
+            if ('heat-release' in j):
+                index_Q = index[i] - 2
+            if ('x-coord' in j):
+                index_x_coord = index[i] - 2
+            if ('y-coord' in j):
+                index_y_coord = index[i] - 2
+            if ('z-coord' in j):
+                index_z_coord = index[i] - 2
+            if ('x-vel' in j):
+                index_x_vel = index[i] - 2
+            if ('y-vel' in j):
+                index_y_vel = index[i] - 2
+            if ('z-vel' in j):
+                index_z_vel = index[i] - 2
+            if ('volume' in j):
+                index_V = index[i] - 2
+            if ('tau' in j):
+                index_tau = index[i] - 2
+            if ('chi-st' in j):
+                index_chi_st = index[i] - 2
+            if ('strain-rate' in j):
+                index_strain_rate = index[i] - 2
+            if ('curvature' in j):
+                index_curvature = index[i] - 2
+            if ('enthalpy-sens' in j):
+                index_enthalpy_sens = index[i] - 2
+            if ('cp' in j):
+                index_cp = index[i] - 2
+            if ('therm-cond' in j):
+                index_therm_cond = index[i] - 2
+            if ('viscosity' in j):
+                index_viscosity = index[i] - 2
+            if ('YSoot' in j):
+                index_YSoot = index[i] - 2
+            if ('csi' in j):
+                index_csi = index[i] - 2
+            if ('mixture-fraction' in j or 'mix-fract' in j):
+                index_csi = index[i] - 2
+            if ('axial-coordinate' in j):
+                index_csi = index[i] - 2
+            if ('fvSoot' in j):
+                index_fvSOOT = index[i] - 2
 
         # Read profiles
         profiles_size = root.find('profiles-size')
@@ -199,7 +228,8 @@ class OpenSMOKEppXMLFile:
 
         # Additional variables name
         for i in range(len(column_index_of_massfractions_profiles)):
-            if(Y[0, column_index_of_massfractions_profiles[i] - len(additional_variable)] > 1e-8): # Warning this can generate bugs
+            # Warning this can generate bugs
+            if (Y[0, column_index_of_massfractions_profiles[i] - len(additional_variable)] > 1e-8):
                 additional_variable.append('conversion-' + list_names[i])
 
         # Assign internal members
