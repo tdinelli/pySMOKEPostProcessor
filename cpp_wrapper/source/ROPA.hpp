@@ -879,7 +879,11 @@ void ROPA::RateOfProductionAnalysis2D(const unsigned int number_of_reactions, do
         unsigned int index_max = data_->number_of_abscissas_;
 
         std::vector<double> volume = data_->additional[data_->index_volume];
-        double total_volume = std::accumulate(volume.begin(), volume.end(), 0.0d);
+        // double total_volume = std::accumulate(volume.begin(), volume.end(), 0.0d);
+        double total_volume = 0;
+        for(unsigned int i = 0; i < volume.size(); i++){
+            total_volume += volume[i];
+        }
 
         std::vector<double> global_production_coefficients;
         std::vector<double> global_destruction_coefficients;
