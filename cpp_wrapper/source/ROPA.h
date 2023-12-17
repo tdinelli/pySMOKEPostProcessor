@@ -96,19 +96,19 @@ class ROPA
     void SetLabelType(std::string type);
 
     inline const std::vector<unsigned int>& reactions() const {return reactions_;};
-    
+
     inline const std::vector<double>& coefficients() const {return coefficients_;};
-    
+
     inline const std::vector<int>& indexFirstName() const {return indexFirstName_;};
 
     inline const std::vector<int>& indexSecondName() const {return indexSecondName_;}; 
-    
+
     inline const std::vector<double>& computedThickness() const {return computedThickness_;};
-    
+
     inline const std::vector<double>& computedLabel() const {return computedLabel_;};
-    
+
     inline const std::vector<double>& formationRates() const {return formationRates_;};
-    
+
     inline const std::vector<std::vector<double>>& reactionRates() const {return reactionRates_;};
 
     inline const std::vector<double>& sumOfRates() const {return sumOfRates_;};

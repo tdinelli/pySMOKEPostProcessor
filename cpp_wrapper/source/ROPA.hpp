@@ -141,7 +141,8 @@ void ROPA::SetLabelType(std::string type)
 void ROPA::RateOfProductionAnalysis(const unsigned int number_of_reactions)
 {
     // Select y variables among the species
-    if (std::find(data_->string_list_massfractions_sorted.begin(), data_->string_list_massfractions_sorted.end(),
+    if (std::find(data_->string_list_massfractions_sorted.begin(),
+                  data_->string_list_massfractions_sorted.end(),
                   species_) != data_->string_list_massfractions_sorted.end())
     {
         speciesIsSelected = true;
@@ -647,9 +648,13 @@ void ROPA::GetFormationRates(std::string specie, std::string units, std::string 
     }
 }
 
-void ROPA::RateOfProductionAnalysis2D(const unsigned int number_of_reactions, double local_x, double local_z,
-        double region_low_x, double region_up_x, 
-        double region_low_z, double region_up_z)
+void ROPA::RateOfProductionAnalysis2D(const unsigned int number_of_reactions,
+                                      double local_x,
+                                      double local_z,
+                                      double region_low_x,
+                                      double region_up_x,
+                                      double region_low_z,
+                                      double region_up_z)
 {
     // This function is totally inefficent and by far the worst code I have evere written
     // Select y variables among the species

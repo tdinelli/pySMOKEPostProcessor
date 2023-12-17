@@ -3,7 +3,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "source/PostProcessorFluxMap.h"
 #include "source/ProfilesDatabase.h"
 #include "source/ROPA.h"
 #include "source/Sensitivities.h"
@@ -71,5 +70,6 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m)
              py::call_guard<py::gil_scoped_release>())
         .def("getSensitivityProfile", &Sensitivities::GetSensitivityProfile, py::call_guard<py::gil_scoped_release>())
         .def("reactions", &Sensitivities::reactions, py::call_guard<py::gil_scoped_release>())
-        .def("sensitivityCoefficients", &Sensitivities::senitivityCoefficients, py::call_guard<py::gil_scoped_release>());
+        .def("sensitivityCoefficients", &Sensitivities::senitivityCoefficients,
+             py::call_guard<py::gil_scoped_release>());
 }

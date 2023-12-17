@@ -35,7 +35,6 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#include <string>
 ProfilesDatabase::ProfilesDatabase(void)
 {
     iSensitivityEnabled_ = false;
@@ -104,7 +103,6 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string &folder_name)
                 {
                     std::string reaction_string;
                     stream >> reaction_string;
-                    // std::cout << "Ecco la reazione: " << reaction_string << std::endl;
                     reaction_strings_.push_back(reaction_string);
                 }
             }
