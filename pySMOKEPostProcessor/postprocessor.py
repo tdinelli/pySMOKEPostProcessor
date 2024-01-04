@@ -193,7 +193,7 @@ class PostProcessor:
         widget.getReactionRates(reaction_index, sum_rates)
 
         if (sum_rates):
-            reaction_rates = widget.sumOfRates()
+            reaction_rates = [widget.sumOfRates()]
         else:
             reaction_rates = widget.reactionRates()
 
