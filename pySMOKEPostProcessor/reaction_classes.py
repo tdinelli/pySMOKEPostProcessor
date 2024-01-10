@@ -4,8 +4,8 @@ import copy
 from operator import add, neg
 
 from .reaction_classes_utilities.reaction_classes_groups import ReadReactionsGroups
-from .reaction_classes_utilities.reaction_classes import reaction_classes
-from .reaction_classes_utilities.reaction_classes import reaction_fluxes
+from .reaction_classes_utilities.reaction_classes_calc import reaction_classes_assign
+from .reaction_classes_utilities.reaction_classes_calc import reaction_fluxes
 
 
 def assignclass(kinmap, classes_definition):
@@ -28,7 +28,7 @@ def assignclass(kinmap, classes_definition):
     # parse classes
     _, subcl_grp_dct = ReadReactionsGroups(classes_definition)
     # sort
-    rxns_sorted = reaction_classes(reactions_all, verbose=False)
+    rxns_sorted = reaction_classes_assign(reactions_all, verbose=False)
     rxns_sorted.assign_class_grp(subcl_grp_dct)
 
     return rxns_sorted, reactions_all
@@ -65,7 +65,7 @@ class FluxByClass:
             tot_rop_df = None
             for sp in sps:
                 tot_rop_df0 = pd.DataFrame(tot_rop_dct[sp]['coefficients'], index=np.array(tot_rop_dct[sp]['reaction_indices'])+1,
-                                           columns=['flux_{}'.format(spname)], dtype=float)
+                                           columns=['flux_{}'.format(spname)], dtype=np.float32)
                 #  quello sotto dovrebbe essere sufficiente
                 # tot_rop_df0 = tot_rop_df0.groupby(level=0).sum() # sum rxns with same indexes
 
@@ -85,7 +85,8 @@ class FluxByClass:
             # sum rxns with same indices
             # sum rxns with same indexes LPM aggiunto qui
             tot_rop_df = tot_rop_df.groupby(level=0).sum()
-
+            # replace nan with 0
+            tot_rop_df = tot_rop_df.replace(np.nan, 0)
             # concatenate flux to the dataframe of rxn classes
             self.flux_sorted.assign_flux(tot_rop_df)
 
@@ -98,6 +99,7 @@ class FluxByClass:
                         weigh: str = 'false',
                         dropunsorted: bool = True):
         # weight options: normbyspecies, omegaij, false
+        # deepcopy if you need to do it multiple times
         # filter rxns
         rxns_sorted = copy.deepcopy(self.flux_sorted)
         if len(filter_dct) > 0:
@@ -111,152 +113,6 @@ class FluxByClass:
         return sortdf
 
     # new function to compute and plot reaction class rate profiles along axial coordinate
-    def process_reaction_class_rate(self, results_folder: str, x_axis_name: str, reactionclass_type: str):
-        # to be extended to all types (reactiontype, classtype, speciestype, bimoltype. requires a call to sort_and_filter first)
-        # do it similar to sort_and_filter, with sortlist (which only provides criteria for getting the rates) and filter_dct
-        indici = [i['index']-1 for i in self.reactions_all if not i['reactiontype']
-                  == None if reactionclass_type in i['reactiontype']]
-        # versione precedente: era in ropa.py (ora tutto in postprocessor.py)
-        x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism,
-                                                       output_folder=results_folder,
-                                                       reaction_index=indici,
-                                                       abscissae_name=x_axis_name)
-
-        return x_axis, reaction_rate_
-
-    # new function to compute plot cumulative contribution of different reactions
-    # to production/consumption rate profile of a species
-    def process_cumulative_reaction_rate(self, results_folder: str,
-                                         x_axis_name: str,
-                                         species: str,
-                                         n_of_rxns: int,
-                                         rate_type: str,
-                                         filter_ClassesToPlot: list,
-                                         threshold: float):
-
-        # distinguish pp input based on ropa type
-        loc_low_up = np.array([0, 0, 0, ], dtype=float)
-        tot_rop_df = None
-
-        tot_rop, indexes, _ = RateOfProductionAnalysis(kinetic_folder=self.kinetic_mechanism,
-                                                       output_folder=results_folder,
-                                                       species=species,
-                                                       ropa_type='global',
-                                                       local_value=loc_low_up[0],
-                                                       lower_value=loc_low_up[1],
-                                                       upper_value=loc_low_up[2],
-                                                       number_of_reactions=n_of_rxns)
-
-        tot_rop_df0 = pd.DataFrame(tot_rop, index=np.array(
-            indexes)+1, columns=['flux_' + species], dtype=float)
-        tot_rop_df0 = tot_rop_df0.groupby(
-            level=0).sum()  # sum rxns with same indexes
-        # THIS IS CODE REPETITION REMOVE
-        if isinstance(tot_rop_df, pd.DataFrame):
-            # concatenate
-            tot_rop_df = pd.concat([tot_rop_df, tot_rop_df0])
-            tot_rop_df = tot_rop_df.groupby(
-                level=0).sum()  # sum rxns with same indexes
-        else:
-            tot_rop_df = copy.deepcopy(tot_rop_df0)
-            # assign flux
-            # self.flux_sorted.assign_flux(tot_rop_df)
-        # TODO
-        self.flux_sorted.sum_fwbw()  # some errors to be fixed. Ask Luna
-
-        tot_rop_pos_df = tot_rop_df[(tot_rop_df >= 0).all(axis=1)]
-        tot_rop_sorted_pos_df = tot_rop_pos_df.sort_values(
-            by='flux_' + species, axis=0, ascending=False)
-
-        tot_rop_neg_df = tot_rop_df[(tot_rop_df < 0).all(axis=1)]
-        tot_rop_sorted_neg_df = tot_rop_neg_df.sort_values(
-            by='flux_' + species, axis=0, ascending=True)
-
-        indici_production = [tot_rop_sorted_pos_df.index[i]
-                             for i in range(len(tot_rop_sorted_pos_df))]
-        indici_consumption = [tot_rop_sorted_neg_df.index[i]
-                              for i in range(len(tot_rop_sorted_neg_df))]
-
-        # print(tot_rop_df)
-
-        if rate_type == 'P':
-            indici = indici_production
-        elif rate_type == 'C':
-            indici = indici_consumption
-        else:
-            raise TypeError(
-                'rate_type can be only "P" (production) or "C" (consumption)')
-
-        reaction_rate_all = []
-        matrix_of_rates_all = []
-        matrix_of_rates = []
-        rate_percentage_contribution = []
-        nomi = []
-
-        # print(indici)
-        for i in range(len(indici)):
-            # INVECE DI CHIAMARE QUESTO, PRENDI DIRETTAMENETE GLI INDICI DELLA ROPA
-            # CHE DOVREBBERO ESSERE UGUALI. E POI CHIAMA GETREACTIONRATES
-            x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism,
-                                                           output_folder=results_folder,
-                                                           reaction_index=[
-                                                               indici[i]-1],
-                                                           abscissae_name=x_axis_name)
-
-            nome = self.kinetic_map.ReactionNameFromIndex(
-                indici[i]-1)  # nome della reazione
-            # TODO
-            # to manage equilibrium reaction where 'species' can be on the right or on the left of '='
-            # i.e., consistently if they are produced or consumed in a specific simulation
-            # REFACTORING NEEDED IMMEDIATASUBITO
-            if not "=>" in nome:
-                reagenti = nome.split(':')[-1].split('=')[0]
-                prodotti = nome.split(':')[-1].split('=')[-1]
-                if rate_type == 'P':
-                    if (species in reagenti):
-                        reaction_rate_ = list(map(neg, reaction_rate_))
-                elif rate_type == 'C':
-                    if (species in prodotti):
-                        reaction_rate_ = list(map(neg, reaction_rate_))
-
-            # to plot reactions only in specific reaction class
-            ToPlot = 1
-            if len(filter_ClassesToPlot) >= 1:
-                ToPlot = 0
-                for j in range(len(filter_ClassesToPlot)):
-                    indici_ToPlot = [k['index']-1 for k in self.reactions_all if not k['reactiontype']
-                                     == None if filter_ClassesToPlot[j] in k['reactiontype']]
-                    if indici[i] in indici_ToPlot:
-                        ToPlot = ToPlot + 1
-                if ToPlot == 0:
-                    reaction_rate_ = [0] * len(reaction_rate_)
-
-            if ToPlot == 1:
-                nomi.append(
-                    self.kinetic_map.ReactionNameFromIndex(indici[i]-1)[:30])
-                matrix_of_rates_all.append(reaction_rate_)
-                if len(nomi) == 1:
-                    reaction_rate_all = reaction_rate_
-                else:
-                    reaction_rate_all = list(
-                        map(add, reaction_rate_all, reaction_rate_))
-
-        nomi_ret = []
-        total_rate_area = np.trapz(y=reaction_rate_all, x=x_axis)
-        for i in range(len(nomi)):
-            single_rate_area = np.trapz(y=matrix_of_rates_all[i], x=x_axis)
-            rate_percentage_contribution.append(
-                single_rate_area / total_rate_area * 100)
-            if rate_percentage_contribution[-1] > threshold:
-                nomi_ret.append(
-                    nomi[i] + ' ' + str(round(rate_percentage_contribution[-1], 1)) + ' %')
-                matrix_of_rates.append(matrix_of_rates_all[:][i])
-            else:
-                rate_percentage_contribution.pop(-1)
-
-        # print(rate_percentage_contribution)
-        return x_axis, matrix_of_rates, nomi_ret
-
 
 def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
     """
