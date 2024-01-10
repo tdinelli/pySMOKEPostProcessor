@@ -1,3 +1,5 @@
+import pandas as pd
+import numpy as np
 from .pySMOKEPostProcessor import ProfilesDatabase, ROPA, Sensitivity
 from .maps.KineticMap import KineticMap
 from .graph_writer import GraphWriter
@@ -24,6 +26,7 @@ class PostProcessor:
         mwi = self.km.mws[sp_idx]
         # derive mass based ropa
         ropa_coefficients = [c*mwi for c in ropa_coefficients]
+        
         return ropa_coefficients
 
     def RateOfProductionAnalysis(self,
@@ -35,7 +38,8 @@ class PostProcessor:
                                  number_of_reactions: int = 10,
                                  two_dimensions: bool = False,
                                  region_location: dict = None,
-                                 mass_ropa: bool = False) -> dict:
+                                 mass_ropa: bool = False,) -> dict:
+        
         if (two_dimensions is False):
             widget = ROPA()
             widget.setDataBase(self.db)
@@ -235,127 +239,88 @@ class PostProcessor:
         return sensitivity_coefficients
 
 
-    # new function to compute plot cumulative contribution of different reactions
-    # to production/consumption rate profile of a species
-    # DA RISCRIVERE COMPLETAMENTE, TUTTE LE FUNZIONI SONO CAMBIATE
-
-    # new function to compute and plot reaction class rate profiles along axial coordinate
-    def process_reaction_class_rate(self, results_folder: str, x_axis_name: str, reactionclass_type: str):
-        # to be extended to all types (reactiontype, classtype, speciestype, bimoltype. requires a call to sort_and_filter first)
-        # do it similar to sort_and_filter, with sortlist (which only provides criteria for getting the rates) and filter_dct
-        indici = [i['index']-1 for i in self.reactions_all if not i['reactiontype'] == None if reactionclass_type in i['reactiontype']]
-        # versione precedente: era in ropa.py (ora tutto in postprocessor.py)
-        x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism,
-                                                       output_folder=results_folder,
-                                                       reaction_index=indici,
-                                                       abscissae_name=x_axis_name)
-		
-        return x_axis, reaction_rate_
-	
-    def process_cumulative_reaction_rate(self, results_folder: str,
-                                         x_axis_name: str,
-                                         species: str, 
-                                         n_of_rxns: int, 
-                                         rate_type: str,
-                                         filter_ClassesToPlot: list,
-                                         threshold: float):
-
-        # distinguish pp input based on ropa type
-        loc_low_up = np.array([0, 0, 0, ], dtype=float)
-        tot_rop_df = None
-
-        tot_rop, indexes, _ = RateOfProductionAnalysis(kinetic_folder=self.kinetic_mechanism, 
-                                                       output_folder=results_folder, 
-                                                       species = species, 
-                                                       ropa_type = 'global', 
-                                                       local_value = loc_low_up[0],
-                                                       lower_value = loc_low_up[1], 
-                                                       upper_value = loc_low_up[2], 
-                                                       number_of_reactions = n_of_rxns)
-
-        tot_rop_df0 = pd.DataFrame(tot_rop, index=np.array(indexes)+1, columns=['flux_' + species], dtype=float)
-        tot_rop_df0 = tot_rop_df0.groupby(level=0).sum() # sum rxns with same indexes
-        # THIS IS CODE REPETITION REMOVE
-        if isinstance(tot_rop_df, pd.DataFrame):
-            # concatenate
-            tot_rop_df = pd.concat([tot_rop_df, tot_rop_df0])
-            tot_rop_df = tot_rop_df.groupby(level=0).sum() # sum rxns with same indexes
-        else:
-            tot_rop_df = copy.deepcopy(tot_rop_df0)			
-            # assign flux
-            # self.flux_sorted.assign_flux(tot_rop_df)
-        # TODO		
-        self.flux_sorted.sum_fwbw() # some errors to be fixed. Ask Luna
-
-        tot_rop_pos_df = tot_rop_df[(tot_rop_df >= 0).all(axis=1)]
-        tot_rop_sorted_pos_df = tot_rop_pos_df.sort_values(by = 'flux_' + species, axis=0, ascending=False)
-
-        tot_rop_neg_df = tot_rop_df[(tot_rop_df < 0).all(axis=1)]
-        tot_rop_sorted_neg_df = tot_rop_neg_df.sort_values(by = 'flux_' + species, axis=0, ascending=True)
-
-        indici_production = [tot_rop_sorted_pos_df.index[i] for i in range(len(tot_rop_sorted_pos_df))]
-        indici_consumption = [tot_rop_sorted_neg_df.index[i] for i in range(len(tot_rop_sorted_neg_df))]
-		
-        print(tot_rop_df)
-
-        if rate_type == 'P':
-            indici = indici_production
-        elif rate_type == 'C':
-            indici = indici_consumption
-        else:
-            raise TypeError('rate_type can be only "P" (production) or "C" (consumption)')
-		
-        reaction_rate_all = []
-        matrix_of_rates_all = []
-        matrix_of_rates = []
-        rate_percentage_contribution = []
-        nomi = []
-
-        print(indici)
-        for i in range(len(indici)):
-            # INVECE DI CHIAMARE QUESTO, PRENDI DIRETTAMENETE GLI INDICI DELLA ROPA
-            # CHE DOVREBBERO ESSERE UGUALI. E POI CHIAMA GETREACTIONRATES
-            x_axis, reaction_rate_ = GetReactionRatesIndex(kinetic_folder=self.kinetic_mechanism, 
-                                                           output_folder=results_folder, 
-                                                           reaction_index=[indici[i]-1], 
-                                                           abscissae_name=x_axis_name)
-			
-            nome = self.kinetic_map.ReactionNameFromIndex(indici[i]-1) # nome della reazione
-            # TODO
-            # to manage equilibrium reaction where 'species' can be on the right or on the left of '=' 
-            # i.e., consistently if they are produced or consumed in a specific simulation
-            # REFACTORING NEEDED IMMEDIATASUBITO
-            if not "=>" in nome:
-                reagenti = nome.split(':')[-1].split('=')[0]
-                prodotti = nome.split(':')[-1].split('=')[-1]
-                if rate_type == 'P':
-                    if(species in reagenti):
-                        reaction_rate_ = list( map(neg, reaction_rate_))
-                elif rate_type == 'C':
-                    if(species in prodotti):
-                        reaction_rate_ = list( map(neg, reaction_rate_))
-
-            # to plot reactions only in specific reaction class
-            ToPlot = 1
-
-            if ToPlot == 1:
-                nomi.append(self.kinetic_map.ReactionNameFromIndex(indici[i]-1)[:30])
-                matrix_of_rates_all.append(reaction_rate_)
-                if len(nomi) == 1:
-                    reaction_rate_all = reaction_rate_
+    def reactionrategroups(self, rxnnames_sr, xaxis: list, threshold : float = 0.01):
+        # reaction rates by groups (example: by class)
+        # rxnnames_sr: series with labels and reaction names
+        # xaxis
+        # threshold: plot only if contributes above threshold% to the total rate
+        rr = dict.fromkeys(rxnnames_sr.index)
+        rrsum = pd.Series(index = rxnnames_sr.index, dtype=np.float32)
+        for label, rxnnames in rxnnames_sr.items():
+            rr[label] = np.array(self.GetReactionRates(reaction_name=rxnnames, sum_rates=True)[0])
+            rrsum[label] = np.trapz(y = rr[label], x = xaxis)
+            
+        # check cumulative contribution and filter based on threshold
+        rrsum /= np.sum(abs(rrsum)) # abs?
+        filteredlabels = list(rrsum[abs(rrsum) > threshold].index)
+        filtered_rr = [rr[key] for key in filteredlabels] 
+        rates_df = pd.DataFrame(np.array(filtered_rr).T, columns = filteredlabels, index=xaxis)
+    
+        return rates_df
+    
+    def cumulativerates(self, xaxis : list, ropa_dct : dict, rate_type : str = 'PC', threshold : float = 0.01):
+        # cumulative reaction rate matrix extract
+        # rate_type: PC, P, C (net, production, consumption)
+        # threshold: delete rates based on % contribution (default: keep only those contributing > 1%)
+        # xaxis: derived from output
+        
+        # 0. ropa DCT: sum coefficients for duplicates
+        coefficients, indices, names = [], [], []
+        allindices_array = np.array(ropa_dct['reaction_indices'])
+        allcoeffs_array = np.array(ropa_dct['coefficients'])
+        for i, idx in enumerate(allindices_array):
+            if idx not in indices:
+                indices.append(idx)
+                names.append(ropa_dct['reaction_names'][i])
+                if ropa_dct['reaction_indices'].count(idx) > 1:
+                    positions = np.where((allindices_array == idx))[0]
+                    coefficients.append(np.sum(allcoeffs_array[positions]))
                 else:
-                    reaction_rate_all = list( map(add, reaction_rate_all, reaction_rate_))
-				
-        nomi_ret = []
-        total_rate_area = np.trapz(y = reaction_rate_all, x = x_axis)
-        for i in range(len(nomi)):
-            single_rate_area = np.trapz(y = matrix_of_rates_all[i], x = x_axis)
-            rate_percentage_contribution.append(single_rate_area / total_rate_area * 100)	
-            if rate_percentage_contribution[-1] > threshold:
-                nomi_ret.append(nomi[i] + ' ' + str(round(rate_percentage_contribution[-1],1))+ ' %')
-                matrix_of_rates.append(matrix_of_rates_all[:][i])
-            else:
-                rate_percentage_contribution.pop(-1)
+                    coefficients.append(allcoeffs_array[i])
+                    
+        # 1. ropa DF: indexes (positive or negative) and reaction names
+        factor = [1.0 - 2.0*(coeff < 0) for coeff in coefficients]
+        ropa_df = pd.DataFrame(np.array([factor, names], dtype=object).T, 
+                               index = indices, 
+                               columns = ['factor', 'reaction_names'])
 
-        print(rate_percentage_contribution)
-        return x_axis, matrix_of_rates, nomi_ret
+        ##### SUM FORWARD AND BACKWARD (based on name)? WAS THERE IN PREVIOUS FUNCTION
+        
+        if rate_type == 'P':
+            ropa_df = ropa_df[ropa_df['factor'].values > 0]
+        elif rate_type == 'C':
+            ropa_df = ropa_df[ropa_df['factor'] < 0]
+            
+        # 2. get reaction rates
+        # if cumulative rate and ropa sign agree: don't change sign; otherwise, do
+        rr = dict.fromkeys(ropa_df.index)
+        rrsum = pd.Series(index = ropa_df.index, dtype=np.float32)
+        
+        for idx in ropa_df.index:
+            rr_idx = np.array(self.GetReactionRates(reaction_index = [idx])[0])
+            rrsum_idx = np.trapz(y = rr_idx, x = xaxis)
+            if (rrsum_idx * float(ropa_df['factor'][idx])) < 0:
+                # integral and ropa have opposite signs: change sign
+                rr_idx *= -1 
+                rrsum_idx *= -1
+            #assign index
+            rr[idx] = rr_idx
+            rrsum[idx] = rrsum_idx
+            
+        # check cumulative contribution and delete based on threshold
+        rrsum /= np.sum(abs(rrsum)) # abs?
+        filteredidxs = list(rrsum[abs(rrsum) > threshold].index)
+        filtered_rr = [rr[key] for key in filteredidxs]
+
+        # add to the names the cumulative % contribution
+        names_wpct = []
+        for idx in filteredidxs:
+            name = ropa_df['reaction_names'][idx]
+            pct = rrsum[idx] * 100
+            names_wpct.append('{} {:.2f}%'.format(name, pct))
+        cumulativerates_df = pd.DataFrame(np.array(filtered_rr).T, columns = names_wpct, index=xaxis)
+        
+        return cumulativerates_df
+    
+######### alternative : do a local ropa to set values; if you don't find the reaction,
+# set the value to zero
