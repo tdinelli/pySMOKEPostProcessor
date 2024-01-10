@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import matplotlib.pyplot as plt
 # from .styles import *
@@ -53,7 +54,7 @@ def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
     bars = []
 
     # Iterate over all data
-    for i, (name, values) in enumerate(data.items()):
+    for i, (_, values) in enumerate(data.items()):
         # The offset in x direction of that bar
         x_offset = (i - n_bars / 2) * bar_width + bar_width / 2
         # Draw a bar for every value of that type
@@ -115,21 +116,26 @@ def plot_bars(data: dict, ax=None):
 
     bar = ax.barh(index, data['coefficients'], color=colors)
 
+    # fix rxn names for e.g., bin rxns
+    pattern = re.compile(r'\d+\.\d+')
+ 
     for idx, i in enumerate(bar):
         x = i.get_width()
         y = i.get_y()+0.5*i.get_height()
+        rxnname = pattern.sub(lambda x: "{:.2f}".format(float(x.group(0))), 
+                              data['reaction_names'][idx])
         coefficient_value = "  (" + \
             str('{:6.4e}'.format(data['coefficients'][idx])) + ")"
         if (x < 0):
             ax.text(0,
                     y,
-                    data['reaction_names'][idx] + coefficient_value,
+                    rxnname + coefficient_value,
                     va='center',
                     fontsize=font)
         else:
             ax.text(0,
                     y,
-                    data['reaction_names'][idx] + coefficient_value,
+                    rxnname + coefficient_value,
                     va='center',
                     ha='right',
                     fontsize=font)
