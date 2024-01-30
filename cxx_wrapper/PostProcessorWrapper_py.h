@@ -1,3 +1,4 @@
+// clang-format off
 // In the future think about removing this stuff from here
 // include definition should be separated in each file
 
@@ -34,3 +35,4 @@
 // pyBIND11
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+// clang-format on

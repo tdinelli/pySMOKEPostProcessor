@@ -1,9 +1,5 @@
-#pragma once
-
-// clang-format off
-#include <OpenSMOKEpp>
-#include <maps/Maps_CHEMKIN>
-// clang-format on
+#ifndef PROFILESDATABASE_H
+#define PROFILESDATABASE_H
 
 class ProfilesDatabase {
  public:
@@ -66,3 +62,6 @@ class ProfilesDatabase {
   std::string name_reactions_;
   std::vector<std::string> reaction_strings_;
 };
+
+#include "ProfilesDatabase.hpp"
+#endif  // PROFILESDATABASE_H

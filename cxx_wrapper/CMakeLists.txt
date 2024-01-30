@@ -32,16 +32,13 @@ target_compile_options(${PROJECT_NAME}
         -Wno-mismatched-new-delete
         -Wno-switch
 )
-#         -Wno-self-assign-field
-#         -Wno-dangling-else
-#         -Wno-return-type-c-linkage
 
 # --------------------------------------------------------------------
 # Installing options
 # --------------------------------------------------------------------
 
-# install(TARGETS
-#     ${PROJECT_NAME}
-#     DESTINATION
-#     ${CMAKE_INSTALL_PREFIX}
-# )
+install(TARGETS
+    ${PROJECT_NAME}
+    DESTINATION
+    ${CMAKE_INSTALL_PREFIX}
+)

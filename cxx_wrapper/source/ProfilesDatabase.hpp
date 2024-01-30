@@ -1,5 +1,3 @@
-#include "ProfilesDatabase.h"
-
 ProfilesDatabase::ProfilesDatabase(void) {
   iSensitivityEnabled_ = false;
   iROPAEnabled_ = false;

@@ -1,11 +1,8 @@
-#pragma once
-
-// clang-format off
-#include <OpenSMOKEpp>
-#include <maps/Maps_CHEMKIN>
+#ifndef ROPA_H
+#define ROPA_H
 
 #include "ProfilesDatabase.h"
-// clang-format on
+#include "PostProcessorFluxMap.h"
 
 class ROPA {
  public:
@@ -121,3 +118,6 @@ class ROPA {
   std::vector<std::vector<double>> reactionRates_;
   std::vector<double> sumOfRates_;
 };
+
+#include "ROPA.hpp"
+#endif  // ROPA_H

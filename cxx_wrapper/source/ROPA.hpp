@@ -1,6 +1,3 @@
-#include "ROPA.h"
-#include "PostProcessorFluxMap.h"
-
 ROPA::ROPA() {
   ropaType_ = "global";
   kineticFolder_ = "";
