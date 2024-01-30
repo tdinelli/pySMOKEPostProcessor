@@ -31,7 +31,6 @@
 *.out
 *.app
 
-.DS_Store
 
 .idea/
 
@@ -61,6 +60,7 @@ pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
 examples-old
 compile_commands.json
+.DS_Store
 
 # ignore neovim stuff
 .cache
