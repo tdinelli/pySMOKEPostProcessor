@@ -31,7 +31,6 @@
 *.out
 *.app
 
-
 .idea/
 
 # Ignore visual studio stuff
@@ -39,31 +38,20 @@ project/bin/
 
 # Ignore python stuff
 __pycache__/
-provette.py
-project/myLINUX/
-pySMOKEPostProcessor/source/.deps/
-pySMOKEPostProcessor/source/.dirstamp
-.vscode/
 Test/
 .ipynb_checkpoints/
-pySMOKEPostProcessor/GraphWriterrrr.py
-pySMOKEPostProcessor/source/stuff_test.txt
+
 examples/Sensitivity/Output-02/Sensitivities.OME2.xml
 examples/Sensitivity/Output-02/Sensitivities.temperature.xml
 examples/roba/
-project/MyMac/
-project/lib/
-pySMOKEPostProcessor/maps/prova_kinMAP.py
 dist/
 build/
 pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
 examples-old
+
 compile_commands.json
+
 .DS_Store
 
-# ignore neovim stuff
 .cache
-
-# ignoring c_interface old just for sake of development
-c_interfaceold
