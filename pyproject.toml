@@ -1,0 +1,39 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "tomli; python_version < '3.11'",
+    "scikit-build>=0.16",
+    "pybind11>=2.10.1",
+    "cmake>=3.24",
+    "boost",
+    "eigen"
+]
+build-backend = "setuptools.build_meta"
+
+
+[tool.conda-lock]
+channels = ["conda-forge"]
+
+[project]
+name = "pySMOKEPostProcessor"
+version = "1.0.0"
+authors = [
+  { name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it" },
+  { name = "Edoardo Ramalli", email = "edoardo.ramalli@polimi.it" },
+  { name = "Luna Pratali Maffei", email = "lunapratali@polimi.it" },
+  { name = "Andrea Nobili", email = "andrea.nobili@polimi.it" }
+]
+maintainers = [
+  { name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it" },
+  { name = "Luna Pratali Maffei", email = "lunapratali@polimi.it" },
+]
+
+requires-python = ">=3.6"
+dependencies = ["numpy", "pandas", "matplotlib", "networkx", "pydot", "graphviz", "scipy", ]
+readme = "README.md"
+license = {file = "LICENSE.md"}
+
+[project.urls]
+Homepage = "https://www.opensmokepp.polimi.it/"
+Repository = "https://github.com/tdinelli/pySMOKEPostProcessor/tree/main"
