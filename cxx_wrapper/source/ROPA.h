@@ -1,8 +1,10 @@
 #ifndef ROPA_H
 #define ROPA_H
 
+// clang-format off
 #include "ProfilesDatabase.h"
 #include "PostProcessorFluxMap.h"
+// clang-format on
 
 class ROPA {
  public:
@@ -10,12 +12,12 @@ class ROPA {
 
   void SetDatabase(ProfilesDatabase* data);
 
-  void RateOfProductionAnalysis(const unsigned int number_of_reactions);
+  void RateOfProductionAnalysis(const unsigned int& number_of_reactions);
 
-  void RateOfProductionAnalysis2D(const unsigned int number_of_reactions,
-                                  const double local_x, const double local_z,
-                                  const double region_low_x, const double region_up_x,
-                                  const double region_low_z, const double region_up_z);
+  void RateOfProductionAnalysis2D(const unsigned int& number_of_reactions,
+                                  const double& local_x, const double& local_z,
+                                  const double& region_low_x, const double& region_up_x,
+                                  const double& region_low_z, const double& region_up_z);
 
   void MergePositiveAndNegativeBars(const std::vector<unsigned int>& positive_indices,
                                     const std::vector<unsigned int>& negative_indices,
@@ -26,61 +28,65 @@ class ROPA {
 
   void FluxAnalysis();
 
-  void GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates);
+  void GetReactionRates(const std::vector<unsigned int>& reaction_indices,
+                        const bool& sum_rates);
 
-  void GetFormationRates(std::string specie, std::string units, std::string type);
+  void GetFormationRates(const std::string& specie, const std::string& units,
+                         const std::string& type);
 
-  void SetKineticFolder(const std::string kineticFolder);
-
-  void SetOutputFolder(const std::string outputFolder);
-
-  void SetROPAType(const std::string kineticFolder);
-
-  void SetSpecies(const std::string kineticFolder);
-
-  void SetLocalValue(double localValue);
-
-  void SetLowerBound(double lowerBound);
-
-  void SetUpperBound(double upperBound);
-
-  void SetElement(const std::string element);
-
-  void SetThickness(const std::string thickness);
-
-  void SetFluxAnalysisType(const std::string type);
-
-  void SetWidth(const int width);
-
-  void SetDepth(const int depth);
-
-  void SetThreshold(const double threshold);
-
-  void SetThicknessLogScale(bool thicknesslogscale);
-
-  void SetLabelType(std::string type);
-
-  inline const std::vector<unsigned int>& reactions() const { return reactions_; };
-
-  inline const std::vector<double>& coefficients() const { return coefficients_; };
-
-  inline const std::vector<int>& indexFirstName() const { return indexFirstName_; };
-
-  inline const std::vector<int>& indexSecondName() const { return indexSecondName_; };
-
-  inline const std::vector<double>& computedThickness() const {
-    return computedThickness_;
+  void SetKineticFolder(const std::string& kineticFolder) {
+    kineticFolder_ = kineticFolder;
   };
 
-  inline const std::vector<double>& computedLabel() const { return computedLabel_; };
+  void SetOutputFolder(const std::string& outputFolder) { outputFolder_ = outputFolder; };
 
-  inline const std::vector<double>& formationRates() const { return formationRates_; };
+  void SetROPAType(const std::string& kineticFolder);
 
-  inline const std::vector<std::vector<double>>& reactionRates() const {
+  void SetSpecies(const std::string& species) { species_ = species; };
+
+  void SetLocalValue(const double& localValue) { localValue_ = localValue; };
+
+  void SetLowerBound(const double& lowerBound) { lowerBound_ = lowerBound; };
+
+  void SetUpperBound(const double& upperBound) { upperBound_ = upperBound; };
+
+  void SetElement(const std::string& element) { element_ = element; };
+
+  void SetThickness(const std::string& thickness);
+
+  void SetFluxAnalysisType(const std::string& type);
+
+  void SetWidth(const int& width) { width_ = width; };
+
+  void SetDepth(const int& depth) { depth_ = depth; };
+
+  void SetThreshold(const double& threshold) { threshold_ = threshold; };
+
+  void SetThicknessLogScale(const bool& thicknesslogscale) {
+    thicknesslogscale_ = thicknesslogscale;
+  };
+
+  void SetLabelType(const std::string& type);
+
+  const std::vector<unsigned int>& reactions() const { return reactions_; };
+
+  const std::vector<double>& coefficients() const { return coefficients_; };
+
+  const std::vector<int>& indexFirstName() const { return indexFirstName_; };
+
+  const std::vector<int>& indexSecondName() const { return indexSecondName_; };
+
+  const std::vector<double>& computedThickness() const { return computedThickness_; };
+
+  const std::vector<double>& computedLabel() const { return computedLabel_; };
+
+  const std::vector<double>& formationRates() const { return formationRates_; };
+
+  const std::vector<std::vector<double>>& reactionRates() const {
     return reactionRates_;
   };
 
-  inline const std::vector<double>& sumOfRates() const { return sumOfRates_; };
+  const std::vector<double>& sumOfRates() const { return sumOfRates_; };
 
  private:
   ProfilesDatabase* data_;

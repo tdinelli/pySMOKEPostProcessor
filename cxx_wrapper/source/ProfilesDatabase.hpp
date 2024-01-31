@@ -253,14 +253,14 @@ void ProfilesDatabase::Prepare() {
   }
 }
 
-void ProfilesDatabase::SpeciesCoarsening(const double threshold) {
+void ProfilesDatabase::SpeciesCoarsening(const double &threshold) {
   current_sorted_index.resize(0);
   for (unsigned int k = 0; k < string_list_massfractions_sorted.size(); k++)
     if (sorted_max[k] > threshold) current_sorted_index.push_back(k);
 }
 
 // 0-based
-void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index,
+void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int &index,
                                                     std::vector<unsigned int> &indices) {
   kineticsMapXML->stoichiometry().BuildStoichiometricMatrix();
 
@@ -284,7 +284,7 @@ void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index,
   std::sort(indices.begin(), indices.end());
 }
 
-void ProfilesDatabase::isReactantProduct(const unsigned int reaction_index,
+void ProfilesDatabase::isReactantProduct(const unsigned int &reaction_index,
                                          double &netStoichiometry) {
   kineticsMapXML->stoichiometry().BuildStoichiometricMatrix();
 

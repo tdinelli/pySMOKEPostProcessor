@@ -11,40 +11,41 @@ Sensitivities::Sensitivities() {
 
 Sensitivities::~Sensitivities() {}
 
-void Sensitivities::SetDatabase(ProfilesDatabase *data) { data_ = data; }
+void Sensitivities::SetDatabase(ProfilesDatabase* data) { data_ = data; }
 
-void Sensitivities::SetNormalizationType(std::string normalizationType) {
-  if (normalizationType != "local" && normalizationType != "max-value")
+void Sensitivities::SetNormalizationType(const std::string& normalizationType) {
+  if (normalizationType != "local" && normalizationType != "max-value") {
     throw std::invalid_argument("Available normalization types are: local | max-value");
-
+  }
   normalizationType_ = normalizationType;
   if (normalizationType_ == "local") iLocalNormalization = true;
 }
 
-void Sensitivities::SetSensitivityType(std::string sensitivityType) {
+void Sensitivities::SetSensitivityType(const std::string& sensitivityType) {
   if (sensitivityType != "global" && sensitivityType != "local" &&
-      sensitivityType != "region")
+      sensitivityType != "region") {
     throw std::invalid_argument(
         "Available sensitivity types are: global | local | region");
-
+  }
   sensitivityType_ = sensitivityType;
 }
 
-void Sensitivities::SetOrderingType(std::string orderingType) {
+void Sensitivities::SetOrderingType(const std::string& orderingType) {
   if (orderingType != "peak-values" && orderingType != "area" &&
-      orderingType != "absolute-area")
+      orderingType != "absolute-area") {
     throw std::invalid_argument(
         "Available sensitivity types are: peak-values | area | absolute-area");
+  }
   orderingType_ = orderingType;
 }
 
-void Sensitivities::SetTarget(std::string target) { target_ = target; }
+void Sensitivities::SetTarget(const std::string& target) { target_ = target; }
 
-void Sensitivities::SetLocalValue(double localValue) { localValue_ = localValue; }
+void Sensitivities::SetLocalValue(const double& localValue) { localValue_ = localValue; }
 
-void Sensitivities::SetLowerBound(double lowerBound) { lowerBound_ = lowerBound; }
+void Sensitivities::SetLowerBound(const double& lowerBound) { lowerBound_ = lowerBound; }
 
-void Sensitivities::SetUpperBound(double upperBound) { upperBound_ = upperBound; }
+void Sensitivities::SetUpperBound(const double& upperBound) { upperBound_ = upperBound; }
 
 void Sensitivities::Prepare() {
   sensitivities = new Sensitivities_Database();
@@ -62,7 +63,7 @@ void Sensitivities::Prepare() {
   }
 }
 
-void Sensitivities::Sensitivity_Analysis(const unsigned int number_of_reactions) {
+void Sensitivities::Sensitivity_Analysis(const unsigned int& number_of_reactions) {
   std::vector<int> indices;
   std::vector<double> coefficients;
 
@@ -207,12 +208,14 @@ void Sensitivities::Sensitivity_Analysis(const unsigned int number_of_reactions)
 }
 
 void Sensitivities::ReadSensitvityCoefficients() {
-  if (target_ == "") throw std::invalid_argument("Select a target!");
+  if (target_ == "") {
+    throw std::invalid_argument("Select a target!");
+  }
 
   sensitivities->ReadFromChildFile(target_);
 }
 
-void Sensitivities::GetSensitivityProfile(unsigned int reaction_index) {
+void Sensitivities::GetSensitivityProfile(const unsigned int& reaction_index) {
   std::string selected_y = target_;
   if (target_ == "") {
     throw std::invalid_argument("You have to select one of the available Y variables");

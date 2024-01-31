@@ -1,6 +1,8 @@
 #ifndef PROFILESDATABASE_H
 #define PROFILESDATABASE_H
 
+// TODO: This class needs major work in terms of private attributes
+
 class ProfilesDatabase {
  public:
   ProfilesDatabase(void);
@@ -12,7 +14,7 @@ class ProfilesDatabase {
 
   void Prepare();
 
-  void SpeciesCoarsening(const double threshold);
+  void SpeciesCoarsening(const double &threshold);
 
   int number_of_abscissas_;
   int number_of_ordinates_;
@@ -54,10 +56,11 @@ class ProfilesDatabase {
   boost::filesystem::path path_folder_results_;
   boost::filesystem::path path_folder_mechanism_;
 
-  void ReactionsAssociatedToSpecies(const unsigned int index,
+  void ReactionsAssociatedToSpecies(const unsigned int &index,
                                     std::vector<unsigned int> &indices);
 
-  void isReactantProduct(const unsigned int reaction_index, double &netStoichiometry);
+  void isReactantProduct(const unsigned int &reaction_index,
+                         double &netStoichiometry);
 
   std::string name_reactions_;
   std::vector<std::string> reaction_strings_;

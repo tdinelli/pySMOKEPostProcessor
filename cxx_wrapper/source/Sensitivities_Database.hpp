@@ -87,7 +87,7 @@ void Sensitivities_Database::ReadParentFile() {
   }
 }
 
-void Sensitivities_Database::ReadFromChildFile(const std::string name) {
+void Sensitivities_Database::ReadFromChildFile(const std::string &name) {
   std::string local_name = "Sensitivities." + name + ".xml";
   boost::property_tree::ptree ptree;
   try {
@@ -110,26 +110,29 @@ void Sensitivities_Database::ReadFromChildFile(const std::string name) {
     std::stringstream stream;
     stream.str(ptree.get<std::string>("opensmoke.coefficients"));
 
-    for (unsigned int i = 0; i < number_of_points_; i++)
-      for (unsigned int j = 0; j < number_of_parameters_; j++)
+    for (unsigned int i = 0; i < number_of_points_; i++) {
+      for (unsigned int j = 0; j < number_of_parameters_; j++) {
         stream >> coefficients_[j][i];
+      }
+    }
   }
 
-  for (unsigned int j = 0; j < number_of_variables_; j++)
+  for (unsigned int j = 0; j < number_of_variables_; j++) {
     if (names_[j] == name) {
       current_local_index_ = j;
       break;
     }
+  }
 
-  if (name == "temperature")
+  if (name == "temperature") {
     variable_ = data_->additional[data_->index_T];
-  else if (name == "density")
+  } else if (name == "density") {
     variable_ = data_->additional[data_->index_density];
-  else if (name == "velocity")
+  } else if (name == "velocity") {
     variable_ = data_->additional[data_->index_velocity];
-  else if (name == "mass-flow-rate")
+  } else if (name == "mass-flow-rate") {
     variable_ = data_->additional[data_->index_mass_flow_rate];
-  else {
+  } else {
     // recognizing the global index of species
     unsigned int species_index;
     for (unsigned int j = 0; j < data_->string_list_massfractions_sorted.size(); j++)
@@ -147,8 +150,8 @@ void Sensitivities_Database::ReadFromChildFile(const std::string name) {
 }
 
 // zero-based
-std::vector<double> Sensitivities_Database::NormalizedProfile(const unsigned int index,
-                                                              bool local_normalization) {
+std::vector<double> Sensitivities_Database::NormalizedProfile(
+    const unsigned int &index, const bool &local_normalization) {
   std::vector<double> profile = coefficients_[index];
   if (local_normalization == true) {
     const double local_threshold = 1.e-16;
@@ -176,9 +179,9 @@ std::vector<double> Sensitivities_Database::NormalizedProfile(const unsigned int
 }
 
 // zero-based
-double Sensitivities_Database::NormalizedProfile(const unsigned int index,
-                                                 bool local_normalization,
-                                                 unsigned int point) {
+double Sensitivities_Database::NormalizedProfile(const unsigned int &index,
+                                                 const bool &local_normalization,
+                                                 const unsigned int &point) {
   if (local_normalization == true) {
     const double local_threshold = 1.e-16;
 
@@ -203,11 +206,12 @@ double Sensitivities_Database::NormalizedProfile(const unsigned int index,
 void Sensitivities_Database::ReactionsReset() {
   // Fill the reaction indices
   current_coarse_index_.resize(number_of_parameters_);
-  for (unsigned int j = 0; j < number_of_parameters_; j++)
+  for (unsigned int j = 0; j < number_of_parameters_; j++) {
     current_coarse_index_[j] = j + 1;
+  }
 }
 
-void Sensitivities_Database::ReactionsCoarsening(const double threshold) {
+void Sensitivities_Database::ReactionsCoarsening(const double &threshold) {
   // Fill the reaction indices
   std::vector<unsigned int> total_indices(number_of_parameters_);
   for (unsigned int j = 0; j < number_of_parameters_; j++) total_indices[j] = j + 1;

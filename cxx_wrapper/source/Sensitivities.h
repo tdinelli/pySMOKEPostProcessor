@@ -10,40 +10,40 @@ class Sensitivities {
 
   ~Sensitivities();
 
-  void SetDatabase(ProfilesDatabase *data);
+  void SetDatabase(ProfilesDatabase* data);
 
-  void SetNormalizationType(std::string normalizationType);
+  void SetNormalizationType(const std::string& normalizationType);
 
-  void SetSensitivityType(std::string sensitivityType);
+  void SetSensitivityType(const std::string& sensitivityType);
 
-  void SetOrderingType(std::string orderingType);
+  void SetOrderingType(const std::string& orderingType);
 
-  void SetTarget(std::string target);
+  void SetTarget(const std::string& target);
 
-  void SetLocalValue(double localValue);
+  void SetLocalValue(const double& localValue);
 
-  void SetLowerBound(double lowerBound);
+  void SetLowerBound(const double& lowerBound);
 
-  void SetUpperBound(double upperBound);
+  void SetUpperBound(const double& upperBound);
 
   void Prepare();
 
-  void Sensitivity_Analysis(const unsigned int number_of_reactions);
+  void Sensitivity_Analysis(const unsigned int& number_of_reactions);
 
   void ReadSensitvityCoefficients();
 
-  void GetSensitivityProfile(unsigned int reaction_index);
+  void GetSensitivityProfile(const unsigned int& reaction_index);
 
-  inline const std::vector<unsigned int> &reactions() const { return reactions_; };
+  const std::vector<unsigned int>& reactions() const { return reactions_; };
 
-  inline const std::vector<double> &senitivityCoefficients() const {
+  const std::vector<double>& senitivityCoefficients() const {
     return sensitivity_coefficients_;
   };
 
  private:
-  ProfilesDatabase *data_;
+  ProfilesDatabase* data_;
 
-  Sensitivities_Database *sensitivities;
+  Sensitivities_Database* sensitivities;
 
   std::string normalizationType_;
   std::string sensitivityType_;

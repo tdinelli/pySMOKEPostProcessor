@@ -9,62 +9,35 @@ ROPA::ROPA() {
   lowerBound_ = 0;
 }
 
-void ROPA::SetKineticFolder(const std::string kineticFolder) {
-  kineticFolder_ = kineticFolder;
-}
-
-void ROPA::SetOutputFolder(const std::string outputFolder) {
-  outputFolder_ = outputFolder;
-}
-
-void ROPA::SetROPAType(const std::string ropaType) {
-  if (ropaType != "global" && ropaType != "local" && ropaType != "region")
+void ROPA::SetROPAType(const std::string& ropaType) {
+  if (ropaType != "global" && ropaType != "local" && ropaType != "region") {
     throw std::invalid_argument("Available ROPA types are: global | local | region");
+  }
   ropaType_ = ropaType;
 }
 
-void ROPA::SetSpecies(const std::string species) { species_ = species; }
-
-void ROPA::SetLocalValue(double localValue) { localValue_ = localValue; }
-
-void ROPA::SetLowerBound(double lowerBound) { lowerBound_ = lowerBound; }
-
-void ROPA::SetUpperBound(double upperBound) { upperBound_ = upperBound; }
-
-void ROPA::SetDatabase(ProfilesDatabase *data) { data_ = data; }
-
-void ROPA::SetElement(const std::string element) { element_ = element; }
-
-void ROPA::SetThickness(const std::string thickness) {
-  if (thickness != "absolute" && thickness != "relative")
+void ROPA::SetThickness(const std::string& thickness) {
+  if (thickness != "absolute" && thickness != "relative") {
     throw std::invalid_argument("Available thickness types are: absolute | relative(%)");
+  }
   thickness_ = thickness;
 }
 
-void ROPA::SetFluxAnalysisType(const std::string type) {
-  if (type != "production" && type != "destruction")
+void ROPA::SetFluxAnalysisType(const std::string& type) {
+  if (type != "production" && type != "destruction") {
     throw std::invalid_argument(
         "Available flux analysis types are: production | destruction");
+  }
   flux_type_ = type;
 }
-
-void ROPA::SetWidth(const int width) { width_ = width; }
-
-void ROPA::SetDepth(const int depth) { depth_ = depth; }
-
-void ROPA::SetThreshold(const double threshold) { threshold_ = threshold; }
-
-void ROPA::SetThicknessLogScale(bool thicknesslogscale) {
-  thicknesslogscale_ = thicknesslogscale;
-}
-
-void ROPA::SetLabelType(std::string type) {
-  if (type != "absolute" && type != "relative")
+void ROPA::SetLabelType(const std::string& type) {
+  if (type != "absolute" && type != "relative") {
     throw std::invalid_argument("Available label types are: absolute | relative(%)");
+  }
   label_type_ = type;
 }
 
-void ROPA::RateOfProductionAnalysis(const unsigned int number_of_reactions) {
+void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
   // Select y variables among the species
   if (std::find(data_->string_list_massfractions_sorted.begin(),
                 data_->string_list_massfractions_sorted.end(),
@@ -356,12 +329,12 @@ void ROPA::FluxAnalysis() {
   computedLabel_ = flux_analysis.ComputedLabelValue;
 }
 
-void ROPA::MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
-                                        const std::vector<unsigned int> &negative_indices,
-                                        const std::vector<double> &positive_coefficients,
-                                        const std::vector<double> &negative_coefficients,
-                                        std::vector<int> &indices,
-                                        std::vector<double> &coefficients) {
+void ROPA::MergePositiveAndNegativeBars(const std::vector<unsigned int>& positive_indices,
+                                        const std::vector<unsigned int>& negative_indices,
+                                        const std::vector<double>& positive_coefficients,
+                                        const std::vector<double>& negative_coefficients,
+                                        std::vector<int>& indices,
+                                        std::vector<double>& coefficients) {
   unsigned int n = positive_indices.size() + negative_indices.size();
 
   std::vector<int> signum(n);
@@ -395,8 +368,8 @@ void ROPA::MergePositiveAndNegativeBars(const std::vector<unsigned int> &positiv
     }
 }
 
-void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices,
-                            const bool sum_rates) {
+void ROPA::GetReactionRates(const std::vector<unsigned int>& reaction_indices,
+                            const bool& sum_rates) {
   unsigned int numberOfReactions = reaction_indices.size();
   // Calculate the reaction rates
   {
@@ -458,7 +431,8 @@ void ROPA::GetReactionRates(std::vector<unsigned int> reaction_indices,
   }
 }
 
-void ROPA::GetFormationRates(std::string specie, std::string units, std::string type) {
+void ROPA::GetFormationRates(const std::string& specie, const std::string& units,
+                             const std::string& type) {
   if (units != "mass" && units != "mole")
     throw std::invalid_argument("Available Formation Rates units are: mole | mass");
 
@@ -466,7 +440,7 @@ void ROPA::GetFormationRates(std::string specie, std::string units, std::string 
   // several species at the same time now let's stay simple one at the time
   // Select y variables among the species
   OpenSMOKE::OpenSMOKEVector<unsigned int> formation_rates_to_plot;
-  std::string selected_species = specie;
+  const std::string selected_species = specie;
 
   {
     unsigned int n_selected_species = 1;
@@ -548,10 +522,12 @@ void ROPA::GetFormationRates(std::string specie, std::string units, std::string 
   }
 }
 
-void ROPA::RateOfProductionAnalysis2D(const unsigned int number_of_reactions,
-                                      double local_x, double local_z, double region_low_x,
-                                      double region_up_x, double region_low_z,
-                                      double region_up_z) {
+void ROPA::RateOfProductionAnalysis2D(const unsigned int& number_of_reactions,
+                                      const double& local_x, const double& local_z,
+                                      const double& region_low_x,
+                                      const double& region_up_x,
+                                      const double& region_low_z,
+                                      const double& region_up_z) {
   // This function is totally inefficent and by far the worst code I have evere written
   // Select y variables among the species
   if (std::find(data_->string_list_massfractions_sorted.begin(),
