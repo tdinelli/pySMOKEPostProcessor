@@ -2,35 +2,35 @@ add_subdirectory(source)
 
 get_property(CXX_INCLUDES GLOBAL PROPERTY CXX_INCLUDES_PROP)
 
-pybind11_add_module(${PROJECT_NAME} SHARED
+pybind11_add_module(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}/PostProcessorWrapper_py.cpp
 )
 
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC
-        Eigen3::Eigen
-        Boost::date_time
-        Boost::filesystem
-        Boost::program_options
-        Boost::system
-        Boost::regex
-        Boost::timer
-        Boost::chrono
+    Eigen3::Eigen
+    Boost::date_time
+    Boost::filesystem
+    Boost::program_options
+    Boost::system
+    Boost::regex
+    Boost::timer
+    Boost::chrono
 )
 
 target_include_directories(
     ${PROJECT_NAME}
     PUBLIC
-        ${OPENSMOKE_INCLUDE_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}
+    ${OPENSMOKE_INCLUDE_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/source
 )
 
 target_compile_options(${PROJECT_NAME}
     PRIVATE
-        -Wno-unused-value
-        -Wno-mismatched-new-delete
-        -Wno-switch
+    -Wno-unused-value
+    -Wno-mismatched-new-delete
+    -Wno-switch
 )
 
 # --------------------------------------------------------------------

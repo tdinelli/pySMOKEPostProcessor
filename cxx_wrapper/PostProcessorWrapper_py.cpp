@@ -1,13 +1,13 @@
 // clang-format off
 #include "PostProcessorWrapper_py.h"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
 #include "source/ProfilesDatabase.h"
 #include "source/ROPA.h"
 #include "source/Sensitivities.h"
 // clang-format on
+
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
 constexpr auto byref = py::return_value_policy::reference_internal;
@@ -105,4 +105,11 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m) {
            py::call_guard<py::gil_scoped_release>())
       .def("sensitivityCoefficients", &Sensitivities::senitivityCoefficients,
            py::call_guard<py::gil_scoped_release>());
+
+#ifdef VERSION_INFO
+  m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+  m.attr("__version__") = "dev";
+#endif
+
 }

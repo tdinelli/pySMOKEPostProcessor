@@ -10,7 +10,7 @@ class ROPA {
  public:
   ROPA();
 
-  void SetDatabase(ProfilesDatabase* data);
+  void SetDatabase(ProfilesDatabase* data) { data_ = data; };
 
   void RateOfProductionAnalysis(const unsigned int& number_of_reactions);
 
