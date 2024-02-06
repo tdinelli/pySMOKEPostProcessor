@@ -1,39 +1,52 @@
+# For the details see: https://github.com/pybind/cmake_example/blob/master/pyproject.toml
+[project]
+name = "pySMOKEPostProcessor"
+version = "0.0.1"
+authors = [
+    {name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it"},
+    {name = "Luna Pratali Maffei", email = "lpratali@polimi.it"},
+    {name = "Edoardo Ramalli", email = "edoardo.ramalli@polimi.it"},
+    {name = "Andrea Nobili", email = "andrea.nobili@polimi.it"},
+]
+maintainers = [
+    {name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it"},
+    {name = "Luna Pratali Maffei", email = "lpratali@polimi.it"},
+]
+description="Python wapper to the OpenSMOKEpp Graphical Post Processor"
+readme = "README.md"
+license = {file = "LICENSE.md"}
+dependencies = ["numpy", "pandas", "matplotlib", "networkx", "pydot", "graphviz", "scipy",]
+requires-python = ">= 3.8"
+
+[project.urls]
+Homepage = "https://creckmodeling.chem.polimi.it/"
+Repository = "https://github.com/Titodinelli/pySMOKEPostProcessor"
+Issues = "https://github.com/tdinelli/pySMOKEPostProcessor/issues"
+# Documentation = "" TODO
+# Changelog = "" Worth add this in the future to keep track of the changelogs
+
 [build-system]
 requires = [
     "setuptools>=42",
     "wheel",
-    "tomli; python_version < '3.11'",
-    "scikit-build>=0.16",
-    "pybind11>=2.10.1",
-    "cmake>=3.24",
-    "boost",
-    "eigen"
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+include-package-data = true
 
-[tool.conda-lock]
-channels = ["conda-forge"]
+[tool.setuptools.packages.find]
+# include = ["sepal_ui*"]
+exclude = ["docs*", "tests*", "Test*", "external*", "doc*"]
 
-[project]
-name = "pySMOKEPostProcessor"
-version = "1.0.0"
-authors = [
-  { name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it" },
-  { name = "Edoardo Ramalli", email = "edoardo.ramalli@polimi.it" },
-  { name = "Luna Pratali Maffei", email = "lunapratali@polimi.it" },
-  { name = "Andrea Nobili", email = "andrea.nobili@polimi.it" }
-]
-maintainers = [
-  { name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it" },
-  { name = "Luna Pratali Maffei", email = "lunapratali@polimi.it" },
-]
+[tool.mypy]
+files = "setup.py"
+python_version = "3.8"
+strict = true
+show_error_codes = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+warn_unreachable = true
 
-requires-python = ">=3.6"
-dependencies = ["numpy", "pandas", "matplotlib", "networkx", "pydot", "graphviz", "scipy", ]
-readme = "README.md"
-license = {file = "LICENSE.md"}
-
-[project.urls]
-Homepage = "https://www.opensmokepp.polimi.it/"
-Repository = "https://github.com/tdinelli/pySMOKEPostProcessor/tree/main"
+[[tool.mypy.overrides]]
+module = ["ninja"]
+ignore_missing_imports = true
