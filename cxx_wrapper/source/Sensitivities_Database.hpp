@@ -37,7 +37,9 @@ void Sensitivities_Database::ReadParentFile() {
     std::stringstream stream;
     stream.str(xml_main_input.get<std::string>("opensmoke.constant-parameters"));
 
-    for (unsigned int j = 0; j < number_of_parameters_; j++) stream >> parameters_[j];
+    for (unsigned int j = 0; j < number_of_parameters_; j++) {
+      stream >> parameters_[j];
+    }
   }
 
   {
@@ -142,10 +144,11 @@ void Sensitivities_Database::ReadFromChildFile(const std::string &name) {
       }
 
     // from mass to mole fractions
-    for (unsigned int i = 0; i < number_of_points_; i++)
+    for (unsigned int i = 0; i < number_of_points_; i++) {
       variable_[i] = data_->omega[species_index][i] *
                      data_->additional[data_->index_MW][i] /
                      data_->mw_species_[species_index];
+    }
   }
 }
 
@@ -163,16 +166,22 @@ std::vector<double> Sensitivities_Database::NormalizedProfile(
         profile[i] = 0.;
   } else {
     double normalization_coefficient = -1.e100;
-    for (unsigned int i = 0; i < number_of_points_; i++)
-      if (fabs(variable_[i]) > normalization_coefficient)
+    for (unsigned int i = 0; i < number_of_points_; i++) {
+      if (fabs(variable_[i]) > normalization_coefficient) {
         normalization_coefficient = fabs(variable_[i]);
+      }
+    }
 
     const double normalization_coefficient_threshold = 1.e-100;
-    if (normalization_coefficient > normalization_coefficient_threshold)
-      for (unsigned int i = 0; i < number_of_points_; i++)
+    if (normalization_coefficient > normalization_coefficient_threshold) {
+      for (unsigned int i = 0; i < number_of_points_; i++) {
         profile[i] *= parameters_[index] / normalization_coefficient;
-    else
-      for (unsigned int i = 0; i < number_of_points_; i++) profile[i] = 0.;
+      }
+    } else {
+      for (unsigned int i = 0; i < number_of_points_; i++) {
+        profile[i] = 0.;
+      }
+    }
   }
 
   return profile;
@@ -185,21 +194,25 @@ double Sensitivities_Database::NormalizedProfile(const unsigned int &index,
   if (local_normalization == true) {
     const double local_threshold = 1.e-16;
 
-    if (fabs(variable_[point]) > local_threshold)
+    if (fabs(variable_[point]) > local_threshold) {
       return coefficients_[index][point] * parameters_[index] / variable_[point];
-    else
+    } else {
       return 0.;
+    }
   } else {
     double normalization_coefficient = -1e100;
-    for (unsigned int i = 0; i < number_of_points_; i++)
-      if (fabs(variable_[i]) > normalization_coefficient)
+    for (unsigned int i = 0; i < number_of_points_; i++) {
+      if (fabs(variable_[i]) > normalization_coefficient) {
         normalization_coefficient = fabs(variable_[i]);
+      }
+    }
 
     const double normalization_coefficient_threshold = 1.e-100;
-    if (normalization_coefficient > normalization_coefficient_threshold)
+    if (normalization_coefficient > normalization_coefficient_threshold) {
       return coefficients_[index][point] * parameters_[index] / normalization_coefficient;
-    else
+    } else {
       return 0.;
+    }
   }
 }
 
@@ -214,7 +227,9 @@ void Sensitivities_Database::ReactionsReset() {
 void Sensitivities_Database::ReactionsCoarsening(const double &threshold) {
   // Fill the reaction indices
   std::vector<unsigned int> total_indices(number_of_parameters_);
-  for (unsigned int j = 0; j < number_of_parameters_; j++) total_indices[j] = j + 1;
+  for (unsigned int j = 0; j < number_of_parameters_; j++) {
+    total_indices[j] = j + 1;
+  }
 
   // Evaluates the coefficients
   std::vector<double> total_coefficients(number_of_parameters_);
@@ -224,11 +239,12 @@ void Sensitivities_Database::ReactionsCoarsening(const double &threshold) {
 
     double max_value = -1.e100;
     unsigned int max_index = 0;
-    for (unsigned int i = 0; i < data_->number_of_abscissas_; i++)
+    for (unsigned int i = 0; i < data_->number_of_abscissas_; i++) {
       if (fabs(profile[i]) > max_value) {
         max_value = fabs(profile[i]);
         max_index = i;
       }
+    }
     total_coefficients[j] = profile[max_index];
   }
 
@@ -240,10 +256,11 @@ void Sensitivities_Database::ReactionsCoarsening(const double &threshold) {
   current_coarse_index_.resize(0);
   if (fabs(coefficients[0]) > 0.) {
     for (unsigned int j = 0; j < number_of_parameters_; j++) {
-      if (fabs(coefficients[j]) / fabs(coefficients[0]) > threshold)
+      if (fabs(coefficients[j]) / fabs(coefficients[0]) > threshold) {
         current_coarse_index_.push_back(indices[j]);
-      else
+      } else {
         break;
+      }
     }
   }
 }

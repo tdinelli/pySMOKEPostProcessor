@@ -468,8 +468,9 @@ void ROPA::GetFormationRates(const std::string& specie, const std::string& units
 
     for (unsigned int i = 0; i < data_->number_of_abscissas_; i++) {
       // Recovers mass fractions
-      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++) {
         omega[k + 1] = data_->omega[k][i];
+      }
 
       // Calculates mole fractions
       double MWmix;
@@ -507,16 +508,17 @@ void ROPA::GetFormationRates(const std::string& specie, const std::string& units
         }
 
         const unsigned k = data_->sorted_index[formation_rates_to_plot[1]] + 1;
-        if (type == "net")
+        if (type == "net") {
           formationRates_[i] = P[k] - D[k];
-        else if (type == "production")
+        } else if (type == "production") {
           formationRates_[i] = P[k];
-        else if (type == "destruction")
+        } else if (type == "destruction") {
           formationRates_[i] = D[k];
-        else
+        } else {
           throw std::invalid_argument(
               "Available Formation Rates types are: net | production | destruction | "
               "characteristic-time");
+        }
       }
     }
   }
@@ -565,8 +567,9 @@ void ROPA::RateOfProductionAnalysis2D(const unsigned int& number_of_reactions,
       }
     }
     // Recovers mass fractions
-    for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+    for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++) {
       omega[k + 1] = data_->omega[k][index];
+    }
 
     // Calculates mole fractions
     double MWmix;
@@ -597,8 +600,7 @@ void ROPA::RateOfProductionAnalysis2D(const unsigned int& number_of_reactions,
                                  ropa.production_coefficients[index_of_species],
                                  ropa.destruction_coefficients[index_of_species],
                                  reaction_indices, reaction_coefficients);
-  }  // Region
-  else if (ropaType_ == "region") {
+  } else if (ropaType_ == "region") {  // Region
     std::vector<double> global_production_coefficients;
     std::vector<double> global_destruction_coefficients;
     std::vector<unsigned int> global_production_reaction_indices;
@@ -745,8 +747,7 @@ void ROPA::RateOfProductionAnalysis2D(const unsigned int& number_of_reactions,
         global_production_reaction_indices, global_destruction_reaction_indices,
         global_production_coefficients, global_destruction_coefficients, reaction_indices,
         reaction_coefficients);
-  } else  // Global
-  {
+  } else {  // Global
     double tmp = 0;
     unsigned int index_min = 0;
     unsigned int index_max = data_->number_of_abscissas_;

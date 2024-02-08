@@ -59,8 +59,7 @@ class ProfilesDatabase {
   void ReactionsAssociatedToSpecies(const unsigned int &index,
                                     std::vector<unsigned int> &indices);
 
-  void isReactantProduct(const unsigned int &reaction_index,
-                         double &netStoichiometry);
+  void isReactantProduct(const unsigned int &reaction_index, double &netStoichiometry);
 
   std::string name_reactions_;
   std::vector<std::string> reaction_strings_;
