@@ -23,7 +23,7 @@ Homepage = "https://creckmodeling.chem.polimi.it/"
 Repository = "https://github.com/Titodinelli/pySMOKEPostProcessor"
 Issues = "https://github.com/tdinelli/pySMOKEPostProcessor/issues"
 # Documentation = "" TODO
-# Changelog = "" Worth add this in the future to keep track of the changelogs
+# Changelog = "" Worth add this in the future to keep track of the changes
 
 [build-system]
 requires = [
@@ -36,8 +36,7 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-# include = ["sepal_ui*"]
-exclude = ["docs*", "tests*", "Test*", "external*", "doc*"]
+exclude = ["docs*", "tests*", "Test*", "external*", "doc*", "__pycache__", "__pycache__*"]
 
 [tool.mypy]
 files = "setup.py"

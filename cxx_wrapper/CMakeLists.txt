@@ -1,7 +1,3 @@
-add_subdirectory(source)
-
-get_property(CXX_INCLUDES GLOBAL PROPERTY CXX_INCLUDES_PROP)
-
 pybind11_add_module(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}/PostProcessorWrapper_py.cpp
 )
@@ -22,7 +18,7 @@ target_link_libraries(
 target_include_directories(
     ${PROJECT_NAME}
     PUBLIC
-    ${OPENSMOKE_INCLUDE_DIR}
+    ${OPENSMOKE_INCLUDE}
     ${CMAKE_CURRENT_LIST_DIR}/source
 )
 

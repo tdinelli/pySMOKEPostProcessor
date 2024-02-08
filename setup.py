@@ -1,4 +1,5 @@
-# For the details see: https://github.com/pybind/cmake_example/blob/master/setup.py
+# For the details see:
+# https://github.com/pybind/cmake_example/blob/master/setup.py
 import os
 import re
 import subprocess
@@ -50,7 +51,6 @@ class CMakeBuild(build_ext):
         # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
-        # print("CIAO TITOTTTTTT", f"-D CMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}{"pySMOKEPostProcessor"}")
         cmake_args = [
             f"-D CMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}{"pySMOKEPostProcessor"}",
             f"-D CMAKE_CXX_COMPILER:PATH={os.environ["CXX"]}",
@@ -137,13 +137,14 @@ class CMakeBuild(build_ext):
 
 
 # The information here can also be placed in setup.cfg - better separation of
-# logic and declaration, and simpler if you include description/version in a file.
-# packages=find_packages(exclude=["__pycache__"]),
+# logic and declaration, and simpler if you include description/version in a
+# file.
 excludes = ["tests", "tests.*", "examples", "examples.*", "Test/",
-            "docs", "docs.*", "devtools", "devtools.*", "__pycache__/"]
+            "docs", "docs.*", "devtools", "devtools.*", "__pycache__",
+            "__pycache__/", "__pycache__*"]
 setup(
     name="pySMOKEPostProcessor",
-    version="0.0.1",
+    version="0.2.0",
     author="Timoteo Dinelli",
     packages=find_packages(where=".", exclude=excludes),
     include_package_data=True,

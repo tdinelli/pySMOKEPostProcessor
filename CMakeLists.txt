@@ -1,21 +1,18 @@
 #--------------------------------------------------------------------
 # Preliminary Settings
 #--------------------------------------------------------------------
-
 cmake_minimum_required (VERSION 3.16)
 
 project (pySMOKEPostProcessor
     DESCRIPTION
-    "Python interface of the OpenSMOKEpp Graphical Post Processor"
+    "Python wrapper of the OpenSMOKEpp Graphical Post Processor"
     LANGUAGES
     CXX
 )
 
-
 # --- install location
 # Not super sure about this
 set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor")
-message(STATUS "Install location: ${CMAKE_INSTALL_PREFIX}")
 
 # --- Set module path in order to use custom CMake modules
 set (CMAKE_COLOR_MAKEFILE ON)
@@ -58,9 +55,6 @@ find_package (Eigen3 REQUIRED)
 # to ease the installation of the python package
 include(cmake/UpdateSubmodules.cmake)
 add_subdirectory(external)
-
-# --- OpenSMOKEpp: We are using submodules just to handle the cloning
-find_package(OpenSMOKEpp REQUIRED)
 
 #--------------------------------------------------------------------
 # Source code subdirectories
