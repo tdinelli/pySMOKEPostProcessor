@@ -57,6 +57,7 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
     }
   }
 
+    std::cout << "Index of species: " << index_of_species << std::endl;
   OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
@@ -74,8 +75,9 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
       }
     }
     // Recovers mass fractions
-    for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+    for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++) {
       omega[k + 1] = data_->omega[k][index];
+    }
 
     // Calculates mole fractions
     double MWmix;
@@ -106,8 +108,7 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
                                  ropa.production_coefficients[index_of_species],
                                  ropa.destruction_coefficients[index_of_species],
                                  reaction_indices, reaction_coefficients);
-  }  // Global | Region
-  else {
+  } else {              // Global | Region
     unsigned int index_min = 0;
     unsigned int index_max = data_->number_of_abscissas_ - 1;
     if (ropaType_ == "region") {
@@ -117,17 +118,20 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
           break;
         }
       }
+
       for (unsigned int j = index_min; j < data_->number_of_abscissas_; j++) {
         if (data_->additional[0][j] >= upperBound_) {
           index_max = j;
           break;
         }
       }
+
       if (index_min == index_max) {
-        if (index_max == data_->number_of_abscissas_ - 1)
+        if (index_max == data_->number_of_abscissas_ - 1){
           index_min = index_max - 1;
-        else
-          index_max = index_min + 1;
+                }
+        else{
+          index_max = index_min + 1;}
       }
     }
 
@@ -141,8 +145,8 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
 
     for (unsigned int j = index_min; j < index_max - 1; j++) {
       // Recovers mass fractions
-      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
-        omega[k + 1] = data_->omega[k][j];
+      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)    {
+        omega[k + 1] = data_->omega[k][j];}
 
       // Calculates mole fractions
       double MWmix;
@@ -187,21 +191,20 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
       }
 
       const double dt = (data_->additional[0][j + 1] - data_->additional[0][j]) / delta;
-      for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size();
-           k++)
-        global_production_coefficients[k] +=
-            dt * ropa.production_coefficients[index_of_species][k];
+      for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size(); k++){
+        global_production_coefficients[k] += dt * ropa.production_coefficients[index_of_species][k];
+                }
 
-      for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size();
-           k++)
-        global_destruction_coefficients[k] +=
-            dt * ropa.destruction_coefficients[index_of_species][k];
+      for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++){
+        global_destruction_coefficients[k] += dt * ropa.destruction_coefficients[index_of_species][k];
+    }
     }
 
-    MergePositiveAndNegativeBars(
-        global_production_reaction_indices, global_destruction_reaction_indices,
-        global_production_coefficients, global_destruction_coefficients, reaction_indices,
-        reaction_coefficients);
+    MergePositiveAndNegativeBars(global_production_reaction_indices,
+                                 global_destruction_reaction_indices,
+                                 global_production_coefficients,
+                                 global_destruction_coefficients, reaction_indices,
+                                 reaction_coefficients);
   }
 
   coefficients_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
