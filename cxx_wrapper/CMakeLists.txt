@@ -29,6 +29,11 @@ target_compile_options(${PROJECT_NAME}
     -Wno-switch
 )
 
+target_compile_definitions(${PROJECT_NAME}
+    PUBLIC
+    VERSION_INFO=${EXAMPLE_VERSION_INFO}
+)
+
 # --------------------------------------------------------------------
 # Installing options
 # --------------------------------------------------------------------

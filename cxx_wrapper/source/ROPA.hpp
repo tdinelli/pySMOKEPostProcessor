@@ -57,7 +57,6 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
     }
   }
 
-    std::cout << "Index of species: " << index_of_species << std::endl;
   OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
@@ -108,7 +107,7 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
                                  ropa.production_coefficients[index_of_species],
                                  ropa.destruction_coefficients[index_of_species],
                                  reaction_indices, reaction_coefficients);
-  } else {              // Global | Region
+  } else {  // Global | Region
     unsigned int index_min = 0;
     unsigned int index_max = data_->number_of_abscissas_ - 1;
     if (ropaType_ == "region") {
@@ -127,11 +126,11 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
       }
 
       if (index_min == index_max) {
-        if (index_max == data_->number_of_abscissas_ - 1){
+        if (index_max == data_->number_of_abscissas_ - 1) {
           index_min = index_max - 1;
-                }
-        else{
-          index_max = index_min + 1;}
+        } else {
+          index_max = index_min + 1;
+        }
       }
     }
 
@@ -145,8 +144,9 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
 
     for (unsigned int j = index_min; j < index_max - 1; j++) {
       // Recovers mass fractions
-      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)    {
-        omega[k + 1] = data_->omega[k][j];}
+      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++) {
+        omega[k + 1] = data_->omega[k][j];
+      }
 
       // Calculates mole fractions
       double MWmix;
@@ -191,20 +191,23 @@ void ROPA::RateOfProductionAnalysis(const unsigned int& number_of_reactions) {
       }
 
       const double dt = (data_->additional[0][j + 1] - data_->additional[0][j]) / delta;
-      for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size(); k++){
-        global_production_coefficients[k] += dt * ropa.production_coefficients[index_of_species][k];
-                }
+      for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size();
+           k++) {
+        global_production_coefficients[k] +=
+            dt * ropa.production_coefficients[index_of_species][k];
+      }
 
-      for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++){
-        global_destruction_coefficients[k] += dt * ropa.destruction_coefficients[index_of_species][k];
-    }
+      for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size();
+           k++) {
+        global_destruction_coefficients[k] +=
+            dt * ropa.destruction_coefficients[index_of_species][k];
+      }
     }
 
-    MergePositiveAndNegativeBars(global_production_reaction_indices,
-                                 global_destruction_reaction_indices,
-                                 global_production_coefficients,
-                                 global_destruction_coefficients, reaction_indices,
-                                 reaction_coefficients);
+    MergePositiveAndNegativeBars(
+        global_production_reaction_indices, global_destruction_reaction_indices,
+        global_production_coefficients, global_destruction_coefficients, reaction_indices,
+        reaction_coefficients);
   }
 
   coefficients_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
@@ -303,11 +306,17 @@ void ROPA::FluxAnalysis() {
   bool relativethickness = false;
   bool labelrelative = false;
 
-  if (flux_type_ == "destruction") destruction = true;
+  if (flux_type_ == "destruction") {
+    destruction = true;
+  }
 
-  if (thickness_ == "relative") relativethickness = true;
+  if (thickness_ == "relative") {
+    relativethickness = true;
+  }
 
-  if (label_type_ == "relative") labelrelative = true;
+  if (label_type_ == "relative") {
+    labelrelative = true;
+  }
 
   flux_analysis.SetDestructionAnalysis(destruction);
   flux_analysis.SetNormalThickness(relativethickness);
@@ -377,8 +386,7 @@ void ROPA::GetReactionRates(const std::vector<unsigned int>& reaction_indices,
   // Calculate the reaction rates
   {
     sumOfRates_.resize(data_->number_of_abscissas_);
-    reactionRates_.resize(numberOfReactions,
-                          std::vector<double>(data_->number_of_abscissas_, 1));
+    reactionRates_.resize(numberOfReactions, std::vector<double>(data_->number_of_abscissas_, 1));
 
     OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
     OpenSMOKE::OpenSMOKEVectorDouble omega(
@@ -388,8 +396,9 @@ void ROPA::GetReactionRates(const std::vector<unsigned int>& reaction_indices,
 
     for (unsigned int i = 0; i < data_->number_of_abscissas_; i++) {
       // Recovers mass fractions
-      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
+      for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++) {
         omega[k + 1] = data_->omega[k][i];
+      }
 
       // Calculate mole fractions
       double MWmix;
@@ -408,25 +417,20 @@ void ROPA::GetReactionRates(const std::vector<unsigned int>& reaction_indices,
       data_->thermodynamicsMapXML->SetTemperature(T);
       data_->thermodynamicsMapXML->SetPressure(P_Pa);
 
-      // data_->kineticsMapXML->KineticConstants();
+      data_->kineticsMapXML->KineticConstants();
       data_->kineticsMapXML->ReactionRates(c.GetHandle());
       data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
 
       if (sum_rates) {
         double sum_rate = 0.;
         for (unsigned int k = 0; k < numberOfReactions; k++) {
-          double multiplication_factor = 1;
-          // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
           const unsigned int j = reaction_indices[k] + 1;
-          sum_rate += multiplication_factor * r[j];
+          sum_rate += r[j];
         }
         sumOfRates_[i] = sum_rate;
       } else {
         for (unsigned int k = 0; k < numberOfReactions; k++) {
-          double multiplication_factor = 1;
-          // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
           const unsigned int j = reaction_indices[k] + 1;
-          // reactionRates_[k][i] = multiplication_factor * r[j];
           reactionRates_[k][i] = r[j];
         }
       }
