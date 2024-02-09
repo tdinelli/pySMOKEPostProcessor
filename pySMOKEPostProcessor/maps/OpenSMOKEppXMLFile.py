@@ -1,4 +1,6 @@
 '''
+Dev NOTES: I am thinking of removing this class and kineticMap class in the same folder in favour of
+          OpenSMOKEpp_Interfaces package keep in mind this in case of future refactoring.
 MODULE: OpenSMOKEppXMLFile
 @Authors:
     Alberto Cuoci [1], Timoteo Dinelli[1]

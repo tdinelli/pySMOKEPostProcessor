@@ -1,7 +1,7 @@
 # For the details see: https://github.com/pybind/cmake_example/blob/master/pyproject.toml
 [project]
 name = "pySMOKEPostProcessor"
-version = "0.0.1"
+version = "0.2.0"
 authors = [
     {name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it"},
     {name = "Luna Pratali Maffei", email = "lpratali@polimi.it"},
@@ -22,8 +22,6 @@ requires-python = ">= 3.8"
 Homepage = "https://creckmodeling.chem.polimi.it/"
 Repository = "https://github.com/Titodinelli/pySMOKEPostProcessor"
 Issues = "https://github.com/tdinelli/pySMOKEPostProcessor/issues"
-# Documentation = "" TODO
-# Changelog = "" Worth add this in the future to keep track of the changes
 
 [build-system]
 requires = [

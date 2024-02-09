@@ -38,9 +38,9 @@ class CMakeBuild(build_ext):
         # Using this requires trailing slash for auto-detection & inclusion of
         # auxiliary "native" libs
 
-        debug = int(os.environ.get("DEBUG", 0)
-                    ) if self.debug is None else self.debug
-        # TODO
+        debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
+
+        # TODO: Add this option
         cfg = "Debug" if debug else "Release"
         cfg = "Release"
 
@@ -52,21 +52,19 @@ class CMakeBuild(build_ext):
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            f"-D CMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}{"pySMOKEPostProcessor"}",
-            f"-D CMAKE_CXX_COMPILER:PATH={os.environ["CXX"]}",
-            f"-D Boost_ROOT:PATH={os.environ["Boost_ROOT"]}",
-            f"-D Eigen3_DIR:PATH={os.environ["Eigen3_ROOT"]}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}{"pySMOKEPostProcessor"}",
+            f"-DCMAKE_CXX_COMPILER:PATH={os.environ["CXX"]}",
+            f"-DBoost_ROOT:PATH={os.environ["Boost_ROOT"]}",
+            f"-DEigen3_DIR:PATH={os.environ["Eigen3_ROOT"]}",
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
         # (needed e.g. to build for ARM OSx on conda-forge)
         if "CMAKE_ARGS" in os.environ:
-            cmake_args += [
-                item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
+            cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
         # In this example, we pass in the version to C++. You might not need to.
-        cmake_args += [f"-DEXAMPLE_VERSION_INFO={
-            self.distribution.get_version()}"]
+        cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -81,16 +79,14 @@ class CMakeBuild(build_ext):
                     ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
                     cmake_args += [
                         "-GNinja",
-                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={
-                            ninja_executable_path}",
+                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
                     ]
                 except ImportError:
                     pass
 
         else:
             # Single config generators are handled "normally"
-            single_config = any(
-                x in cmake_generator for x in {"NMake", "Ninja"})
+            single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
 
             # CMake allows an arch-in-generator style for backward compatibility
             contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
@@ -112,8 +108,7 @@ class CMakeBuild(build_ext):
             # Cross-compile support for macOS - respect ARCHFLAGS if set
             archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
             if archs:
-                cmake_args += [
-                    "-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
+                cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.

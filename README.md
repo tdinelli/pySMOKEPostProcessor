@@ -25,9 +25,14 @@ The [examples](examples) folder contains a collection of [notebooks](examples/no
 
 The detail explanation on how to build and install the package can be found inside the relative [documentation](docs/INSTALL.md).
 
+# TODO URGENT
+- Pandas deprecation.
+
 # Not Working
 - ROPA by mass
 - Reaction rate by class
+- FDI
+- CumulativeRates
 
 # LICENSE
 

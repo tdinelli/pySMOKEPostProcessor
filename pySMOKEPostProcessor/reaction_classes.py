@@ -1,33 +1,62 @@
 import pandas as pd
 import numpy as np
 import copy
-from operator import add, neg
 
 from .reaction_classes_utilities.reaction_classes_groups import ReadReactionsGroups
 from .reaction_classes_utilities.reaction_classes_calc import reaction_classes_assign
 from .reaction_classes_utilities.reaction_classes_calc import reaction_fluxes
 
 
+# def assignclass(kinmap, classes_definition):
+#     """
+#     read the kinetic mechanism and assign classes if available
+#     kinmap: kinetic map already processed
+#     """
+#
+#     kinmap.Classes()
+#     reactions_all = []
+#     for i in range(kinmap.NumberOfReactions):
+#         reaction = {
+#             'index': i+1,
+#             'name': kinmap.reaction_names[i],
+#             'class': kinmap.rxnclass[i+1],
+#             'reactiontype': kinmap.rxnsubclass[i+1]
+#         }
+#         reactions_all.append(reaction)
+#
+#     # parse classes
+#     _, subcl_grp_dct = ReadReactionsGroups(classes_definition)
+#     # sort
+#     rxns_sorted = reaction_classes_assign(reactions_all, verbose=False)
+#     rxns_sorted.assign_class_grp(subcl_grp_dct)
+#
+#     return rxns_sorted, reactions_all
 def assignclass(kinmap, classes_definition):
     """
-    read the kinetic mechanism and assign classes if available
-    kinmap: kinetic map already processed
+    Read the kinetic mechanism and assign reaction classes if available.
+    Args:
+        kinmap (): kinetic map already processed.
+        classes_definition ():
+
+    Returns:
     """
 
     kinmap.Classes()
-    reactions_all = []
-    for i in range(kinmap.NumberOfReactions):
-        reaction = {
+
+    # Get reactions info
+    reactions_all = [
+        {
             'index': i+1,
-            'name': kinmap.reaction_names[i],
+            'name': name,
             'class': kinmap.rxnclass[i+1],
             'reactiontype': kinmap.rxnsubclass[i+1]
-        }
-        reactions_all.append(reaction)
+        } for i, name in enumerate(kinmap.reaction_names)
+    ]
 
-    # parse classes
+    # Parse classes
     _, subcl_grp_dct = ReadReactionsGroups(classes_definition)
-    # sort
+
+    # Assign classes
     rxns_sorted = reaction_classes_assign(reactions_all, verbose=False)
     rxns_sorted.assign_class_grp(subcl_grp_dct)
 
