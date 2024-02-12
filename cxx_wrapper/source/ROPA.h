@@ -1,129 +1,155 @@
+/*-----------------------------------------------------------------------*\
+|    ___                   ____  __  __  ___  _  _______                  |
+|   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
+|  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
+|  | |_| | |_) |  __/ | | |___) | |  | | |_| | . \| |__|_   _|_   _|      |
+|   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
+|        |_|                                                              |
+|                                                                         |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
+|			       Edoardo Ramalli <edoardo.ramalli@polimi.it>			  |
+|   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
+|   Department of Chemistry, Materials and Chemical Engineering           |
+|   Politecnico di Milano                                                 |
+|   P.zza Leonardo da Vinci 32, 20133 Milano                              |
+|                                                                         |
+|-------------------------------------------------------------------------|
+|                                                                         |
+|   This file is part of OpenSMOKE++ framework.                           |
+|                                                                         |
+|	License																  |
+|                                                                         |
+|   Copyright(C) 2016-2012  Alberto Cuoci                                 |
+|   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
+|   it under the terms of the GNU General Public License as published by  |
+|   the Free Software Foundation, either version 3 of the License, or     |
+|   (at your option) any later version.                                   |
+|                                                                         |
+|   OpenSMOKE++ is distributed in the hope that it will be useful,        |
+|   but WITHOUT ANY WARRANTY; without even the implied warranty of        |
+|   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         |
+|   GNU General Public License for more details.                          |
+|                                                                         |
+|   You should have received a copy of the GNU General Public License     |
+|   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
+|                                                                         |
+\*-----------------------------------------------------------------------*/
+
 #ifndef ROPA_H
 #define ROPA_H
 
-// clang-format off
 #include "ProfilesDatabase.h"
-#include "PostProcessorFluxMap.h"
-// clang-format on
 
-class ROPA {
- public:
-  ROPA();
+class ROPA
+{
+  public:
+    ROPA();
 
-  void SetDatabase(ProfilesDatabase* data) { data_ = data; };
+    void SetDatabase(ProfilesDatabase *data);
 
-  void RateOfProductionAnalysis(const unsigned int& number_of_reactions);
+    void RateOfProductionAnalysis(const unsigned int number_of_reactions);
 
-  void RateOfProductionAnalysis2D(const unsigned int& number_of_reactions,
-                                  const double& local_x, const double& local_z,
-                                  const double& region_low_x, const double& region_up_x,
-                                  const double& region_low_z, const double& region_up_z);
+    void RateOfProductionAnalysis2D(const unsigned int number_of_reactions, const double local_x,
+            const double local_z,const double region_low_x, const double region_up_x,
+            const double region_low_z, const double region_up_z);
 
-  void MergePositiveAndNegativeBars(std::vector<unsigned int> positive_indices,
-                                    std::vector<unsigned int> negative_indices,
-                                    std::vector<double> positive_coefficients,
-                                    std::vector<double> negative_coefficients,
-                                    std::vector<int> indices,
-                                    std::vector<double> coefficients);
+    void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
+                                      const std::vector<unsigned int> &negative_indices,
+                                      const std::vector<double> &positive_coefficients,
+                                      const std::vector<double> &negative_coefficients, std::vector<int> &indices,
+                                      std::vector<double> &coefficients);
 
-  void FluxAnalysis();
+    void FluxAnalysis();
 
-  void GetReactionRates(const std::vector<unsigned int>& reaction_indices,
-                        const bool& sum_rates);
+    void GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates);
 
-  void GetFormationRates(const std::string& specie, const std::string& units,
-                         const std::string& type);
+    void GetFormationRates(std::string specie, std::string units, std::string type);
 
-  void SetKineticFolder(const std::string& kineticFolder) {
-    kineticFolder_ = kineticFolder;
-  };
+    void SetKineticFolder(const std::string kineticFolder);
 
-  void SetOutputFolder(const std::string& outputFolder) { outputFolder_ = outputFolder; };
+    void SetOutputFolder(const std::string outputFolder);
 
-  void SetROPAType(const std::string& ropaType);
+    void SetROPAType(const std::string kineticFolder);
 
-  void SetSpecies(const std::string& species) { species_ = species; };
+    void SetSpecies(const std::string kineticFolder);
 
-  void SetLocalValue(const double& localValue) { localValue_ = localValue; };
+    void SetLocalValue(double localValue);
 
-  void SetLowerBound(const double& lowerBound) { lowerBound_ = lowerBound; };
+    void SetLowerBound(double lowerBound);
 
-  void SetUpperBound(const double& upperBound) { upperBound_ = upperBound; };
+    void SetUpperBound(double upperBound);
 
-  void SetElement(const std::string& element) { element_ = element; };
+    void SetElement(const std::string element);
 
-  void SetThickness(const std::string& thickness);
+    void SetThickness(const std::string thickness);
 
-  void SetFluxAnalysisType(const std::string& type);
+    void SetFluxAnalysisType(const std::string type);
 
-  void SetWidth(const int& width) { width_ = width; };
+    void SetWidth(const int width);
 
-  void SetDepth(const int& depth) { depth_ = depth; };
+    void SetDepth(const int depth);
 
-  void SetThreshold(const double& threshold) { threshold_ = threshold; };
+    void SetThreshold(const double threshold);
 
-  void SetThicknessLogScale(const bool& thicknesslogscale) {
-    thicknesslogscale_ = thicknesslogscale;
-  };
+    void SetThicknessLogScale(bool thicknesslogscale);
 
-  void SetLabelType(const std::string& type);
+    void SetLabelType(std::string type);
 
-  const std::vector<unsigned int>& reactions() const { return reactions_; };
+    inline const std::vector<unsigned int>& reactions() const {return reactions_;};
 
-  const std::vector<double>& coefficients() const { return coefficients_; };
+    inline const std::vector<double>& coefficients() const {return coefficients_;};
 
-  const std::vector<int>& indexFirstName() const { return indexFirstName_; };
+    inline const std::vector<int>& indexFirstName() const {return indexFirstName_;};
 
-  const std::vector<int>& indexSecondName() const { return indexSecondName_; };
+    inline const std::vector<int>& indexSecondName() const {return indexSecondName_;}; 
 
-  const std::vector<double>& computedThickness() const { return computedThickness_; };
+    inline const std::vector<double>& computedThickness() const {return computedThickness_;};
 
-  const std::vector<double>& computedLabel() const { return computedLabel_; };
+    inline const std::vector<double>& computedLabel() const {return computedLabel_;};
 
-  const std::vector<double>& formationRates() const { return formationRates_; };
+    inline const std::vector<double>& formationRates() const {return formationRates_;};
 
-  const std::vector<std::vector<double>>& reactionRates() const {
-    return reactionRates_;
-  };
+    inline const std::vector<std::vector<double>>& reactionRates() const {return reactionRates_;};
 
-  const std::vector<double>& sumOfRates() const { return sumOfRates_; };
+    inline const std::vector<double>& sumOfRates() const {return sumOfRates_;};
 
- private:
-  ProfilesDatabase* data_;
-  std::vector<unsigned int> indices_coarse_reactions_;
-  std::vector<std::string> string_list_reactions;
+  private:
 
-  std::string ropaType_;
-  std::string kineticFolder_;
-  std::string outputFolder_;
-  std::string species_;
+    ProfilesDatabase *data_;
+    std::vector<unsigned int> indices_coarse_reactions_;
+    std::vector<std::string> string_list_reactions;
 
-  double localValue_;
-  double upperBound_;
-  double lowerBound_;
-  bool speciesIsSelected;
+    std::string ropaType_;
+    std::string kineticFolder_;
+    std::string outputFolder_;
+    std::string species_;
 
-  std::string element_;
-  std::string thickness_;
-  std::string flux_type_;
-  int width_;
-  int depth_;
-  double threshold_;
-  bool thicknesslogscale_;
-  std::string label_type_;
+    double localValue_;
+    double upperBound_;
+    double lowerBound_;
+    bool speciesIsSelected;
 
-  std::vector<unsigned int> reactions_;
-  std::vector<double> coefficients_;
+    std::string element_;
+    std::string thickness_;
+    std::string flux_type_;
+    int width_;
+    int depth_;
+    double threshold_;
+    bool thicknesslogscale_;
+    std::string label_type_;
+    
+    std::vector<unsigned int> reactions_;
+    std::vector<double> coefficients_;
 
-  std::vector<int> indexFirstName_;
-  std::vector<int> indexSecondName_;
-  std::vector<double> computedThickness_;
-  std::vector<double> computedLabel_;
+    std::vector<int> indexFirstName_;
+    std::vector<int> indexSecondName_;
+    std::vector<double> computedThickness_;
+    std::vector<double> computedLabel_;
 
-  std::vector<double> formationRates_;
-  std::vector<std::vector<double>> reactionRates_;
-  std::vector<double> sumOfRates_;
+    std::vector<double> formationRates_;
+    std::vector<std::vector<double>> reactionRates_;
+    std::vector<double> sumOfRates_;
 };
 
 #include "ROPA.hpp"
-#endif  // ROPA_H
+#endif // ROPA_H

@@ -1,63 +1,100 @@
+/*-----------------------------------------------------------------------*\
+|    ___                   ____  __  __  ___  _  _______                  |
+|   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
+|  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
+|  | |_| | |_) |  __/ | | |___) | |  | | |_| | . \| |__|_   _|_   _|      |
+|   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
+|        |_|                                                              |
+|                                                                         |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
+|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>				  |
+|   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
+|   Department of Chemistry, Materials and Chemical Engineering           |
+|   Politecnico di Milano                                                 |
+|   P.zza Leonardo da Vinci 32, 20133 Milano                              |
+|                                                                         |
+|-------------------------------------------------------------------------|
+|                                                                         |
+|   This file is part of OpenSMOKE++ framework.                           |
+|                                                                         |
+|	License																  |
+|                                                                         |
+|   Copyright(C) 2016-2012  Alberto Cuoci                                 |
+|   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
+|   it under the terms of the GNU General Public License as published by  |
+|   the Free Software Foundation, either version 3 of the License, or     |
+|   (at your option) any later version.                                   |
+|                                                                         |
+|   OpenSMOKE++ is distributed in the hope that it will be useful,        |
+|   but WITHOUT ANY WARRANTY; without even the implied warranty of        |
+|   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         |
+|   GNU General Public License for more details.                          |
+|                                                                         |
+|   You should have received a copy of the GNU General Public License     |
+|   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
+|                                                                         |
+\*-----------------------------------------------------------------------*/
+
 #ifndef SENSITIVITIES_H
 #define SENSITIVITIES_H
 
 #include "ProfilesDatabase.h"
 #include "Sensitivities_Database.h"
 
-class Sensitivities {
- public:
-  Sensitivities();
+class Sensitivities
+{
 
-  ~Sensitivities();
+  public:
+    Sensitivities();
 
-  void SetDatabase(ProfilesDatabase* data);
+    ~Sensitivities();
 
-  void SetNormalizationType(const std::string& normalizationType);
+    void SetDatabase(ProfilesDatabase *data);
 
-  void SetSensitivityType(const std::string& sensitivityType);
+    void SetNormalizationType(std::string normalizationType);
 
-  void SetOrderingType(const std::string& orderingType);
+    void SetSensitivityType(std::string sensitivityType);
 
-  void SetTarget(const std::string& target);
+    void SetOrderingType(std::string orderingType);
 
-  void SetLocalValue(const double& localValue);
+    void SetTarget(std::string target);
 
-  void SetLowerBound(const double& lowerBound);
+    void SetLocalValue(double localValue);
 
-  void SetUpperBound(const double& upperBound);
+    void SetLowerBound(double lowerBound);
 
-  void Prepare();
+    void SetUpperBound(double upperBound);
 
-  void Sensitivity_Analysis(const unsigned int& number_of_reactions);
+    void Prepare();
 
-  void ReadSensitvityCoefficients();
+    void Sensitivity_Analysis(const unsigned int number_of_reactions);
 
-  void GetSensitivityProfile(const unsigned int& reaction_index);
+    void ReadSensitvityCoefficients();
 
-  const std::vector<unsigned int>& reactions() const { return reactions_; };
+    void GetSensitivityProfile(unsigned int reaction_index);
+    
+    inline const std::vector<unsigned int>& reactions() const {return reactions_;};
+    
+    inline const std::vector<double>& senitivityCoefficients() const {return sensitivity_coefficients_;};
 
-  const std::vector<double>& senitivityCoefficients() const {
-    return sensitivity_coefficients_;
-  };
+  private:
+    ProfilesDatabase *data_;
 
- private:
-  ProfilesDatabase* data_;
+    Sensitivities_Database *sensitivities;
 
-  Sensitivities_Database* sensitivities;
+    std::string normalizationType_;
+    std::string sensitivityType_;
+    std::string orderingType_;
+    std::string target_;
 
-  std::string normalizationType_;
-  std::string sensitivityType_;
-  std::string orderingType_;
-  std::string target_;
+    double localValue_;
+    double lowerBound_;
+    double upperBound_;
 
-  double localValue_;
-  double lowerBound_;
-  double upperBound_;
-
-  bool iLocalNormalization = false;
-  std::vector<double> sensitivity_coefficients_;
-  std::vector<unsigned int> reactions_;
+    bool iLocalNormalization = false;
+    std::vector<double> sensitivity_coefficients_;
+    std::vector<unsigned int> reactions_;
 };
 
 #include "Sensitivities.hpp"
-#endif  // SENSITIVITIES_H
+#endif // SENSITIVITIES_H

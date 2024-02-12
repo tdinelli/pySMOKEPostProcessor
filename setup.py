@@ -52,10 +52,10 @@ class CMakeBuild(build_ext):
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}{"pySMOKEPostProcessor"}",
-            f"-DCMAKE_CXX_COMPILER:PATH={os.environ["CXX"]}",
-            f"-DBoost_ROOT:PATH={os.environ["Boost_ROOT"]}",
-            f"-DEigen3_DIR:PATH={os.environ["Eigen3_ROOT"]}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}pySMOKEPostProcessor",
+            f"-DCMAKE_CXX_COMPILER:PATH={os.environ['CXX']}",
+            f"-DBoost_ROOT:PATH={os.environ['Boost_ROOT']}",
+            f"-DEigen3_DIR:PATH={os.environ['Eigen3_ROOT']}",
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
