@@ -341,12 +341,12 @@ void ROPA::FluxAnalysis() {
   computedLabel_ = flux_analysis.ComputedLabelValue;
 }
 
-void ROPA::MergePositiveAndNegativeBars(const std::vector<unsigned int>& positive_indices,
-                                        const std::vector<unsigned int>& negative_indices,
-                                        const std::vector<double>& positive_coefficients,
-                                        const std::vector<double>& negative_coefficients,
-                                        std::vector<int>& indices,
-                                        std::vector<double>& coefficients) {
+void ROPA::MergePositiveAndNegativeBars(std::vector<unsigned int> positive_indices,
+                                        std::vector<unsigned int> negative_indices,
+                                        std::vector<double> positive_coefficients,
+                                        std::vector<double> negative_coefficients,
+                                        std::vector<int> indices,
+                                        std::vector<double> coefficients) {
   unsigned int n = positive_indices.size() + negative_indices.size();
 
   std::vector<int> signum(n);

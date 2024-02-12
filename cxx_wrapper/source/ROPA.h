@@ -19,12 +19,12 @@ class ROPA {
                                   const double& region_low_x, const double& region_up_x,
                                   const double& region_low_z, const double& region_up_z);
 
-  void MergePositiveAndNegativeBars(const std::vector<unsigned int>& positive_indices,
-                                    const std::vector<unsigned int>& negative_indices,
-                                    const std::vector<double>& positive_coefficients,
-                                    const std::vector<double>& negative_coefficients,
-                                    std::vector<int>& indices,
-                                    std::vector<double>& coefficients);
+  void MergePositiveAndNegativeBars(std::vector<unsigned int> positive_indices,
+                                    std::vector<unsigned int> negative_indices,
+                                    std::vector<double> positive_coefficients,
+                                    std::vector<double> negative_coefficients,
+                                    std::vector<int> indices,
+                                    std::vector<double> coefficients);
 
   void FluxAnalysis();
 
@@ -40,7 +40,7 @@ class ROPA {
 
   void SetOutputFolder(const std::string& outputFolder) { outputFolder_ = outputFolder; };
 
-  void SetROPAType(const std::string& kineticFolder);
+  void SetROPAType(const std::string& ropaType);
 
   void SetSpecies(const std::string& species) { species_ = species; };
 

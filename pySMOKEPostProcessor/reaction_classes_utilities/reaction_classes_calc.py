@@ -9,6 +9,7 @@ SCRIPT: rxnclasses
     This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     Please report any bug to: luna.pratali@polimi.it
 '''
+import copy
 import pandas as pd
 import sys
 import numpy as np
@@ -52,7 +53,6 @@ def check_bimol_type(speciestype, reactiontype):
 
     return '+'.join(type_list)
 
-
 def filter_class0(rxn_class_df, filter_dct: dict = {}):
     """ only keep classes according to criteria listed in filter_dct
     """
@@ -62,7 +62,8 @@ def filter_class0(rxn_class_df, filter_dct: dict = {}):
             dict_indexes[criterion] = np.array(
                 list(
                     rxn_class_df[
-                        [any(v in val for v in values) for val in rxn_class_df[criterion]]
+                        [any(v in val for v in values)
+                            for val in rxn_class_df[criterion]]
                     ].index
                 )
             )
@@ -71,19 +72,20 @@ def filter_class0(rxn_class_df, filter_dct: dict = {}):
             *[set(val) for val in dict_indexes.values()])))
         rxn_class_df = rxn_class_df.loc[np.array(
             list(set(indexes_filter)))]
-
+    
     return rxn_class_df
 
-
-def sortby0(rxn_class_df, sortlist: list, dropunsorted: bool = True):
+def sortby0(rxn_class_df,
+            sortlist: list,
+            dropunsorted: bool = True):
     """
-    group rxn dataframe by listed criteria and
+    group rxn dataframe by listed criteria and 
     """
     # check that all criteria are columns
     if not all(criterion in rxn_class_df.columns for criterion in sortlist):
         print(' * Error: criteria not all present in dataframe columns - exiting')
         sys.exit()
-
+        
     # group
     labels = []
     listofnames = []
@@ -96,7 +98,7 @@ def sortby0(rxn_class_df, sortlist: list, dropunsorted: bool = True):
             label = '['+']['.join(grp_idx)+']'
         labels.append(label)
         listofnames.append(grp_df['name'].values)
-
+        
     new_sort_df = pd.Series(listofnames, labels)
     # drop unsorted indexes
     if dropunsorted:
@@ -104,23 +106,11 @@ def sortby0(rxn_class_df, sortlist: list, dropunsorted: bool = True):
 
     return new_sort_df
 
-
 class reaction_classes_assign:
-    """
-
-    Attributes:
-        rxn_class_df:
-        reactions:
-        verbose:
-        rxn_class_df:
-    """
 
     def __init__(self, reactions, verbose: bool):
         """
-
-        Args:
-            reactions ():
-            verbose:
+        allocate dataframe
         """
         # turn reactions into a dataframe
         # index = rxn index, columns = [classtype, class, reactiontype, flux]
@@ -153,9 +143,7 @@ class reaction_classes_assign:
 
     def assign_class_grp(self, subcl_grp_dct):
         """
-        Assign class group if available
-        Args:
-            subcl_grp_dct ():
+        assign class group if available
         """
         for subcl, subset in self.rxn_class_df.groupby('reactiontype'):
             # None values are automatically discarded
@@ -166,37 +154,18 @@ class reaction_classes_assign:
                 self.rxn_class_df['classtype'][rxns] = 'UNSORTED'
                 print(
                     ' * Warning: reactiontype {} not found in class groups'.format(subcl))
-
-
+                
 class reaction_fluxes:
-    """
-
-    Attributes:
-        rxn_class_df:
-        verbose:
-        rxn_class_df:
-        flux_cols:
-        rxn_class_df:
-        rxn_class_df_all:
-        rxn_class_df:
-        rxn_class_df:
-    """
-
     def __init__(self, rxn_class_df, verbose: bool):
         """
-        Initialize rxn class dataframe
-        Args:
-            rxn_class_df ():
-            verbose:
+        initialize rxn class dataframe
         """
         self.rxn_class_df = rxn_class_df
         self.verbose = verbose
 
     def assign_flux(self, tot_rop_df):
         """
-        Assign flux from the flux analysis
-        Args:
-            tot_rop_df ():
+        assign flux from the flux analysis
         """
         # print(self.rxn_class_df.loc[tot_rop_df.index])
         self.rxn_class_df = pd.concat([self.rxn_class_df, tot_rop_df], axis=1)
@@ -269,8 +238,8 @@ class reaction_fluxes:
                                           self.flux_cols] += self.rxn_class_df.loc[idx, self.flux_cols]
 
                 if self.verbose:
-                    print(' * merging flux {} and removing {}'.format(self.rxn_class_df['name'][max_flux_idx],
-                                                                      self.rxn_class_df['name'][idx]))
+                    print('* merging flux {} and removing {}'.format(self.rxn_class_df['name'][max_flux_idx],
+                                                                     self.rxn_class_df['name'][idx]))
 
                 self.rxn_class_df = self.rxn_class_df.drop(idxs, axis=0)
 
@@ -280,7 +249,7 @@ class reaction_fluxes:
         """ only keep classes according to criteria listed in filter_dct
         """
         self.rxn_class_df = filter_class0(self.rxn_class_df, filter_dct)
-
+        
     def filter_flux(self, threshold=1e-3):
         """
         delete all reactions with contributions below a threshold
@@ -289,12 +258,18 @@ class reaction_fluxes:
         indexes_filter = np.array([])
 
         for flux_sp_name in self.flux_cols:
-            indexes_filter = np.append(indexes_filter, np.array(list(self.rxn_class_df[abs(self.rxn_class_df[flux_sp_name]) / max(abs(self.rxn_class_df[flux_sp_name])) > threshold].index)))
+            indexes_filter = np.append(indexes_filter,
+                                       np.array(list(self.rxn_class_df[abs(self.rxn_class_df[flux_sp_name]) /
+                                                                       max(abs(self.rxn_class_df[flux_sp_name])) > threshold].index))
+                                       )
 
         self.rxn_class_df = self.rxn_class_df.loc[np.array(
             list(set(indexes_filter)))]
 
-    def sortby(self, sortlist, weigh: str = 'false', dropunsorted: bool = True):
+    def sortby(self,
+               sortlist,
+               weigh: str = 'false',
+               dropunsorted: bool = True):
         """
         sum fluxes by criteria in sortlist
         """
