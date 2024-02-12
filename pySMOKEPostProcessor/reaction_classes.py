@@ -1,7 +1,6 @@
-import pandas as pd
-import numpy as np
 import copy
-from operator import add, neg
+import numpy as np
+import pandas as pd
 
 from .reaction_classes_utilities.reaction_classes_groups import ReadReactionsGroups
 from .reaction_classes_utilities.reaction_classes_calc import reaction_classes_assign
@@ -114,6 +113,7 @@ class FluxByClass:
 
     # new function to compute and plot reaction class rate profiles along axial coordinate
 
+
 def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
     """
     combines the heatmaps of different simulations for the same set of species
@@ -125,10 +125,8 @@ def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
 
     # simul names
     sim_names = sorted_dfs_dct.keys()
-    species_lists = list(np.concatenate(
-        [np.array(sorted_dfs_dct[sim_name].index) for sim_name in sim_names]))
-    classes_list = list(np.concatenate(
-        [np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names]))
+    species_lists = list(np.concatenate([np.array(sorted_dfs_dct[sim_name].index) for sim_name in sim_names]))
+    classes_list = list(np.concatenate([np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names]))
     # find common species and classes
     all_sp = np.array(sorted(set(species_lists), key=species_lists.index))
     all_cl = np.array(sorted(set(classes_list), key=classes_list.index))
@@ -139,10 +137,9 @@ def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
         pdnew = dffull.loc[all_sp]
         # rename indexes according to simul name
         if tosum is False:
-            pdnew = pdnew.rename(
-                index=lambda spname: spname + '-' + str(sim_name))
+            pdnew = pdnew.rename(index=lambda spname: spname + '-' + str(sim_name))
             # now concate to dftot
-            dftot = pd.concat([dftot, pdnew])
+            dftot = pd.concat([dftot, pdnew])  # Here there is a wwarning generation
         elif tosum is True:
             dftot = dftot.add(pdnew, fill_value=0.)
 
@@ -190,8 +187,7 @@ def FDI(sorted_dfs_dct: dict,
                 df_sim.loc[sp] = 0.
 
     # dataframe of FDIs
-    df_FDI = pd.DataFrame(0., index=sim_names,
-                          columns=sim_names, dtype=np.float64)
+    df_FDI = pd.DataFrame(0., index=sim_names, columns=sim_names, dtype=np.float64)
 
     # calculate the differences in the omega: (om_ijn-om_ijm)^2
     df_FDI.sort_index(axis=0, inplace=True)
@@ -206,15 +202,14 @@ def FDI(sorted_dfs_dct: dict,
                 # print(sim_n, df_diff_square)
                 # now calculate FDI based on type
                 if fditype == 'global':
-                    df_FDI[m][n] = np.power(np.sum(df_diff_square.values), 0.5)
+                    df_FDI.loc[n, m] = np.power(np.sum(df_diff_square.values), 0.5)
                 elif fditype == 'species':
                     # sum_j: all classes for one species
-                    df_FDI[m][n] = np.power(
+                    df_FDI.loc[n, m] = np.power(
                         np.sum(df_diff_square.loc['flux_' + speciesi]), 0.5)
                 elif fditype == 'class':
                     # sum_i: all species for one class
-                    df_FDI[m][n] = np.power(
-                        np.sum(df_diff_square[classj]), 0.5)
+                    df_FDI.loc[n, m] = np.power(np.sum(df_diff_square[classj]), 0.5)
                 # print(df_FDI[m][n])
     # print(df_FDI)
     # compute mu = 1/N sum(n,m) (FDI), n != m
@@ -225,7 +220,7 @@ def FDI(sorted_dfs_dct: dict,
     for nn, n in enumerate(df_FDI.index):
         for mm, m in enumerate(df_FDI.columns):
             if mm > nn:  # only low triangular, no diagonal
-                df_FDI[m][n] -= mu
+                df_FDI.loc[n, m] -= mu
     # print(df_FDI)
     df_FDI.sort_index(axis=0, ascending=False, inplace=True)
     df_FDI.sort_index(axis=1, inplace=True)

@@ -96,7 +96,7 @@ def cumulative_rates(simul_fld,
     try:
         x = getattr(output, x_axis)
     except AttributeError:
-        print('*Warning: attribute {} not found. using "time" as default'.format(x_axis))
+        print(' * Warning: attribute {} not found. using "time" as default'.format(x_axis))
         x = output.time # x coordinate
     # ROPA for each species - if species_list contains dictionary, extract flux for each
     cum_df_dct = dict.fromkeys(species_list)
@@ -136,7 +136,7 @@ def reactionrates_byclasses(simul_fld,
     try:
         x = getattr(output, x_axis)
     except AttributeError:
-        print('*Warning: attribute {} not found. using "time" as default'.format(x_axis))
+        print(' * Warning: attribute {} not found. using "time" as default'.format(x_axis))
         x = output.time # x coordinate
         
     for i, sortlist in enumerate(sortlists):
