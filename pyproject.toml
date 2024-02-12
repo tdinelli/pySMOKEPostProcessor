@@ -15,7 +15,7 @@ maintainers = [
 description="Python wapper to the OpenSMOKEpp Graphical Post Processor"
 readme = "README.md"
 license = {file = "LICENSE.md"}
-dependencies = ["numpy", "pandas", "matplotlib", "networkx", "pydot", "graphviz", "scipy",]
+dependencies = ["numpy", "pandas", "pyarrow", "matplotlib", "networkx", "pydot", "graphviz", "scipy",]
 requires-python = ">= 3.8"
 
 [project.urls]
