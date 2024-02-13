@@ -25,9 +25,6 @@ The [examples](examples) folder contains a collection of [notebooks](examples/no
 
 The detail explanation on how to build and install the package can be found inside the relative [documentation](doc/INSTALL.md).
 
-# TODO
-- Performance refactoring first on C++ side, then in python.
-
 # LICENSE
 
 See the [LICENSE](LICENSE.md) file for license rights and limitations (GPL-3.0).

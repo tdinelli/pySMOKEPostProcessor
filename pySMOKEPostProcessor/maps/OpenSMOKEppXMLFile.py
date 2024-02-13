@@ -46,7 +46,7 @@ class OpenSMOKEppXMLFile:
                systemType == "PlugFlowReactor" or
                systemType == "PerfectlyStirredReactor"):
                 warnings.warn(
-                    " * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained!\n,Some of the functions in this class may not work!")
+                    " * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained! Some of the functions in this class may not work!")
             else:
                 raise Exception(f"Unknown system type: {systemType}")
 
