@@ -45,7 +45,14 @@ If everything worked fine something like this should be on your screen:
 > Successfully installed pySMOKEPostProcessor-0.3.0
 ```
 
-## 4. To update after editing
+## Development functionalities
+
+Way of controlling the installation procedure of the package run the pip install command in verbose mode:
+```bash
+> python -m pip install . -vvv
+``` 
+
+In order to update the package after changing source code files.
 ```bash
 > python -m pip install . -U
 ``` 
