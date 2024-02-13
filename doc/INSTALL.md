@@ -32,10 +32,10 @@ Go into the [conda.recipe](conda.recipe) directory, and run the following comman
 ```
 
 ## 3. Install python package via "pip" 
-
+Work from the base folder pySMOKEPostProcessor.
 ```bash
 > conda activate pp
-> sh export_var.sh
+> source export_var.sh
 > python -m pip install .
 ```
 
@@ -44,3 +44,8 @@ If everything worked fine something like this should be on your screen:
 ```bash
 > Successfully installed pySMOKEPostProcessor-0.3.0
 ```
+
+## 4. To update after editing
+```bash
+> python -m pip install . -U
+``` 
