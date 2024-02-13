@@ -129,17 +129,30 @@ def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
     classes_list = list(np.concatenate([np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names]))
     # find common species and classes
     all_sp = np.array(sorted(set(species_lists), key=species_lists.index))
-    all_cl = np.array(sorted(set(classes_list), key=classes_list.index))
+    
     # for each species: rename according to simulation name and concatenate dataframes
-    dftot = pd.DataFrame(columns=all_cl, dtype=np.float64)
+    dftot = pd.DataFrame()
     for sim_name, dffull in sorted_dfs_dct.items():
         # filter indexes
         pdnew = dffull.loc[all_sp]
         # rename indexes according to simul name
         if tosum is False:
             pdnew = pdnew.rename(index=lambda spname: spname + '-' + str(sim_name))
-            # now concate to dftot
-            dftot = pd.concat([dftot, pdnew])  # Here there is a wwarning generation
+
+        if len(dftot) == 0:
+            dftot = pdnew
+            continue
+        if tosum is False:
+            # in case of future warnings
+            # if not all([col in dftot.columns for col in pdnew.columns]):
+            #     colstoadd = [col for col in pdnew.columns if col not in dftot.columns]
+            #     dftot[colstoadd] = 0.
+                
+            #elif not all([col in pdnew.columns for col in dftot.columns]):
+            #    colstoadd = [col for col in dftot.columns if col not in pdnew.columns]
+            #    pdnew[colstoadd] = 0.
+                
+            dftot = pd.concat([dftot, pdnew]) 
         elif tosum is True:
             dftot = dftot.add(pdnew, fill_value=0.)
 
