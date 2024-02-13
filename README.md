@@ -13,26 +13,20 @@ The [examples](examples) folder contains a collection of [notebooks](examples/no
 
 ### Features
 
-- Rate Of Production Analysis. [notebook](examples/notebooks/ROPA-01.ipynb).
-- Sensitivity Analysis.
-- Elementary Flux Analysis.
-- Reaction Rates plots.
-- Formation Rates plots.
-- Sensitivity Coefficients plots.
-- Rate Of Production Analysis by means of reaction classes.
+- Rate Of Production Analysis. [notebook](examples/notebooks/RateOfProductionAnalysis.ipynb).
+- Sensitivity Analysis. [notebook](examples/notebooks/SensitivityAnalysis.ipynb).
+- Elementary Flux Analysis. [notebook](examples/notebooks/FluxAnalysis.ipynb).
+- Reaction Rates plots. [notebook](examples/notebooks/Reaction_Rates.ipynb), [notebook-reactionclasses](examples/notebooks/Reaction_Rates_byclass.ipynb), [notebook-cumulative-reaction-rates](examples/notebooks/Cumulative-Rates.ipynb).
+- Formation Rates plots. [notebook](examples/notebooks/FormationRates.ipynb).
+- Sensitivity Coefficients plots. [notebook](examples/Sensitivity_Coefficients.ipynb).
+- Rate Of Production Analysis by means of reaction classes. [notebook](examples/notebooks/Reaction_Classes.ipynb), [notebook-soot-FDI](examples/notebooks/Reaction_Classes_FDI.ipynb).
 
 ## Compile and Install
 
-The detail explanation on how to build and install the package can be found inside the relative [documentation](docs/INSTALL.md).
+The detail explanation on how to build and install the package can be found inside the relative [documentation](doc/INSTALL.md).
 
-# TODO URGENT
-- Pandas deprecation.
-
-# Not Working
-- ROPA by mass
-- Reaction rate by class
-- FDI
-- CumulativeRates
+# TODO
+- Performance refactoring first on C++ side, then in python.
 
 # LICENSE
 
