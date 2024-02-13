@@ -31,8 +31,6 @@
 *.out
 *.app
 
-.DS_Store
-
 .idea/
 
 # Ignore visual studio stuff
@@ -40,23 +38,24 @@ project/bin/
 
 # Ignore python stuff
 __pycache__/
-provette.py
-project/myLINUX/
-pySMOKEPostProcessor/source/.deps/
-pySMOKEPostProcessor/source/.dirstamp
-.vscode/
 Test/
 .ipynb_checkpoints/
-pySMOKEPostProcessor/GraphWriterrrr.py
-pySMOKEPostProcessor/source/stuff_test.txt
+examples/notebooks/Debug.ipynb
+
 examples/Sensitivity/Output-02/Sensitivities.OME2.xml
 examples/Sensitivity/Output-02/Sensitivities.temperature.xml
 examples/roba/
-project/MyMac/
-project/lib/
-pySMOKEPostProcessor/maps/prova_kinMAP.py
 dist/
 build/
 pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
 examples-old
+
+examples/data/final/
+examples/data/old/
+
+compile_commands.json
+
+.DS_Store
+
+.cache

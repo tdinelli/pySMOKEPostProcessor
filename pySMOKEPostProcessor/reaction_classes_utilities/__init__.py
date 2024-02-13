@@ -1,2 +1,4 @@
 from .reaction_classes_groups import ReadReactionsGroups
-from .reaction_classes import reaction_classes
+from .reaction_classes_calc import reaction_classes_assign
+from .reaction_classes_calc import filter_class0
+from .reaction_classes_calc import sortby0

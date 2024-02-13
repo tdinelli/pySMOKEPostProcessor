@@ -19,12 +19,13 @@ import sys
 import os
 
 # Import internal modules
-from pySMOKEPostProcessor.maps.KineticMap import KineticMap
+from .KineticMap import KineticMap
+
 
 class StoichiometricMap:
 
     def __init__(self, kineticFolder):
-        
+
         self.kinetics = KineticMap(kineticFolder)
         kinetic_xml = os.path.join(kineticFolder, 'kinetics.xml')
         self.ReadMechFile(kinetic_xml)
@@ -43,17 +44,16 @@ class StoichiometricMap:
         return np.float64(subvector), pos+length+1
 
     def ReadMechFile(self, kinetics_xml):
-
         tree = ET.parse(kinetics_xml)
         root = tree.getroot()
         kinetics_element = root.find('Kinetics')
         stoichiometry_element = kinetics_element.find('Stoichiometry')
-        self.stoichiometry = (stoichiometry_element.text).split()       
+        self.stoichiometry = (stoichiometry_element.text).split()
 
     def stoichiometryProcessing(self):
-        
+
         stoichiometry = self.stoichiometry
-        
+
         pos = 0
         numDir1, pos = self.ReadVectorInt(stoichiometry, pos)
         numDir2, pos = self.ReadVectorInt(stoichiometry, pos)
@@ -117,7 +117,7 @@ class StoichiometricMap:
 
         # Elementary reactions only
         if (explicit_reaction_orders == 0):
-            
+
             lambda_numDir1 = numDir1
             lambda_numDir2 = numDir2
             lambda_numDir3 = numDir3
@@ -143,12 +143,10 @@ class StoichiometricMap:
             lambda_jRevEq4 = jRevEq4
             lambda_jRevEq5 = jRevEq5
             lambda_valueRevEq5 = valueRevEq5
-            
-        else:
 
+        else:
             sys.exit("Non-elementary reactions cannot be processed")
 
-        
         self.numDir1 = numDir1
         self.numDir2 = numDir2
         self.numDir3 = numDir3
@@ -195,8 +193,8 @@ class StoichiometricMap:
 
         self.lambda_numRevEq1 = lambda_numRevEq1
         self.lambda_numRevEq2 = lambda_numRevEq2
-        self.lambda_numRevEq3 = lambda_numRevEq3 
-        self.lambda_numRevEq4 = lambda_numRevEq4 
+        self.lambda_numRevEq3 = lambda_numRevEq3
+        self.lambda_numRevEq4 = lambda_numRevEq4
         self.lambda_numRevEq5 = lambda_numRevEq5
 
         self.lambda_jDir1 = lambda_jDir1
@@ -204,7 +202,7 @@ class StoichiometricMap:
         self.lambda_jDir3 = lambda_jDir3
         self.lambda_jDir4 = lambda_jDir4
         self.lambda_jDir5 = lambda_jDir5
-        self.lambda_valueDir5 = lambda_valueDir5   
+        self.lambda_valueDir5 = lambda_valueDir5
 
         self.lambda_jRevEq1 = lambda_jRevEq1
         self.lambda_jRevEq2 = lambda_jRevEq2
@@ -214,63 +212,63 @@ class StoichiometricMap:
         self.lambda_valueRevEq5 = lambda_valueRevEq5
 
     def StoichiometryCoeffReactants(self, kinetics):
-
         react_species = []
         react_reaction = []
         react_nu = []
 
-        count1=0
-        count2=0
-        count3=0
-        count4=0
-        count5=0
+        count1 = 0
+        count2 = 0
+        count3 = 0
+        count4 = 0
+        count5 = 0
         for i in range(kinetics.NumberOfSpecies):
-
             for k in range(self.numDir1[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir1[count1])
                 react_nu.append(1.)
                 count1 = count1+1
-                
+
             for k in range(self.numDir2[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir2[count2])
                 react_nu.append(2.)
                 count2 = count2+1
-                
+
             for k in range(self.numDir3[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir3[count3])
                 react_nu.append(3.)
                 count3 = count3+1
-                
+
             for k in range(self.numDir4[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir4[count4])
                 react_nu.append(0.5)
                 count4 = count4+1
-                
+
             for k in range(self.numDir5[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir5[count5])
                 react_nu.append(self.valueDir5[count5])
                 count5 = count5+1
 
-        self.nur = sparse.coo_matrix((react_nu,(react_reaction,react_species)),shape=(kinetics.NumberOfReactions,kinetics.NumberOfSpecies))
+        self.nur = sparse.coo_matrix((react_nu,
+                                      (react_reaction, react_species)),
+                                     shape=(kinetics.NumberOfReactions,
+                                            kinetics.NumberOfSpecies))
 
         return self.nur
 
-    def StoichiometryCoeffProducts(self, kinetics):  
-
+    def StoichiometryCoeffProducts(self, kinetics):
         react_species = []
         react_reaction = []
         react_nu = []
 
-        count1=0
-        count2=0
-        count3=0
-        count4=0
-        count5=0
+        count1 = 0
+        count2 = 0
+        count3 = 0
+        count4 = 0
+        count5 = 0
         for i in range(kinetics.NumberOfSpecies):
 
             for k in range(self.numRevTot1[i]):
@@ -278,125 +276,130 @@ class StoichiometricMap:
                 react_reaction.append(self.jRevTot1[count1])
                 react_nu.append(1.)
                 count1 = count1+1
-                
+
             for k in range(self.numRevTot2[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot2[count2])
                 react_nu.append(2.)
                 count2 = count2+1
-                
+
             for k in range(self.numRevTot3[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot3[count3])
                 react_nu.append(3.)
                 count3 = count3+1
-                
+
             for k in range(self.numRevTot4[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot4[count4])
                 react_nu.append(0.5)
                 count4 = count4+1
-                
+
             for k in range(self.numRevTot5[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot5[count5])
                 react_nu.append(self.valueRevTot5[count5])
                 count5 = count5+1
 
-        self.nup = sparse.coo_matrix((react_nu,(react_reaction,react_species)),shape=(kinetics.NumberOfReactions,kinetics.NumberOfSpecies))
+        self.nup = sparse.coo_matrix((react_nu,
+                                      (react_reaction, react_species)),
+                                     shape=(kinetics.NumberOfReactions,
+                                            kinetics.NumberOfSpecies))
 
         return self.nup
 
-    def ReactionOrderReactants(self,kinetics):
-
+    def ReactionOrderReactants(self, kinetics):
         react_species = []
         react_reaction = []
         react_lambda = []
 
-        count1=0
-        count2=0
-        count3=0
-        count4=0
-        count5=0
+        count1 = 0
+        count2 = 0
+        count3 = 0
+        count4 = 0
+        count5 = 0
         for i in range(kinetics.NumberOfSpecies):
-
             for k in range(self.lambda_numDir1[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir1[count1])
                 react_lambda.append(1.)
                 count1 = count1+1
-                
+
             for k in range(self.lambda_numDir2[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir2[count2])
                 react_lambda.append(2.)
                 count2 = count2+1
-                
+
             for k in range(self.lambda_numDir3[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir3[count3])
                 react_lambda.append(3.)
                 count3 = count3+1
-                
+
             for k in range(self.lambda_numDir4[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir4[count4])
                 react_lambda.append(0.5)
                 count4 = count4+1
-                
+
             for k in range(self.lambda_numDir5[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir5[count5])
                 react_lambda.append(self.lambda_valueDir5[count5])
                 count5 = count5+1
 
-        self.lambdar = sparse.coo_matrix((react_lambda,(react_reaction,react_species)),shape=(kinetics.NumberOfReactions,kinetics.NumberOfSpecies))
+        self.lambdar = sparse.coo_matrix((react_lambda,
+                                          (react_reaction, react_species)),
+                                         shape=(kinetics.NumberOfReactions,
+                                                kinetics.NumberOfSpecies))
 
         return self.lambdar
 
-    def ReactionOrderProducts(self,kinetics):  
-
+    def ReactionOrderProducts(self, kinetics):
         react_species = []
         react_reaction = []
         react_lambda = []
 
-        count1=0
-        count2=0
-        count3=0
-        count4=0
-        count5=0
+        count1 = 0
+        count2 = 0
+        count3 = 0
+        count4 = 0
+        count5 = 0
         for i in range(kinetics.NumberOfSpecies):
-
             for k in range(self.lambda_numRevEq1[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq1[count1])
                 react_lambda.append(1.)
                 count1 = count1+1
-                
+
             for k in range(self.lambda_numRevEq2[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq2[count2])
                 react_lambda.append(2.)
                 count2 = count2+1
-                
+
             for k in range(self.lambda_numRevEq3[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq3[count3])
                 react_lambda.append(3.)
                 count3 = count3+1
-                
+
             for k in range(self.lambda_numRevEq4[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq4[count4])
                 react_lambda.append(0.5)
                 count4 = count4+1
-                
+
             for k in range(self.lambda_numRevEq5[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq5[count5])
                 react_lambda.append(self.lambda_valueRevEq5[count5])
                 count5 = count5+1
 
-        self.lambdap = sparse.coo_matrix((react_lambda,(react_reaction,react_species)),shape=(kinetics.NumberOfReactions,kinetics.NumberOfSpecies))
+        self.lambdap = sparse.coo_matrix((react_lambda,
+                                          (react_reaction, react_species)),
+                                         shape=(kinetics.NumberOfReactions,
+                                                kinetics.NumberOfSpecies))
 
         return self.lambdap

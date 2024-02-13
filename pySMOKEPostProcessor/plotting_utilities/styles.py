@@ -19,9 +19,9 @@ from matplotlib import rcParams
 save_dpi = 200
 
 # Set font styles:
-csfont = {'fontname':'Arial', 'fontweight':'regular'}
-hfont = {'fontname':'Arial', 'fontweight':'bold'}
-ifont = {'fontname':'Arial', 'fontweight':'regular', 'style':'italic'}
+csfont = {'fontname': 'Arial', 'fontweight': 'regular'}
+hfont = {'fontname': 'Arial', 'fontweight': 'bold'}
+ifont = {'fontname': 'Arial', 'fontweight': 'regular', 'style': 'italic'}
 rcParams["font.family"] = "serif"
 rcParams["font.serif"] = "Arial"
 rcParams["font.sans-serif"] = "Arial"

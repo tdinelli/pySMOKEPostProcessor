@@ -157,12 +157,9 @@ def keyword_dcts_from_blocks(block_dct):
     new_block_dct = {}
     if block_dct is not None:
         for key, block in block_dct.items():
-            
             key_dct = keyword_dct_from_paren_blocks(block)
-           
             if key_dct is None:
                 key_dct = keyword_dct_from_block(block)
-                
             if key_dct is None:
                 key_dct = list(block.split())
 
