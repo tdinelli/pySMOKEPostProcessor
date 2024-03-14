@@ -279,13 +279,14 @@ class PostProcessor:
         # xaxis: derived from output
 
         # 0. ropa DCT: sum coefficients for duplicates
-        coefficients, indices, names = [], [], []
+        coefficients, indices, names, names_split = [], [], [], []
         allindices_array = np.array(ropa_dct['reaction_indices'])
         allcoeffs_array = np.array(ropa_dct['coefficients'])
         for i, idx in enumerate(allindices_array):
             if idx not in indices:
                 indices.append(idx)
                 names.append(ropa_dct['reaction_names'][i])
+                names_split.append(ropa_dct['reaction_names'][i].split(': ')[1])
                 if ropa_dct['reaction_indices'].count(idx) > 1:
                     positions = np.where((allindices_array == idx))[0]
                     coefficients.append(np.sum(allcoeffs_array[positions]))
@@ -294,10 +295,8 @@ class PostProcessor:
 
         # 1. ropa DF: indexes (positive or negative) and reaction names
         factor = [1.0 - 2.0*(coeff < 0) for coeff in coefficients]
-        ropa_df = pd.DataFrame(np.array([factor, names], dtype=object).T,
-                               index=indices, columns=['factor', 'reaction_names'])
-
-        # SUM FORWARD AND BACKWARD (based on name)? WAS THERE IN PREVIOUS FUNCTION
+        ropa_df = pd.DataFrame(np.array([factor, names, names_split], dtype=object).T,
+                               index=indices, columns=['factor', 'reaction_names', 'reaction_names_split'])
 
         if rate_type == 'P':
             ropa_df = ropa_df[ropa_df['factor'].values > 0]
@@ -309,17 +308,56 @@ class PostProcessor:
         rr = dict.fromkeys(ropa_df.index)
         rrsum = pd.Series(index=ropa_df.index, dtype=np.float64)
 
-        for idx in ropa_df.index:
+        rrdel = []
+        scannedidxs = []
+        for idx in ropa_df.index:  
+            check = False
+                    
             rr_idx = np.array(self.GetReactionRates(reaction_index=[idx])[0])
+
             rrsum_idx = np.trapz(y=rr_idx, x=xaxis)
             if (rrsum_idx * float(ropa_df['factor'][idx])) < 0:
                 # integral and ropa have opposite signs: change sign
                 rr_idx *= -1
                 rrsum_idx *= -1
-            # assign index
-            rr[idx] = rr_idx
-            rrsum[idx] = rrsum_idx
 
+            # if the reaction corresponds to the bw rxn of an irrev rxn already treated: sum
+            # look for bw rxn
+            if '=>' in ropa_df['reaction_names_split'][idx]:
+                
+                prod, reac = ropa_df['reaction_names_split'][idx].split('=>')
+                bwname = '=>'.join([reac, prod])
+                idxrs = ropa_df.index[ropa_df['reaction_names_split'] == bwname].tolist()
+                for idxr in idxrs:
+                    if idxr in scannedidxs:
+                        rr[idxr] += rr_idx
+                        rrsum[idxr] += rrsum_idx
+                        ropa_df.loc[idxr,'reaction_names'] = ropa_df['reaction_names'][idx].replace("=>", "=")
+                        rrdel.append(idx)
+                        check = True
+
+            # if a reaction with the same name was already analyzed: add flux to that
+            rxnname = ropa_df['reaction_names_split'][idx]
+            idxrs = ropa_df.index[ropa_df['reaction_names_split'] == rxnname].tolist()
+            idxr_scanned = [idxr for idxr in idxrs if idxr in scannedidxs]
+            if len(idxr_scanned) > 0:
+                idxr = idxr_scanned[0]
+                rr[idxr] += rr_idx
+                rrsum[idxr] += rrsum_idx
+                ropa_df.loc[idxr,'reaction_names'] = ropa_df['reaction_names'][idx].replace("=>", "=")
+                rrdel.append(idx)
+                check = True
+
+            if check == False:
+                # assign index
+                rr[idx] = rr_idx
+                rrsum[idx] = rrsum_idx
+                scannedidxs.append(idx)
+            elif check == True:
+                del rr[idx]
+
+        # drop indexes of bw rxn
+        rrsum = rrsum.drop(labels=rrdel)
         # check cumulative contribution and delete based on threshold
         rrsum /= np.sum(abs(rrsum))  # abs?
         filteredidxs = list(rrsum[abs(rrsum) > threshold].index)
@@ -328,9 +366,9 @@ class PostProcessor:
         # add to the names the cumulative % contribution
         names_wpct = []
         for idx in filteredidxs:
-            name = ropa_df['reaction_names'][idx]
+            name = ropa_df['reaction_names_split'][idx]
             pct = rrsum[idx] * 100
-            names_wpct.append('{} {:.2f}%'.format(name, pct))
+            names_wpct.append('{} {:.5f}%'.format(name, pct))
         cumulativerates_df = pd.DataFrame(np.array(filtered_rr).T, columns=names_wpct, index=xaxis)
 
         return cumulativerates_df
