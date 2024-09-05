@@ -50,12 +50,9 @@ build/
 pySMOKEPostProcessor.egg-info/
 pySMOKEPostProcessor_old
 examples-old
-
 examples/data/final/
 examples/data/old/
-
 compile_commands.json
-
 .DS_Store
-
 .cache
+.cmake.neovim.json

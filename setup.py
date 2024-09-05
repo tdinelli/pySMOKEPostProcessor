@@ -134,9 +134,20 @@ class CMakeBuild(build_ext):
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a
 # file.
-excludes = ["tests", "tests.*", "examples", "examples.*", "Test/",
-            "docs", "docs.*", "devtools", "devtools.*", "__pycache__",
-            "__pycache__/", "__pycache__*"]
+excludes = [
+    "tests",
+    "tests.*",
+    "examples",
+    "examples.*",
+    "Test/",
+    "docs",
+    "docs.*",
+    "devtools",
+    "devtools.*",
+    "__pycache__",
+    "__pycache__/",
+    "__pycache__*",
+]
 setup(
     name="pySMOKEPostProcessor",
     version="0.2.0",

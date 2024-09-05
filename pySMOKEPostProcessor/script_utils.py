@@ -1,18 +1,25 @@
 """
-wrapper functions calling multiple functionalities
+Wrapper functions calling multiple functionalities
 """
 
 from .maps.KineticMap import KineticMap
 from .maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
-from .reaction_classes import FluxByClass
-from .reaction_classes import assignclass
-from .reaction_classes_utilities.reaction_classes_calc import filter_class0
-from .reaction_classes_utilities.reaction_classes_calc import sortby0
 from .postprocessor import PostProcessor
+from .reaction_classes import FluxByClass, assignclass
+from .reaction_classes_utilities.reaction_classes_calc import (filter_class0,
+                                                               sortby0)
 
 
-# return dataframe of sorted reaction classes based on the specified class groups file
 def get_sortedrxns(kin_xml_fld, class_groups_file):
+    """Function that sort a dataframe based on the specified class groups file.
+    Parameters
+    ----------
+    kin_xml_fld (str): kinetic folder
+    class_groups_file (str): path to the file containing the reaction class definition.
+    Returns
+    -------
+    Sorted dataframe based on the reaction class definition.
+    """
     km = KineticMap(kin_xml_fld,)
     rxns_sorted_obj, _ = assignclass(km, class_groups_file)
 

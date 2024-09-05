@@ -28,3 +28,8 @@ The detail explanation on how to build and install the package can be found insi
 # LICENSE
 
 See the [LICENSE](LICENSE.md) file for license rights and limitations (GPL-3.0).
+
+### DEVELOPERS notes
+- https://sarcasm.github.io/notes/dev/compilation-database.html
+- ninja -t compdb > compile_commands.json
+- https://www.reddit.com/r/neovim/comments/18rbvzf/lsp_does_not_want_to_find_library_header_files/
