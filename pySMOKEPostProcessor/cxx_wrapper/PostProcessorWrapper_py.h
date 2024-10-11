@@ -11,16 +11,16 @@
 #include <numeric>
 
 // OpenSMOKEpp library
-#include "OpenSMOKE_Definitions.h"
-#include "kernel/thermo/Thermodynamics_CHEMKIN"
-#include "kernel/transport/Transport_CHEMKIN"
-#include "kernel/kinetics/ReactionPolicy_CHEMKIN.h"
-#include "maps/ThermodynamicsMap_CHEMKIN.h"
-#include "maps/TransportPropertiesMap_CHEMKIN.h"
-#include "maps/KineticsMap_CHEMKIN.h"
-#include "maps/FluxAnalysisMap.h"
-#include "math/PhysicalConstants.h"
-#include "kernel/kinetics/KineticsUtilityFunctions.h"
+#include <OpenSMOKE_Definitions.h>
+#include <kernel/thermo/Thermodynamics_CHEMKIN>
+#include <kernel/transport/Transport_CHEMKIN>
+#include <kernel/kinetics/ReactionPolicy_CHEMKIN.h>
+#include <kernel/kinetics/KineticsUtilityFunctions.h>
+#include <maps/ThermodynamicsMap_CHEMKIN.h>
+#include <maps/TransportPropertiesMap_CHEMKIN.h>
+#include <maps/KineticsMap_CHEMKIN.h>
+#include <maps/FluxAnalysisMap.h>
+#include <math/PhysicalConstants.h>
 
 // Boost library
 #include <boost/filesystem.hpp>

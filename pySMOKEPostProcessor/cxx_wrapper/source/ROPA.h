@@ -1,155 +1,113 @@
+// clang-format off
 /*-----------------------------------------------------------------------*\
-|    ___                   ____  __  __  ___  _  _______                  |
-|   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
-|  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
-|  | |_| | |_) |  __/ | | |___) | |  | | |_| | . \| |__|_   _|_   _|      |
-|   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
-|        |_|                                                              |
 |                                                                         |
-|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				          |
-|			       Edoardo Ramalli <edoardo.ramalli@polimi.it>			            |
+|                        _____  __  ___ ____   __ __  ______              |
+|          ____   __  __/ ___/ /  |/  // __ \ / //_/ / ____/____   ____   |
+|         / __ \ / / / /\__ \ / /|_/ // / / // ,<   / __/  / __ \ / __ \  |
+|        / /_/ // /_/ /___/ // /  / // /_/ // /| | / /___ / /_/ // /_/ /  |
+|       / .___/ \__, //____//_/  /_/ \____//_/ |_|/_____// .___// .___/   |
+|      /_/     /____/                                   /_/    /_/        |
+|                                                                         |
+|                                                                         |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>                  |
+|            Edoardo Ramalli <edoardo.ramalli@polimi.it>				          |
+|            Luna Pratali Maffei <luna.pratali@polimi.it>                 |
 |   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
 |   Department of Chemistry, Materials and Chemical Engineering           |
-|   Politecnico di Milano                                                 |
-|   P.zza Leonardo da Vinci 32, 20133 Milano                              |
-|                                                                         |
-|-------------------------------------------------------------------------|
-|                                                                         |
-|   This file is part of OpenSMOKE++ framework.                           |
-|                                                                         |
-|	License																                                  |
-|                                                                         |
-|   Copyright(C) 2016-2012  Alberto Cuoci                                 |
-|   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
-|   it under the terms of the GNU General Public License as published by  |
-|   the Free Software Foundation, either version 3 of the License, or     |
-|   (at your option) any later version.                                   |
-|                                                                         |
-|   OpenSMOKE++ is distributed in the hope that it will be useful,        |
-|   but WITHOUT ANY WARRANTY; without even the implied warranty of        |
-|   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         |
-|   GNU General Public License for more details.                          |
-|                                                                         |
-|   You should have received a copy of the GNU General Public License     |
-|   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
-|                                                                         |
+|   Politecnico di Milano, P.zza Leonardo da Vinci 32, 20133 Milano       |
 \*-----------------------------------------------------------------------*/
-
-#ifndef ROPA_H
-#define ROPA_H
+// clang-format on
+#pragma once
 
 #include "ProfilesDatabase.h"
 
-class ROPA
-{
-  public:
-    ROPA();
+typedef std::variant<double, size_t, std::string, bool> multi_type;
 
-    void SetDatabase(ProfilesDatabase *data);
+class ROPA {
+ public:
+  ROPA(const std::unordered_map<std::string, multi_type>& ropa_settings);
 
-    void RateOfProductionAnalysis(const unsigned int number_of_reactions);
+  void set_database(ProfilesDatabase* data);
 
-    void RateOfProductionAnalysis2D(const unsigned int number_of_reactions, const double local_x,
-            const double local_z,const double region_low_x, const double region_up_x,
-            const double region_low_z, const double region_up_z);
+  void rate_of_production_analysis(const size_t number_of_reactions);
 
-    void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
-                                      const std::vector<unsigned int> &negative_indices,
-                                      const std::vector<double> &positive_coefficients,
-                                      const std::vector<double> &negative_coefficients, std::vector<int> &indices,
-                                      std::vector<double> &coefficients);
+  // void RateOfProductionAnalysis2D(const size_t number_of_reactions, const double
+  // local_x,
+  //                                 const double local_z, const double region_low_x,
+  //                                 const double region_up_x, const double region_low_z,
+  //                                 const double region_up_z);
 
-    void FluxAnalysis();
+  void flux_analysis();
 
-    void GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates);
+  void get_reaction_rates(const std::vector<size_t>& reaction_indices,
+                          const bool sum_rates);
 
-    void GetFormationRates(std::string specie, std::string units, std::string type);
+  void get_formation_rates(const std::string species, const std::string units,
+                           const std::string type);
 
-    void SetKineticFolder(const std::string kineticFolder);
+  const std::vector<size_t>& reactions() const { return reactions_; };
 
-    void SetOutputFolder(const std::string outputFolder);
+  const std::vector<double>& coefficients() const { return coefficients_; };
 
-    void SetROPAType(const std::string kineticFolder);
+  const std::vector<size_t>& index_first_name() const { return index_first_name_; };
 
-    void SetSpecies(const std::string kineticFolder);
+  const std::vector<size_t>& index_second_name() const { return index_second_name_; };
 
-    void SetLocalValue(double localValue);
+  const std::vector<double>& computed_thickness() const { return computed_thickness_; };
 
-    void SetLowerBound(double lowerBound);
+  const std::vector<double>& computed_labels() const { return computed_labels_; };
 
-    void SetUpperBound(double upperBound);
+  const std::vector<double>& formation_rates() const { return formation_rates_; };
 
-    void SetElement(const std::string element);
+  const std::vector<std::vector<double>>& reaction_rates() const {
+    return reaction_rates_;
+  };
 
-    void SetThickness(const std::string thickness);
+  const std::vector<double>& sum_of_rates() const { return sum_of_rates_; };
 
-    void SetFluxAnalysisType(const std::string type);
+  const static void py_wrap(pybind11::module_&);
 
-    void SetWidth(const int width);
+ private:
+  // The inputs of this function are determined by opensmoke...
+  void merge_positive_and_negative_bars(
+      const std::vector<unsigned int>& positive_indices,
+      const std::vector<unsigned int>& negative_indices,
+      const std::vector<double>& positive_coefficients,
+      const std::vector<double>& negative_coefficients, std::vector<int>& indices,
+      std::vector<double>& coefficients);
 
-    void SetDepth(const int depth);
+  ProfilesDatabase* data_;
+  std::vector<size_t> indices_coarse_reactions_;
+  std::vector<std::string> string_list_reactions;
 
-    void SetThreshold(const double threshold);
+  std::string ropa_type_;
+  std::string species_;
 
-    void SetThicknessLogScale(bool thicknesslogscale);
+  double local_value_;
+  double upper_bound_;
+  double lower_bound_;
+  bool species_is_selected_;
 
-    void SetLabelType(std::string type);
+  std::string element_;
+  std::string thickness_;
+  std::string flux_analysis_type_;
+  size_t width_;
+  size_t depth_;
+  double threshold_;
+  bool thicknesslogscale_;
+  std::string label_type_;
 
-    inline const std::vector<unsigned int>& reactions() const {return reactions_;};
+  std::vector<size_t> reactions_;
+  std::vector<double> coefficients_;
 
-    inline const std::vector<double>& coefficients() const {return coefficients_;};
+  std::vector<size_t> index_first_name_;
+  std::vector<size_t> index_second_name_;
+  std::vector<double> computed_thickness_;
+  std::vector<double> computed_labels_;
 
-    inline const std::vector<int>& indexFirstName() const {return indexFirstName_;};
-
-    inline const std::vector<int>& indexSecondName() const {return indexSecondName_;}; 
-
-    inline const std::vector<double>& computedThickness() const {return computedThickness_;};
-
-    inline const std::vector<double>& computedLabel() const {return computedLabel_;};
-
-    inline const std::vector<double>& formationRates() const {return formationRates_;};
-
-    inline const std::vector<std::vector<double>>& reactionRates() const {return reactionRates_;};
-
-    inline const std::vector<double>& sumOfRates() const {return sumOfRates_;};
-
-  private:
-
-    ProfilesDatabase *data_;
-    std::vector<unsigned int> indices_coarse_reactions_;
-    std::vector<std::string> string_list_reactions;
-
-    std::string ropaType_;
-    std::string kineticFolder_;
-    std::string outputFolder_;
-    std::string species_;
-
-    double localValue_;
-    double upperBound_;
-    double lowerBound_;
-    bool speciesIsSelected;
-
-    std::string element_;
-    std::string thickness_;
-    std::string flux_type_;
-    int width_;
-    int depth_;
-    double threshold_;
-    bool thicknesslogscale_;
-    std::string label_type_;
-    
-    std::vector<unsigned int> reactions_;
-    std::vector<double> coefficients_;
-
-    std::vector<int> indexFirstName_;
-    std::vector<int> indexSecondName_;
-    std::vector<double> computedThickness_;
-    std::vector<double> computedLabel_;
-
-    std::vector<double> formationRates_;
-    std::vector<std::vector<double>> reactionRates_;
-    std::vector<double> sumOfRates_;
+  std::vector<double> formation_rates_;
+  std::vector<std::vector<double>> reaction_rates_;
+  std::vector<double> sum_of_rates_;
 };
 
 #include "ROPA.hpp"
-#endif // ROPA_H

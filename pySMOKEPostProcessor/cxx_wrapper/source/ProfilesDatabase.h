@@ -19,68 +19,90 @@
 // clang-format on
 #pragma once
 
-#include <Eigen/Sparse>
-
 class ProfilesDatabase {
  public:
-  ProfilesDatabase(void);
-  ~ProfilesDatabase(void);
+  ProfilesDatabase();
 
-  bool ReadKineticMechanism(const std::string &folder_name);
+  ~ProfilesDatabase();
 
-  bool ReadFileResults(const std::string &folder_name);
+  void read_kinetic_mechanism(const std::string &folder_name);
 
-  void Prepare();
+  void read_file_results(const std::string &folder_name);
 
-  void SpeciesCoarsening(const double threshold);
+  void species_coarsening(const double threshold);
 
-  int number_of_abscissas_;
-  int number_of_ordinates_;
+  void reactions_associated_to_species(const size_t index, std::vector<size_t> &indices);
 
-  std::vector<int> column_index_of_massfractions_profiles;
-  std::vector<std::string> string_list_additional;
-  std::vector<int> list_of_conversion_species_;
+  void is_reactant_product(const size_t reaction_index, double &netStoichiometry);
 
-  std::vector<std::string> string_list_massfractions_sorted;
-  std::vector<int> sorted_index;
-  std::vector<int> current_sorted_index;
+  const static void py_wrap(pybind11::module_ &);
+
+  std::unique_ptr<OpenSMOKE::ThermodynamicsMap_CHEMKIN> thermodynamics_map_xml_;
+
+  std::unique_ptr<OpenSMOKE::KineticsMap_CHEMKIN> kinetics_map_xml_;
+
+  const std::vector<std::string> &string_list_massfractions_sorted() const {
+    return string_list_massfractions_sorted_;
+  };
+
+  const std::vector<size_t> &sorted_index() const { return sorted_index_; };
+
+  const size_t &number_of_abscissas() const { return number_of_abscissas_; };
+
+  const size_t &number_of_ordinates() const { return number_of_ordinates_; };
+
+  const std::vector<std::vector<double>> &omega() const { return omega_; };
+
+  const std::vector<std::vector<double>> &additional() const { return additional_; };
+
+  const size_t &index_T() const { return index_T_; };
+
+  const size_t &index_P() const { return index_P_; };
+
+ private:
+  void read_xml();
+
+  bool is_sensitivity_enabled_;
+
+  bool is_ropa_enabled_;
+
+  bool is_kinetics_available_;
+
+  size_t index_density_;
+
+  size_t index_velocity_;
+
+  size_t index_mass_flow_rate_;
+
+  std::vector<std::vector<double>> omega_;
+  std::vector<std::vector<double>> additional_;
+  std::vector<std::string> reaction_strings_;
+
+  boost::property_tree::ptree xml_main_input_;
+
+  size_t index_T_;
+  size_t index_P_;
+  size_t index_MW_;
+  size_t index_volume_;
+
+  size_t index_x_coord_;
+  size_t index_z_coord_;
+
+  size_t number_of_abscissas_;
+  size_t number_of_ordinates_;
+
+  std::vector<size_t> index_of_massfractions_profiles_;
+  std::vector<std::string> list_additional_;
+  std::vector<size_t> conversion_species_;
+
+  std::vector<std::string> string_list_massfractions_sorted_;
+  std::vector<size_t> sorted_index_;
+  std::vector<size_t> current_sorted_index;
   std::vector<double> sorted_max;
-
-  std::vector<std::vector<double>> omega;
-  std::vector<std::vector<double>> additional;
-
-  unsigned int index_T;
-  unsigned int index_P;
-  unsigned int index_MW;
-  unsigned int index_density;
-  unsigned int index_velocity;
-  unsigned int index_mass_flow_rate;
-  unsigned int index_volume;
-
-  unsigned int index_x_coord;
-  unsigned int index_z_coord;
 
   std::vector<double> mw_species_;
 
-  boost::property_tree::ptree xml_main_input;
-
-  OpenSMOKE::ThermodynamicsMap_CHEMKIN *thermodynamicsMapXML;
-  OpenSMOKE::KineticsMap_CHEMKIN *kineticsMapXML;
-
-  bool iSensitivityEnabled_;
-  bool iROPAEnabled_;
-  bool is_kinetics_available_;
-
-  boost::filesystem::path path_folder_results_;
-  boost::filesystem::path path_folder_mechanism_;
-
-  void ReactionsAssociatedToSpecies(const unsigned int index,
-                                    std::vector<unsigned int> &indices);
-
-  void isReactantProduct(const unsigned int reaction_index, double &netStoichiometry);
-
   std::string name_reactions_;
-  std::vector<std::string> reaction_strings_;
 };
 
 #include "ProfilesDatabase.hpp"
