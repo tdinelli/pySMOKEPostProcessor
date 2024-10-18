@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ProfilesDatabase.h"
+#include "PostProcessorFluxMap.h"
 
 typedef std::variant<double, size_t, std::string, bool> multi_type;
 
@@ -39,11 +40,9 @@ class ROPA {
 
   void flux_analysis();
 
-  void get_reaction_rates(const std::vector<size_t>& reaction_indices,
-                          const bool sum_rates);
+  void get_reaction_rates(const std::vector<size_t>& reaction_indices, const bool sum_rates);
 
-  void get_formation_rates(const std::string species, const std::string units,
-                           const std::string type);
+  void get_formation_rates(const std::string species, const std::string units, const std::string type);
 
   const std::vector<size_t>& reactions() const { return reactions_; };
 
@@ -59,9 +58,7 @@ class ROPA {
 
   const std::vector<double>& formation_rates() const { return formation_rates_; };
 
-  const std::vector<std::vector<double>>& reaction_rates() const {
-    return reaction_rates_;
-  };
+  const std::vector<std::vector<double>>& reaction_rates() const { return reaction_rates_; };
 
   const std::vector<double>& sum_of_rates() const { return sum_of_rates_; };
 
@@ -69,12 +66,11 @@ class ROPA {
 
  private:
   // The inputs of this function are determined by opensmoke...
-  void merge_positive_and_negative_bars(
-      const std::vector<unsigned int>& positive_indices,
-      const std::vector<unsigned int>& negative_indices,
-      const std::vector<double>& positive_coefficients,
-      const std::vector<double>& negative_coefficients, std::vector<int>& indices,
-      std::vector<double>& coefficients);
+  void merge_positive_and_negative_bars(const std::vector<unsigned int>& positive_indices,
+                                        const std::vector<unsigned int>& negative_indices,
+                                        const std::vector<double>& positive_coefficients,
+                                        const std::vector<double>& negative_coefficients, std::vector<int>& indices,
+                                        std::vector<double>& coefficients);
 
   ProfilesDatabase* data_;
   std::vector<size_t> indices_coarse_reactions_;

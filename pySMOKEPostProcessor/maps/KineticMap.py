@@ -1,11 +1,4 @@
-import os
-import xml.etree.ElementTree as ET
-import numpy as np
-
 """
-Dev NOTES: I am thinking of removing this class and OpenSMOKEppXML class in the same folder in favour of
-          OpenSMOKEpp_Interfaces package keep in mind this in case of future refactoring.
-MODULE: KineticMechanism
 @Authors:
     Alberto Cuoci [1], Timoteo Dinelli [1], Luna Pratali Maffei [1]
     [1]: CRECK Modeling Lab, Department of Chemistry, Materials, and Chemical Engineering, Politecnico di Milano
@@ -16,62 +9,57 @@ MODULE: KineticMechanism
 @Additional notes:
     - This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
       Please report any bug to: timoteo.dinelli@polimi.it
-    - This is a modified class frome the original one KineticMechanism.py inside PyTools4OpenSMOKE modified by
-      Timoteo Dinelli to handle gas-phase in order to post-process data in order to integrate the entire capability of
-      post-processing simulations inside the pySMOKEPostProcessor. Improved performances to make it runs blazingly fast.
-    - Luna Pratali Maffei add utilities to perform post processing of reaction classes
+    - This is a modified class frome the original one KineticMechanism.py inside PyTools4OpenSMOKE modified by Timoteo
+      Dinelli and Luna Pratali Maffei to accomodate different new features.
 """
+
+import os
+import xml.etree.ElementTree as ET
+import numpy as np
 
 
 class KineticMap:
 
-    def __init__(self, KineticFolder: str):
+    def __init__(self, kinetic_folder: str) -> None:
 
-        reactionNames_xml = os.path.join(KineticFolder, "reaction_names.xml")
-        if not os.path.isfile(reactionNames_xml):
-            raise ValueError("The kinetic folder does not contain any reaction_names.xml file! \
-                              Please provide a valid mechanism")
+        reaction_names_xml = os.path.join(kinetic_folder, "reaction_names.xml")
+        if not os.path.isfile(reaction_names_xml):
+            raise ValueError("The kinetic folder does not contain any reaction_names.xml file!")
 
-        kinetic_xml = os.path.join(KineticFolder, "kinetics.xml")
-
+        kinetic_xml = os.path.join(kinetic_folder, "kinetics.xml")
         if not os.path.isfile(kinetic_xml):
-            raise ValueError("The kinetic folder does not contain any kinetics.xml file! \
-                              Please provide a valid mechanism")
+            raise ValueError("The kinetic folder does not contain any kinetics.xml file!")
 
-        self.ParseReactionNames(reaction_names=reactionNames_xml)
-        self.ParseKinetic(kinetics_file=kinetic_xml)
+        self._reaction_names = self.parse_reaction_names(reaction_names_xml=reaction_names_xml)
+        self.parse_kinetic(kinetics_xml=kinetic_xml)
 
-    def ParseReactionNames(self, reaction_names: str) -> None:
+    @staticmethod
+    def parse_reaction_names(reaction_names_xml: str) -> list:
         """
-        Function that parse the reaction_names.xml file and define the necessary variables for the class.
-        Args:
-            reaction_names: path to the file reaction_names.xml.
+        Read the file named reaction_names.xml and returns a list containing the names of the reactions.
         """
-        reaction_names_tree = ET.parse(reaction_names)
+        reaction_names_tree = ET.parse(reaction_names_xml)
         rn_root = reaction_names_tree.getroot()
-        self.reaction_names = rn_root.find("reaction-names")
-        self.reaction_names = (self.reaction_names.text).split()
+        reaction_names = rn_root.find("reaction-names")
+        reaction_names = (reaction_names.text).split()
+        return reaction_names
 
-    def ParseKinetic(self, kinetics_file: str) -> None:
-        """
-        Function that parse the kinetics.xml file and define the necessary variables for the class.
-        Args:
-            kinetics_file: path to the file kinetics.xml.
-        """
-        tree = ET.parse(kinetics_file)
+    def parse_kinetic(self, kinetics_xml: str) -> None:
+        """ """
+        tree = ET.parse(kinetics_xml)
         root = tree.getroot()
 
         # List of elements
         elements = root.find("NamesOfElements").text.split()
-        NumberOfElements = len(elements)  # ne
+        number_of_elements = len(elements)  # ne
 
         # List of species
         species = root.find("NamesOfSpecies").text.split()
-        NumberOfSpecies = len(species)  # ns
+        number_of_species = len(species)  # ns
 
         # Atomic composition
-        atomic = np.fromstring(root.find("AtomicComposition").text, dtype=np.float32, sep=' ')
-        atomic = atomic.reshape((NumberOfSpecies, NumberOfElements))
+        atomic = np.fromstring(root.find("AtomicComposition").text, dtype=np.float32, sep=" ")
+        atomic = atomic.reshape((number_of_species, number_of_elements))
 
         # Elements molecular weights
         element_weights = {
@@ -81,7 +69,7 @@ class KineticMap:
             "N": 14.0069999694824,
             "HE": 4.002999782562256,
             "AR": 39.948001861572270,
-            "S": 32.065
+            "S": 32.065,
         }
 
         mwe = np.array([element_weights.get(elem, 0.0) for elem in elements], dtype=np.float32)
@@ -89,105 +77,96 @@ class KineticMap:
         # Species molecular weights
         mws = np.dot(atomic, mwe)
 
-        # Soot classes (if they exists)
-        # This is for postprocessing soot (currently not implemented)
-        # reaction_class_name = []
-        # reaction_class_size = []
-        # reaction_class_indices = []
-
         # Kinetics
         kinetics = root.find("Kinetics")
 
         # Number Of Reactions
-        NumberOfReactions = int(kinetics.findtext("NumberOfReactions"))
+        number_of_reactions = int(kinetics.findtext("NumberOfReactions"))
 
         # Fall Off reactions
-        self.NumberOfFallOffReactions, *IndicesOfFallOffReactions = map(int, kinetics.find("FallOff").text.split())
-        self.IndicesOfFallOffReactions = IndicesOfFallOffReactions
+        self._number_of_falloff_reactions, *indices_of_falloff_reactions = map(
+            int, kinetics.find("FallOff").text.split()
+        )
+        self._indices_of_falloff_reactions = indices_of_falloff_reactions
+
         # Cabr Reactions
-        self.NumberOfCabrReactions, *IndicesOfCabrReactions = map(int, kinetics.find("CABR").text.split())
-        self.IndicesOfCabrReactions = IndicesOfCabrReactions
+        self._number_of_cabr_reactions, *indices_of_cabr_reactions = map(int, kinetics.find("CABR").text.split())
+        self._indices_of_cabr_reactions = indices_of_cabr_reactions
 
         # Kinetic parameters
         kinetic_parameters = kinetics.find("KineticParameters")
         direct = kinetic_parameters.find("Direct")
 
-        self.A = np.exp(np.fromstring(direct.findtext("lnA"), dtype=np.float64, sep=' ')[1:])
-        self.Beta = np.fromstring(direct.findtext("Beta"), dtype=np.float64, sep=' ')[1:]
-        self.E_over_R = np.fromstring(direct.findtext("E_over_R"), dtype=np.float64, sep=' ')[1:]
+        self._A = np.exp(np.fromstring(direct.findtext("lnA"), dtype=np.float64, sep=" ")[1:])
+        self._Beta = np.fromstring(direct.findtext("Beta"), dtype=np.float64, sep=" ")[1:]
+        self._E_over_R = np.fromstring(direct.findtext("E_over_R"), dtype=np.float64, sep=" ")[1:]
 
-        # Assign internal members
+        self._elements = elements
+        self._atomic = atomic
+        self._species = species
+        self._number_of_elements = number_of_elements
+        self._number_of_species = number_of_species
+        self._number_of_reactions = number_of_reactions
+        self._kinetics = kinetics
 
-        self.elements = elements
-        self.atomic = atomic
-        self.species = species
-        self.NumberOfElements = NumberOfElements
-        self.NumberOfSpecies = NumberOfSpecies
-        self.NumberOfReactions = NumberOfReactions
-        self.kinetics = kinetics
+        self._mwe = mwe
+        self._mws = mws
 
-        self.mwe = mwe
-        self.mws = mws
-
-        # TODO: Check here, these two variables seems to be unsed
-        self.groups = []
-        self.reactions = []
-
-    def Classes(self) -> None:
+    def read_reactionclasses(self) -> dict:
         """
         Read reaction classes if present.
         Raises:
             Exception: If no reaction classes definitions found raise exception.
         """
-        reaction_classes = self.kinetics.find("ReactionClasses")
+        reaction_classes = self._kinetics.find("ReactionClasses")
 
         if reaction_classes is None:
             raise Exception("The kinetic mechanism provided does not contain any reaction class!")
 
-        # TODO (TD): Luna PPM I don't really like the following two lines I am thinking on how to rewrite them better.
-        self.rxnclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
-        self.rxnsubclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
+        reaction_class = {i: None for i in range(1, self._number_of_reactions + 1)}
+        reaction_subclass = {i: None for i in range(1, self._number_of_reactions + 1)}
         classes = {}
 
         for child in reaction_classes:
             if child.tag == "MainClass":
                 classname = child.attrib["name"]
-                if classname not in classes:
-                    classes[classname] = {}
+                class_entry = classes.setdefault(classname, {})
+
                 for subclass in child:
                     subclassname = subclass.attrib["name"]
-                    if subclassname not in classes[classname]:
-                        classes[classname][subclassname] = []
+                    subclass_entry = class_entry.setdefault(subclassname, [])
                     reaction_indices = subclass.find("ReactionIndices")
                     if reaction_indices is not None:
                         indices = map(int, reaction_indices.text.split())
                         for i in indices:
                             i += 1
-                            classes[classname][subclassname].append(i)
-                            self.rxnclass[i] = classname
-                            self.rxnsubclass[i] = subclassname
+                            subclass_entry.append(i)
+                            reaction_class[i] = classname
+                            reaction_subclass[i] = subclassname
+        print(reaction_class)
 
-        self.classes = classes
+        return classes
 
-    def ReactionNameFromIndex(self, reactionIndex: int) -> str:
+    def reaction_name_from_index(self, reaction_index: int) -> str:
         """
         Function that given the index of a reaction returns its name.
         Args:
-            reactionIndex: Index of the reaction (0-based).
+            reaction_index: Index of the reaction (0-based).
         Returns:
             Name of the reaction.
         """
-        if reactionIndex < self.NumberOfReactions:
-            return f"R{reactionIndex + 1}: {self.reaction_names[reactionIndex]}"
-        elif reactionIndex < self.NumberOfReactions + self.NumberOfFallOffReactions:
-            global_index = self.IndicesOfFallOffReactions[reactionIndex - self.NumberOfReactions]
-            return f"R{global_index}(inf): {self.reaction_names[global_index - 1]}"
+        if reaction_index < self._number_of_reactions:
+            return f"R{reaction_index + 1}: {self._reaction_names[reaction_index]}"
+        elif reaction_index < self._number_of_reactions + self._number_of_falloff_reactions:
+            global_index = self._indices_of_falloff_reactions[reaction_index - self._number_of_reactions]
+            return f"R{global_index}(inf): {self._reaction_names[global_index - 1]}"
         else:
-            global_index = self.IndicesOfCabrReactions[reactionIndex -
-                                                       self.NumberOfReactions - self.NumberOfFallOffReactions]
-            return f"R{global_index}(inf): {self.reaction_names[global_index - 1]}"
+            global_index = self._indices_of_cabr_reactions[
+                reaction_index - self._number_of_reactions - self._number_of_falloff_reactions
+            ]
+            return f"R{global_index}(inf): {self._reaction_names[global_index - 1]}"
 
-    def ReactionIndexFromName(self, name: str) -> int:
+    def reaction_index_from_name(self, name: str) -> int:
         """
         Function that given the name of the reaction returns the corresponding index whithin the list of the reactions.
         Warning: this is the index of the reaction 0-based pay attention to cabr and falloff reactions.
@@ -197,11 +176,11 @@ class KineticMap:
             Index of the reaction.
         """
         try:
-            return self.reaction_names.index(name)
+            return self._reaction_names.index(name)
         except ValueError:
-            raise ValueError("The requested reaction is not available whithin the kinetic mechanism")
+            raise ValueError(f"The requested reaction {name} is not available whithin the kinetic mechanism")
 
-    def SpeciesNameFromIndex(self, index: int) -> str:
+    def species_name_from_index(self, index: int) -> str:
         """
         Function that given an index returns the coressponding species name.
         Args:
@@ -209,12 +188,12 @@ class KineticMap:
         Returns:
             Name of the species.
         """
-        if 0 <= index < len(self.species):
-            return self.species[index]
+        if 0 <= index < len(self._species):
+            return self._species[index]
         else:
-            raise IndexError("Index out of range")
+            raise IndexError(f"Index {index} out of range")
 
-    def IndexFromSpeciesName(self, name: str) -> int:
+    def index_from_species_name(self, name: str) -> int:
         """
         Function that given the name of a species returns its index.
         Args:
@@ -223,6 +202,66 @@ class KineticMap:
             Index of the species.
         """
         try:
-            return self.species.index(name)
+            return self._species.index(name)
         except ValueError:
-            raise ValueError("The kinetic mechanism does not contain the requested species!")
+            raise ValueError(f"The kinetic mechanism does not contain the requested species {name}!")
+
+    @property
+    def elements(self):
+        return self._elements
+
+    @property
+    def atomic(self):
+        return self._atomic
+
+    @property
+    def species(self):
+        return self._species
+
+    @property
+    def number_of_elements(self):
+        return self._number_of_elements
+
+    @property
+    def number_of_species(self):
+        return self._number_of_species
+
+    @property
+    def number_of_reactions(self):
+        return self._number_of_reactions
+
+    @property
+    def mwe(self):
+        return self._mwe
+
+    @property
+    def mws(self):
+        return self._mws
+
+    @property
+    def A(self):
+        return self._A
+
+    @property
+    def Beta(self):
+        return self._Beta
+
+    @property
+    def E_over_R(self):
+        return self._E_over_R
+
+    @property
+    def number_of_falloff_reactions(self):
+        return self._number_of_falloff_reactions
+
+    @property
+    def indices_of_falloff_reactions(self):
+        return self._indices_of_falloff_reactions
+
+    @property
+    def number_of_cabr_reactions(self):
+        return self._number_of_cabr_reactions
+
+    @property
+    def indices_of_cabr_reactions(self):
+        return self._indices_of_cabr_reactions

@@ -33,22 +33,26 @@ ROPA::ROPA(const std::unordered_map<std::string, multi_type>& ropa_settings) {
 
   // Flux analysis specific things
   element_ = std::get<std::string>(ropa_settings.at("element"));
+
   thickness_ = std::get<std::string>(ropa_settings.at("thickness"));
   if (thickness_ != "absolute" && thickness_ != "relative") {
     std::cerr << "Available thickness_ types are: absolute | relative(%)" << std::endl;
     std::exit(EXIT_FAILURE);
   }
+
   flux_analysis_type_ = std::get<std::string>(ropa_settings.at("flux_analysis_type"));
   if (flux_analysis_type_ != "production" && flux_analysis_type_ != "destruction") {
-    std::cerr << "Available flux analysis types are: production | destruction"
-              << std::endl;
+    std::cerr << "Available flux analysis types are: production | destruction" << std::endl;
     std::exit(EXIT_FAILURE);
   }
+
   width_ = std::get<size_t>(ropa_settings.at("width"));
   depth_ = std::get<size_t>(ropa_settings.at("depth"));
   threshold_ = std::get<double>(ropa_settings.at("threshold"));
+
   // TODO
   // thicknesslogscale_ = std::get<bool>(ropa_settings.at("thickness_logscale"));
+
   label_type_ = std::get<std::string>(ropa_settings.at("label_type"));
   if (label_type_ != "absolute" && label_type_ != "relative") {
     std::cout << "Available label types are: absolute | relative(%)" << std::endl;
@@ -60,8 +64,7 @@ void ROPA::set_database(ProfilesDatabase* data) { data_ = data; }
 
 void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
   // Select y variables among the species
-  if (std::find(data_->string_list_massfractions_sorted().begin(),
-                data_->string_list_massfractions_sorted().end(),
+  if (std::find(data_->string_list_massfractions_sorted().begin(), data_->string_list_massfractions_sorted().end(),
                 species_) != data_->string_list_massfractions_sorted().end()) {
     species_is_selected_ = true;
   } else {
@@ -80,8 +83,7 @@ void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
   }
 
   OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamics_map_xml_->NumberOfSpecies());
-  OpenSMOKE::OpenSMOKEVectorDouble omega(
-      data_->thermodynamics_map_xml_->NumberOfSpecies());
+  OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamics_map_xml_->NumberOfSpecies());
 
   std::vector<int> reaction_indices;
@@ -103,8 +105,7 @@ void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
 
     // Calculates mole fractions
     double MWmix;
-    data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(
-        x.GetHandle(), MWmix, omega.GetHandle());
+    data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
 
     // Calculates concentrations
     const double P_Pa = data_->additional()[data_->index_P()][index];
@@ -125,11 +126,10 @@ void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
     OpenSMOKE::ROPA_Data ropa;
     data_->kinetics_map_xml_->RateOfProductionAnalysis(ropa);
 
-    merge_positive_and_negative_bars(ropa.production_reaction_indices[index_of_species],
-                                     ropa.destruction_reaction_indices[index_of_species],
-                                     ropa.production_coefficients[index_of_species],
-                                     ropa.destruction_coefficients[index_of_species],
-                                     reaction_indices, reaction_coefficients);
+    merge_positive_and_negative_bars(
+        ropa.production_reaction_indices[index_of_species], ropa.destruction_reaction_indices[index_of_species],
+        ropa.production_coefficients[index_of_species], ropa.destruction_coefficients[index_of_species],
+        reaction_indices, reaction_coefficients);
   }  // Global | Region
   else {
     size_t index_min = 0;
@@ -156,8 +156,7 @@ void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
       }
     }
 
-    const double delta =
-        data_->additional()[0][index_max] - data_->additional()[0][index_min];
+    const double delta = data_->additional()[0][index_max] - data_->additional()[0][index_min];
 
     std::vector<double> global_production_coefficients;
     std::vector<double> global_destruction_coefficients;
@@ -171,8 +170,7 @@ void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
 
       // Calculates mole fractions
       double MWmix;
-      data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(
-          x.GetHandle(), MWmix, omega.GetHandle());
+      data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
 
       // Calculates concentrations
       const double P_Pa = data_->additional()[data_->index_P()][j];
@@ -202,43 +200,31 @@ void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
       }
 
       if (j == index_min) {
-        global_production_coefficients.resize(
-            ropa.production_coefficients[index_of_species].size());
-        global_destruction_coefficients.resize(
-            ropa.destruction_coefficients[index_of_species].size());
-        global_production_reaction_indices =
-            ropa.production_reaction_indices[index_of_species];
-        global_destruction_reaction_indices =
-            ropa.destruction_reaction_indices[index_of_species];
+        global_production_coefficients.resize(ropa.production_coefficients[index_of_species].size());
+        global_destruction_coefficients.resize(ropa.destruction_coefficients[index_of_species].size());
+        global_production_reaction_indices = ropa.production_reaction_indices[index_of_species];
+        global_destruction_reaction_indices = ropa.destruction_reaction_indices[index_of_species];
       }
 
-      const double dt =
-          (data_->additional()[0][j + 1] - data_->additional()[0][j]) / delta;
-      for (size_t k = 0; k < ropa.production_coefficients[index_of_species].size();
-           k++) {
-        global_production_coefficients[k] +=
-            dt * ropa.production_coefficients[index_of_species][k];
+      const double dt = (data_->additional()[0][j + 1] - data_->additional()[0][j]) / delta;
+      for (size_t k = 0; k < ropa.production_coefficients[index_of_species].size(); k++) {
+        global_production_coefficients[k] += dt * ropa.production_coefficients[index_of_species][k];
       }
 
-      for (size_t k = 0; k < ropa.destruction_coefficients[index_of_species].size();
-           k++) {
-        global_destruction_coefficients[k] +=
-            dt * ropa.destruction_coefficients[index_of_species][k];
+      for (size_t k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++) {
+        global_destruction_coefficients[k] += dt * ropa.destruction_coefficients[index_of_species][k];
       }
     }
 
-    merge_positive_and_negative_bars(
-        global_production_reaction_indices, global_destruction_reaction_indices,
-        global_production_coefficients, global_destruction_coefficients,
-        reaction_indices, reaction_coefficients);
+    merge_positive_and_negative_bars(global_production_reaction_indices, global_destruction_reaction_indices,
+                                     global_production_coefficients, global_destruction_coefficients, reaction_indices,
+                                     reaction_coefficients);
   }
 
-  coefficients_.resize(
-      std::min<size_t>(number_of_reactions, reaction_coefficients.size()));
+  coefficients_.resize(std::min<size_t>(number_of_reactions, reaction_coefficients.size()));
   reactions_.resize(std::min<size_t>(number_of_reactions, reaction_coefficients.size()));
 
-  for (size_t i = 0;
-       i < std::min<size_t>(number_of_reactions, reaction_coefficients.size()); i++) {
+  for (size_t i = 0; i < std::min<size_t>(number_of_reactions, reaction_coefficients.size()); i++) {
     coefficients_[i] = reaction_coefficients[i];
     reactions_[i] = reaction_indices[i];
   }
@@ -246,8 +232,7 @@ void ROPA::rate_of_production_analysis(const size_t number_of_reactions) {
 
 void ROPA::flux_analysis() {
   // Select y variables among the species
-  if (std::find(data_->string_list_massfractions_sorted().begin(),
-                data_->string_list_massfractions_sorted().end(),
+  if (std::find(data_->string_list_massfractions_sorted().begin(), data_->string_list_massfractions_sorted().end(),
                 species_) != data_->string_list_massfractions_sorted().end()) {
     species_is_selected_ = true;
   } else {
@@ -264,7 +249,7 @@ void ROPA::flux_analysis() {
     }
   }
 
-  size_t index_element;  // = ui.comboBox_Elements->currentIndex();
+  size_t index_element;
   std::vector<std::string> elements_names = data_->thermodynamics_map_xml_->elements();
   for (size_t k = 0; k < elements_names.size(); k++) {
     if (element_ == elements_names[k]) {
@@ -272,12 +257,10 @@ void ROPA::flux_analysis() {
       break;
     }
   }
-  const double n_elements = data_->thermodynamics_map_xml_->atomic_composition()(
-      index_of_species, index_element);
+  const double n_elements = data_->thermodynamics_map_xml_->atomic_composition()(index_of_species, index_element);
 
   if (n_elements == 0.) {
-    std::cerr << "The selected species does not contain the selected element"
-              << std::endl;
+    std::cerr << "The selected species does not contain the selected element" << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
@@ -294,8 +277,7 @@ void ROPA::flux_analysis() {
     }
   }
   OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamics_map_xml_->NumberOfSpecies());
-  OpenSMOKE::OpenSMOKEVectorDouble omega(
-      data_->thermodynamics_map_xml_->NumberOfSpecies());
+  OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble r(data_->kinetics_map_xml_->NumberOfReactions());
 
@@ -305,8 +287,7 @@ void ROPA::flux_analysis() {
   }
   // Calculates mole fractions
   double MWmix;
-  data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(x.GetHandle(), MWmix,
-                                                                   omega.GetHandle());
+  data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
 
   // Calculates concentrations
   const double P_Pa = data_->additional()[data_->index_P()][index];
@@ -324,57 +305,50 @@ void ROPA::flux_analysis() {
   data_->kinetics_map_xml_->ReactionRates(c.GetHandle());
   data_->kinetics_map_xml_->GiveMeReactionRates(r.GetHandle());
 
-  // OpenSMOKE::FluxAnalysisMap flux_analysis(*data_->thermodynamics_map_xml(),
-  // *data_->kinetics_map_xml_);
-  // pySMOKEPostProcessor::PostProcessorFluxMap
-  // flux_analysis(*data_->thermodynamics_map_xml(),
-  // *data_->kinetics_map_xml_);
-  //
-  // bool destruction = false;
-  // bool relativethickness = false;
-  // bool labelrelative = false;
-  //
-  // if (flux_type_ == "destruction") destruction = true;
-  //
-  // if (thickness_ == "relative") relativethickness = true;
-  //
-  // if (label_type_ == "relative") labelrelative = true;
-  //
-  // flux_analysis.SetDestructionAnalysis(destruction);
-  // flux_analysis.SetNormalThickness(relativethickness);
-  // flux_analysis.SetNormalTags(labelrelative);
-  // flux_analysis.SetLogarithmicThickness(thicknesslogscale_);
-  // flux_analysis.SetMaxDepth(max_depth);
-  // flux_analysis.SetMaxWidth(max_width);
-  // flux_analysis.SetMinPercentageThreshold(min_threshold_percentage);
-  // flux_analysis.SetAtom(index_element);
-  // flux_analysis.SetReactionRates(r.Size(), r.GetHandle());
-  //
-  // std::vector<size_t> important_indices;
-  // important_indices.push_back(index_of_species);
-  // flux_analysis.GloballyAnalyze(important_indices, 0);
-  // flux_analysis.CalculateThickness();
-  //
-  // flux_analysis.ComputeFluxAnalysis();
-  //
-  // indexFirstName_ = flux_analysis.IndexFirstName;
-  // indexSecondName_ = flux_analysis.IndexSecondName;
-  // computedThickness_ = flux_analysis.ComputedThicknessValue;
-  // computedLabel_ = flux_analysis.ComputedLabelValue;
+  pySMOKEPostProcessor::PostProcessorFluxMap flux_analysis(*data_->thermodynamics_map_xml_, *data_->kinetics_map_xml_);
+
+  bool destruction = false;
+  bool relativethickness = false;
+  bool labelrelative = false;
+
+  if (flux_analysis_type_ == "destruction") { destruction = true; }
+
+  if (flux_analysis_type_ == "relative") { relativethickness = true; }
+
+  if (flux_analysis_type_ == "relative") { labelrelative = true; }
+
+  flux_analysis.SetDestructionAnalysis(destruction);
+  flux_analysis.SetNormalThickness(relativethickness);
+  flux_analysis.SetNormalTags(labelrelative);
+  flux_analysis.SetLogarithmicThickness(thicknesslogscale_);
+  flux_analysis.SetMaxDepth(max_depth);
+  flux_analysis.SetMaxWidth(max_width);
+  flux_analysis.SetMinPercentageThreshold(min_threshold_percentage);
+  flux_analysis.SetAtom(index_element);
+  flux_analysis.SetReactionRates(r.Size(), r.GetHandle());
+
+  std::vector<unsigned int> important_indices;
+  important_indices.push_back(index_of_species);
+  flux_analysis.GloballyAnalyze(important_indices, 0);
+  flux_analysis.CalculateThickness();
+
+  flux_analysis.compute_flux_analysis();
+
+  index_first_name_ = flux_analysis.index_first_name;
+  index_second_name_ = flux_analysis.index_second_name;
+  computed_thickness_ = flux_analysis.computed_thickness_value;
+  computed_labels_ = flux_analysis.computed_label_value;
 }
 
-void ROPA::get_reaction_rates(const std::vector<size_t>& reaction_indices,
-                              const bool sum_rates) {
+void ROPA::get_reaction_rates(const std::vector<size_t>& reaction_indices, const bool sum_rates) {
   size_t number_of_reactions = reaction_indices.size();
 
   // Calculate the reaction rates
   sum_of_rates_.resize(data_->number_of_abscissas());
-  reaction_rates_.resize(number_of_reactions,
-                         std::vector<double>(data_->number_of_abscissas(), 1));
+  reaction_rates_.resize(number_of_reactions, std::vector<double>(data_->number_of_abscissas(), 1));
 
   OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamics_map_xml_->NumberOfSpecies());
-  OpenSMOKE::OpenSMOKEVectorDouble omega(
-      data_->thermodynamics_map_xml_->NumberOfSpecies());
+  OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble r(data_->kinetics_map_xml_->NumberOfReactions());
 
@@ -386,8 +360,7 @@ void ROPA::get_reaction_rates(const std::vector<size_t>& reaction_indices,
 
     // Calculate mole fractions
     double MWmix;
-    data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(
-        x.GetHandle(), MWmix, omega.GetHandle());
+    data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
 
     // Calculate concentrations
     const double P_Pa = data_->additional()[data_->index_P()][i];
@@ -423,8 +396,7 @@ void ROPA::get_reaction_rates(const std::vector<size_t>& reaction_indices,
   }
 }
 
-void ROPA::get_formation_rates(const std::string specie, const std::string units,
-                               const std::string type) {
+void ROPA::get_formation_rates(const std::string specie, const std::string units, const std::string type) {
   if (units != "mass" && units != "mole") {
     std::cerr << "Available Formation Rates units are: mole | mass" << std::endl;
     std::exit(EXIT_FAILURE);
@@ -452,8 +424,7 @@ void ROPA::get_formation_rates(const std::string specie, const std::string units
   OpenSMOKE::OpenSMOKEVectorDouble P(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble D(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamics_map_xml_->NumberOfSpecies());
-  OpenSMOKE::OpenSMOKEVectorDouble omega(
-      data_->thermodynamics_map_xml_->NumberOfSpecies());
+  OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamics_map_xml_->NumberOfSpecies());
   OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamics_map_xml_->NumberOfSpecies());
 
   for (size_t i = 0; i < data_->number_of_abscissas(); i++) {
@@ -463,8 +434,7 @@ void ROPA::get_formation_rates(const std::string specie, const std::string units
 
     // Calculates mole fractions
     double MWmix;
-    data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(
-        x.GetHandle(), MWmix, omega.GetHandle());
+    data_->thermodynamics_map_xml_->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
 
     // Calculates concentrations
     const double P_Pa = data_->additional()[data_->index_P()][i];
@@ -480,20 +450,17 @@ void ROPA::get_formation_rates(const std::string specie, const std::string units
 
     data_->kinetics_map_xml_->KineticConstants();
     data_->kinetics_map_xml_->ReactionRates(c.GetHandle());
-    data_->kinetics_map_xml_->ProductionAndDestructionRates(
-        P.GetHandle(),
-        D.GetHandle());  // kmol / m3 / s
+    data_->kinetics_map_xml_->ProductionAndDestructionRates(P.GetHandle(),
+                                                            D.GetHandle());  // kmol / m3 / s
 
     if (type == "characteristic-time") {
       const size_t k = data_->sorted_index()[formation_rates_to_plot[1]] + 1;
       formation_rates_[i] = c[k] / (D[k] + 1.e-32);
     } else {
       if (units == "mass") {
-        OpenSMOKE::ElementByElementProduct(P.Size(), P.GetHandle(),
-                                           data_->thermodynamics_map_xml_->MWs().data(),
+        OpenSMOKE::ElementByElementProduct(P.Size(), P.GetHandle(), data_->thermodynamics_map_xml_->MWs().data(),
                                            P.GetHandle());
-        OpenSMOKE::ElementByElementProduct(D.Size(), D.GetHandle(),
-                                           data_->thermodynamics_map_xml_->MWs().data(),
+        OpenSMOKE::ElementByElementProduct(D.Size(), D.GetHandle(), data_->thermodynamics_map_xml_->MWs().data(),
                                            D.GetHandle());
       }
 
@@ -843,12 +810,11 @@ void ROPA::get_formation_rates(const std::string specie, const std::string units
 //   }
 // }
 
-void ROPA::merge_positive_and_negative_bars(
-    const std::vector<unsigned int>& positive_indices,
-    const std::vector<unsigned int>& negative_indices,
-    const std::vector<double>& positive_coefficients,
-    const std::vector<double>& negative_coefficients, std::vector<int>& indices,
-    std::vector<double>& coefficients) {
+void ROPA::merge_positive_and_negative_bars(const std::vector<unsigned int>& positive_indices,
+                                            const std::vector<unsigned int>& negative_indices,
+                                            const std::vector<double>& positive_coefficients,
+                                            const std::vector<double>& negative_coefficients, std::vector<int>& indices,
+                                            std::vector<double>& coefficients) {
   size_t n = positive_indices.size() + negative_indices.size();
 
   std::vector<size_t> signum(n);
@@ -887,28 +853,17 @@ const void ROPA::py_wrap(pybind11::module_& m) {
   py::class_<ROPA>(m, "ROPA")
       .def(py::init<const std::unordered_map<std::string, multi_type>&>())
       .def("set_database", &ROPA::set_database, py::call_guard<py::gil_scoped_release>())
-      .def("rate_of_production_analysis", &ROPA::rate_of_production_analysis,
-           py::call_guard<py::gil_scoped_release>())
-      .def("flux_analysis", &ROPA::flux_analysis,
-           py::call_guard<py::gil_scoped_release>())
-      .def("get_reaction_rates", &ROPA::get_reaction_rates,
-           py::call_guard<py::gil_scoped_release>())
-      .def("get_formation_rates", &ROPA::get_formation_rates,
-           py::call_guard<py::gil_scoped_release>())
+      .def("rate_of_production_analysis", &ROPA::rate_of_production_analysis, py::call_guard<py::gil_scoped_release>())
+      .def("flux_analysis", &ROPA::flux_analysis, py::call_guard<py::gil_scoped_release>())
+      .def("get_reaction_rates", &ROPA::get_reaction_rates, py::call_guard<py::gil_scoped_release>())
+      .def("get_formation_rates", &ROPA::get_formation_rates, py::call_guard<py::gil_scoped_release>())
       .def("reactions", &ROPA::reactions, py::call_guard<py::gil_scoped_release>())
       .def("coefficients", &ROPA::coefficients, py::call_guard<py::gil_scoped_release>())
-      .def("index_first_name", &ROPA::index_first_name,
-           py::call_guard<py::gil_scoped_release>())
-      .def("index_second_name", &ROPA::index_second_name,
-           py::call_guard<py::gil_scoped_release>())
-      .def("computed_thickness", &ROPA::computed_thickness,
-           py::call_guard<py::gil_scoped_release>())
-      .def("computed_labels", &ROPA::computed_labels,
-           py::call_guard<py::gil_scoped_release>())
-      .def("formation_rates", &ROPA::formation_rates,
-           py::call_guard<py::gil_scoped_release>())
-      .def("reaction_rates", &ROPA::reaction_rates,
-           py::call_guard<py::gil_scoped_release>())
-      .def("sum_of_rates", &ROPA::sum_of_rates,
-           py::call_guard<py::gil_scoped_release>());
+      .def("index_first_name", &ROPA::index_first_name, py::call_guard<py::gil_scoped_release>())
+      .def("index_second_name", &ROPA::index_second_name, py::call_guard<py::gil_scoped_release>())
+      .def("computed_thickness", &ROPA::computed_thickness, py::call_guard<py::gil_scoped_release>())
+      .def("computed_labels", &ROPA::computed_labels, py::call_guard<py::gil_scoped_release>())
+      .def("formation_rates", &ROPA::formation_rates, py::call_guard<py::gil_scoped_release>())
+      .def("reaction_rates", &ROPA::reaction_rates, py::call_guard<py::gil_scoped_release>())
+      .def("sum_of_rates", &ROPA::sum_of_rates, py::call_guard<py::gil_scoped_release>());
 }

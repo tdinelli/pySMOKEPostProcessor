@@ -35,24 +35,19 @@ void ProfilesDatabase::read_kinetic_mechanism(const std::string& folder_name) {
   boost::filesystem::path path_mechanism = path_folder_mechanism / "kinetics.xml";
 
   if (!boost::filesystem::exists(path_folder_mechanism)) {
-    std::cerr << "The specified folder does not exist: " + path_folder_mechanism.string()
-              << std::endl;
+    std::cerr << "The specified folder does not exist: " + path_folder_mechanism.string() << std::endl;
     std::exit(EXIT_FAILURE);
   }
   if (!boost::filesystem::exists(path_mechanism)) {
-    std::cerr
-        << "The folder of the kinetic mechanism does not contains any kinetics.xml!"
-        << std::endl;
+    std::cerr << "The folder of the kinetic mechanism does not contains any kinetics.xml!" << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
   boost::property_tree::ptree ptree;
   boost::property_tree::read_xml((path_mechanism).string(), ptree);
 
-  thermodynamics_map_xml_ =
-      std::make_unique<OpenSMOKE::ThermodynamicsMap_CHEMKIN>(ptree, false);
-  kinetics_map_xml_ = std::make_unique<OpenSMOKE::KineticsMap_CHEMKIN>(
-      *thermodynamics_map_xml_, ptree, false);
+  thermodynamics_map_xml_ = std::make_unique<OpenSMOKE::ThermodynamicsMap_CHEMKIN>(ptree, false);
+  kinetics_map_xml_ = std::make_unique<OpenSMOKE::KineticsMap_CHEMKIN>(*thermodynamics_map_xml_, ptree, false);
 
   if (thermodynamics_map_xml_->NumberOfSpecies() == omega_.size()) {
     is_ropa_enabled_ = true;
@@ -63,12 +58,10 @@ void ProfilesDatabase::read_kinetic_mechanism(const std::string& folder_name) {
     std::exit(EXIT_FAILURE);
   }
 
-  boost::filesystem::path path_reaction_names =
-      path_folder_mechanism / "reaction_names.xml";
+  boost::filesystem::path path_reaction_names = path_folder_mechanism / "reaction_names.xml";
 
   if (!boost::filesystem::exists(path_reaction_names)) {
-    std::cerr << "Kinetic folder does not contain the reaction_names.xml file"
-              << std::endl;
+    std::cerr << "Kinetic folder does not contain the reaction_names.xml file" << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
@@ -101,15 +94,13 @@ void ProfilesDatabase::read_file_results(const std::string& folder_name) {
   // Here we perform the actual reading of the file
   read_xml();
 
-  boost::filesystem::path path_sensitivities =
-      path_folder_results_ / "Sensitivities.xml";
+  boost::filesystem::path path_sensitivities = path_folder_results_ / "Sensitivities.xml";
   if (boost::filesystem::exists(path_sensitivities)) { is_sensitivity_enabled_ = true; }
 }
 
 void ProfilesDatabase::read_xml() {
   // 1. Indices of T, P and MW
-  boost::optional<boost::property_tree::ptree&> child =
-      xml_main_input_.get_child_optional("opensmoke.t-p-mw");
+  boost::optional<boost::property_tree::ptree&> child = xml_main_input_.get_child_optional("opensmoke.t-p-mw");
 
   if (child) {
     std::stringstream stream;
@@ -181,15 +172,13 @@ void ProfilesDatabase::read_xml() {
 
     string_list_massfractions_sorted_ = string_list_massfractions_unsorted;
 
-    std::sort(string_list_massfractions_sorted_.begin(),
-              string_list_massfractions_sorted_.end());
+    std::sort(string_list_massfractions_sorted_.begin(), string_list_massfractions_sorted_.end());
     // string_list_massfractions_sorted_.sort();
 
     sorted_index_.resize(number_of_massfractions_profiles);
     for (size_t j = 0; j < number_of_massfractions_profiles; j++) {
       for (size_t k = 0; k < number_of_massfractions_profiles; k++) {
-        if (string_list_massfractions_sorted_[j] ==
-            string_list_massfractions_unsorted[k]) {
+        if (string_list_massfractions_sorted_[j] == string_list_massfractions_unsorted[k]) {
           sorted_index_[j] = k;
           break;
         }
@@ -247,9 +236,7 @@ void ProfilesDatabase::read_xml() {
   for (size_t j = 0; j < index_of_massfractions_profiles_.size(); j++) {
     sorted_max[j] = -1.e100;
     for (size_t i = 0; i < number_of_abscissas_; i++) {
-      if (omega_[sorted_index_[j]][i] > sorted_max[j]) {
-        sorted_max[j] = omega_[sorted_index_[j]][i];
-      }
+      if (omega_[sorted_index_[j]][i] > sorted_max[j]) { sorted_max[j] = omega_[sorted_index_[j]][i]; }
     }
   }
 
@@ -277,23 +264,16 @@ void ProfilesDatabase::species_coarsening(const double threshold) {
 }
 
 // 0-based
-void ProfilesDatabase::reactions_associated_to_species(const size_t index,
-                                                       std::vector<size_t>& indices) {
+void ProfilesDatabase::reactions_associated_to_species(const size_t index, std::vector<size_t>& indices) {
   kinetics_map_xml_->stoichiometry().BuildStoichiometricMatrix();
 
-  for (int k = 0;
-       k <
-       kinetics_map_xml_->stoichiometry().stoichiometric_matrix_reactants().outerSize();
-       ++k) {
+  for (int k = 0; k < kinetics_map_xml_->stoichiometry().stoichiometric_matrix_reactants().outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(
              kinetics_map_xml_->stoichiometry().stoichiometric_matrix_reactants(), k);
          it; ++it)
       if (it.col() == index) { indices.push_back(it.row()); };
   }
-  for (int k = 0;
-       k <
-       kinetics_map_xml_->stoichiometry().stoichiometric_matrix_products().outerSize();
-       ++k) {
+  for (int k = 0; k < kinetics_map_xml_->stoichiometry().stoichiometric_matrix_products().outerSize(); ++k) {
     for (Eigen::SparseMatrix<double>::InnerIterator it(
              kinetics_map_xml_->stoichiometry().stoichiometric_matrix_products(), k);
          it; ++it)
@@ -303,8 +283,7 @@ void ProfilesDatabase::reactions_associated_to_species(const size_t index,
   std::sort(indices.begin(), indices.end());
 }
 
-void ProfilesDatabase::is_reactant_product(const size_t reaction_index,
-                                           double& netStoichiometry) {
+void ProfilesDatabase::is_reactant_product(const size_t reaction_index, double& netStoichiometry) {
   kinetics_map_xml_->stoichiometry().BuildStoichiometricMatrix();
 
   std::vector<double> reactants_stoich;
@@ -313,10 +292,8 @@ void ProfilesDatabase::is_reactant_product(const size_t reaction_index,
   std::vector<double> products_indices;
   std::vector<double> duplicate_species_indices;
 
-  Eigen::SparseMatrix<double> reactants =
-      kinetics_map_xml_->stoichiometry().stoichiometric_matrix_reactants();
-  Eigen::SparseMatrix<double> products =
-      kinetics_map_xml_->stoichiometry().stoichiometric_matrix_products();
+  Eigen::SparseMatrix<double> reactants = kinetics_map_xml_->stoichiometry().stoichiometric_matrix_reactants();
+  Eigen::SparseMatrix<double> products = kinetics_map_xml_->stoichiometry().stoichiometric_matrix_products();
 
   // TODO
   // Here there is a large room for improvement in terms of computational
@@ -353,9 +330,8 @@ void ProfilesDatabase::is_reactant_product(const size_t reaction_index,
   // 3. iterator to store return type
   std::vector<double>::iterator it, end;
 
-  end = std::set_intersection(reactants_indices.begin(), reactants_indices.end(),
-                              products_indices.begin(), products_indices.end(),
-                              common_species.begin());
+  end = std::set_intersection(reactants_indices.begin(), reactants_indices.end(), products_indices.begin(),
+                              products_indices.end(), common_species.begin());
 
   for (it = common_species.begin(); it != end; it++) {
     duplicate_species_indices.push_back(*it);
@@ -380,10 +356,9 @@ void ProfilesDatabase::is_reactant_product(const size_t reaction_index,
   } else if (duplicate_species_indices.size() == 0) {
     netStoichiometry = 1;
   } else {
-    std::cerr
-        << "Something is wrong with the reaction you are asking for! Reaction id: " +
-               std::to_string(reaction_index)
-        << std::endl;
+    std::cerr << "Something is wrong with the reaction you are asking for! Reaction id: " +
+                     std::to_string(reaction_index)
+              << std::endl;
     std::exit(EXIT_FAILURE);
   }
 }
@@ -393,6 +368,5 @@ const void ProfilesDatabase::py_wrap(pybind11::module_& m) {
       .def(py::init<>())
       .def("read_kinetic_mechanism", &ProfilesDatabase::read_kinetic_mechanism,
            py::call_guard<py::gil_scoped_release>())
-      .def("read_file_results", &ProfilesDatabase::read_file_results,
-           py::call_guard<py::gil_scoped_release>());
+      .def("read_file_results", &ProfilesDatabase::read_file_results, py::call_guard<py::gil_scoped_release>());
 }

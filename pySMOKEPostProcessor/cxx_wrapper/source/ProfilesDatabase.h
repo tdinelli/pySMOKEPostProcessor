@@ -35,8 +35,6 @@ class ProfilesDatabase {
 
   void is_reactant_product(const size_t reaction_index, double &netStoichiometry);
 
-  const static void py_wrap(pybind11::module_ &);
-
   std::unique_ptr<OpenSMOKE::ThermodynamicsMap_CHEMKIN> thermodynamics_map_xml_;
 
   std::unique_ptr<OpenSMOKE::KineticsMap_CHEMKIN> kinetics_map_xml_;
@@ -58,6 +56,8 @@ class ProfilesDatabase {
   const size_t &index_T() const { return index_T_; };
 
   const size_t &index_P() const { return index_P_; };
+
+  const static void py_wrap(pybind11::module_ &);
 
  private:
   void read_xml();

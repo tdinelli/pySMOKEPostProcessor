@@ -25,16 +25,15 @@ class PostProcessorFluxMap : public OpenSMOKE::FluxAnalysisMap {
   PostProcessorFluxMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN &thermodynamicsMapXML,
                        OpenSMOKE::KineticsMap_CHEMKIN &kineticsMapXML);
 
-  void ComputeFluxAnalysis();
-  void ComputeValues(const size_t index_j, std::vector<unsigned int> &local_indices,
-                     std::vector<double> &local_thickness,
-                     std::vector<double> &local_normal_fluxes,
-                     std::vector<double> &local_fluxes);
+  void compute_flux_analysis();
+  void compute_values(const size_t index_j, std::vector<unsigned int> &local_indices,
+                      std::vector<double> &local_thickness, std::vector<double> &local_normal_fluxes,
+                      std::vector<double> &local_fluxes);
 
-  std::vector<int> IndexFirstName;
-  std::vector<int> IndexSecondName;
-  std::vector<double> ComputedLabelValue;
-  std::vector<double> ComputedThicknessValue;
+  std::vector<size_t> index_first_name;
+  std::vector<size_t> index_second_name;
+  std::vector<double> computed_label_value;
+  std::vector<double> computed_thickness_value;
 };
 }  // namespace pySMOKEPostProcessor
 
