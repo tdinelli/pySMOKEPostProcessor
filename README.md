@@ -18,7 +18,7 @@ The [examples](examples) folder contains a collection of [notebooks](examples/no
 - Elementary Flux Analysis. [notebook](examples/notebooks/FluxAnalysis.ipynb).
 - Reaction Rates plots. [notebook](examples/notebooks/Reaction_Rates.ipynb), [notebook-reactionclasses](examples/notebooks/Reaction_Rates_byclass.ipynb), [notebook-cumulative-reaction-rates](examples/notebooks/Cumulative-Rates.ipynb).
 - Formation Rates plots. [notebook](examples/notebooks/FormationRates.ipynb).
-- Sensitivity Coefficients plots. [notebook](examples/Sensitivity_Coefficients.ipynb).
+- Sensitivity Coefficients plots. [notebook](examples/notebooks/Sensitivity_Coefficients.ipynb).
 - Rate Of Production Analysis by means of reaction classes. [notebook](examples/notebooks/Reaction_Classes.ipynb), [notebook-soot-FDI](examples/notebooks/Reaction_Classes_FDI.ipynb).
 
 ## Compile and Install
