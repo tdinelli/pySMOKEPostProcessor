@@ -631,9 +631,12 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    Python wrapper around the OpenSMOKEpp Graphical Post Processor made
-    originally by Professor Alberto Cuoci.
-    Copyright (C) 2024 Timoteo Dinelli et al.
+    Python wrapper around the OpenSMOKEpp Graphical Post Processor.
+    Copyright (C) 2024
+        Timoteo Dinelli     <timoteo.dinelli@polimi.it>
+        Luna Pratali Maffei <luna.pratali@polimi.it>
+        Edoardo Ramalli     <edoardo.ramalli@polimi.it>
+        Andrea Nobili       <anobili@stanford.edu>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -653,7 +656,12 @@ Also add information on how to contact you by electronic and paper mail.
   If the program does terminal interaction, make it output a short
 notice like this when it starts in an interactive mode:
 
-    pySMOKEPostProcessor Copyright (C) 2024  Timoteo Dinelli et al.
+    pySMOKEPostProcessor Copyright (C) 2024
+        Timoteo Dinelli     <timoteo.dinelli@polimi.it>
+        Luna Pratali Maffei <luna.pratali@polimi.it>
+        Edoardo Ramalli     <edoardo.ramalli@polimi.it>
+        Andrea Nobili       <anobili@stanford.edu>
+
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
