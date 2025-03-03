@@ -53,6 +53,7 @@ examples-old
 
 examples/data/final/
 examples/data/old/
+scripts_local
 
 compile_commands.json
 

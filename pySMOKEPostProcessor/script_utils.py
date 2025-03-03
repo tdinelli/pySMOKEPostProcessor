@@ -1,5 +1,6 @@
 """ wrapper functions calling multiple functionalities
 """
+import pandas as pd
 import numpy as np
 from .maps.KineticMap import KineticMap
 from .maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
@@ -108,6 +109,37 @@ def cumulative_rates(simul_fld,
         cum_df_dct[species] = pp.cumulativerates(x, tot_rop_dct, rate_type = rate_type, threshold = threshold)
         
     return cum_df_dct
+
+def reorder_cumulative_rates(df1, df2):
+    """ reorder reactions of cumulative rates (entries of cum_df_dct)
+        so that the common reactions will appear first
+    """
+
+    # Extract base names (before the space) from column names
+    df1_base = {col.split(" ")[0]: col for col in df1.columns}
+    df2_base = {col.split(" ")[0]: col for col in df2.columns}
+
+    # Find matching column bases
+    common_bases = [col for col in df1_base.keys() if col in df2_base.keys()]
+
+    # Order for matching columns (based on df1 order)
+    df1_matching_cols = [df1_base[base]
+                        for base in common_bases]
+    df2_matching_cols = [df2_base[base]
+                        for base in common_bases]
+    # Extra columns in df1 (not in df2)
+    extra_cols_df1 = [df1_base[base]
+                    for base in df1_base.keys() if base not in common_bases]
+
+    # Extra columns in df2 (not in df1)
+    extra_cols_df2 = [df2_base[base]
+                    for base in df2_base.keys() if base not in common_bases]
+
+    # Reorder both DataFrames
+    df1 = df1[df1_matching_cols + extra_cols_df1]
+    df2 = df2[df2_matching_cols + extra_cols_df2]
+
+    return df1, df2
 
 # reaction rates by class / subclass / rxn type
 

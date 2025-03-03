@@ -23,7 +23,7 @@ def plot_areas(data_df, xlabel = 'x axis', ylabel = 'y axis', title = '',
     leg = []
     pattern = re.compile(r'\d+\.\d+')
     for rxnname in data_df.columns:
-        leg.append(pattern.sub(lambda x: "{:.2f}".format(float(x.group(0))), rxnname))
+        leg.append(pattern.sub(lambda x: "{:.5f}".format(float(x.group(0))), rxnname))
         
     ax.legend(leg, fontsize = fontsize, loc = loc)
     ax.set_xlabel(xlabel)
