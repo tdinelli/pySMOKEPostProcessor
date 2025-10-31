@@ -1,17 +1,28 @@
-"""
-@Authors:
-    Alberto Cuoci [1], Timoteo Dinelli[1]
-    [1]: CRECK Modeling Lab, Department of Chemistry, Materials, and Chemical Engineering, Politecnico di Milano
-@Contacts:
-    alberto.cuoci@polimi.it
-    timoteo.dinelli@polimi.it
-@Additional notes:
-    This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    Please report any bug to: alberto.cuoci@polimi.it
-    This is a modified class frome the original one OpenSMOKEppXMLFile.py inside PyTools4OpenSMOKE
-    modified by Timoteo Dinelli in order to perform post processing analysis for gas phase simulations
-"""
-
+# ---------------------------------------------------------------------------------- #
+#                                                                                    #
+#                              _____  __  ___ ____   __ __  ______                   #
+#                ____   __  __/ ___/ /  |/  // __ \ / //_/ / ____/____   ____        #
+#               / __ \ / / / /\__ \ / /|_/ // / / // ,<   / __/  / __ \ / __ \       #
+#              / /_/ // /_/ /___/ // /  / // /_/ // /| | / /___ / /_/ // /_/ /       #
+#             / .___/ \__, //____//_/  /_/ \____//_/ |_|/_____// .___// .___/        #
+#            /_/     /____/                                   /_/    /_/             #
+#                                                                                    #
+#                                                                                    #
+# ---------------------------------------------------------------------------------- #
+# Please refer to the copyright statement and license                                #
+# information at the end of this file.                                               #
+# ---------------------------------------------------------------------------------- #
+#                                                                                    #
+#         Authors: Timoteo Dinelli     <timoteo.dinelli@polimi.it>                   #
+#                  Luna Pratali Maffei <luna.pratali@polimi.it>                      #
+#                  Edoardo Ramalli     <edoardo.ramalli@polimi.it>                   #
+#                  Andrea Nobili       <edoardo.ramalli@polimi.it>                   #
+#                                                                                    #
+#         CRECK Modeling Group <http://creckmodeling.chem.polimi.it>                 #
+#         Department of Chemistry, Materials and Chemical Engineering                #
+#         Politecnico di Milano, P.zza Leonardo da Vinci 32, 20133 Milano            #
+#                                                                                    #
+# ---------------------------------------------------------------------------------- #
 import os
 import warnings
 import numpy as np
@@ -21,30 +32,18 @@ from .KineticMap import KineticMap
 
 
 class OpenSMOKEppXMLFile:
-    """
-    Description of the OpenSMOKEppXMLFile class
-    TODO
-    """
-
     def __init__(self, output_folder: str, kinetic_folder: str) -> None:
         kinetic_map = KineticMap(kinetic_folder)
         xml_file_name = os.path.join(output_folder, "Output.xml")
         tree = ET.parse(xml_file_name)
         root = tree.getroot()
 
-        # System type
+        # System types
+        new_system_types = ["HomogeneousReactor", "Flamelet", "Flame1D", "Flame2D"]
+        old_system_types = ["BatchReactor", "PlugFlowReactor", "PerfectlyStirredReactor"]
         system_type = ((root.find("Type")).text).strip()
-        if (
-            system_type != "HomogeneousReactor"
-            and system_type != "Flamelet"
-            and system_type != "Flame1D"
-            and system_type != "Flame2D"
-        ):
-            if (
-                system_type == "BatchReactor"
-                or system_type == "PlugFlowReactor"
-                or system_type == "PerfectlyStirredReactor"
-            ):
+        if system_type not in new_system_types:
+            if system_type in old_system_types:
                 warnings.warn(
                     " * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained! Some of \
                     the functions in this class may not work!"
@@ -229,7 +228,6 @@ class OpenSMOKEppXMLFile:
                 additional_variable.append("conversion-" + list_names[i])
 
         # Assign internal members
-
         self._npts = npts
         self._ns = kinetic_map.number_of_species
         self._nc = nc
@@ -344,3 +342,28 @@ class OpenSMOKEppXMLFile:
     @property
     def fvSOOT(self):
         return self._fvSOOT
+
+
+# ---------------------------------------------------------------------------------- #
+#                                                                                    #
+#         Python wrapper around the OpenSMOKEpp Graphical Post Processor.            #
+#         Copyright (C) 2024                                                         #
+#             Timoteo Dinelli     <timoteo.dinelli@polimi.it>                        #
+#             Luna Pratali Maffei <luna.pratali@polimi.it>                           #
+#             Edoardo Ramalli     <edoardo.ramalli@polimi.it>                        #
+#             Andrea Nobili       <anobili@stanford.edu>                             #
+#                                                                                    #
+#         This program is free software: you can redistribute it and/or modify       #
+#         it under the terms of the GNU General Public License as published by       #
+#         the Free Software Foundation, either version 3 of the License, or          #
+#         (at your option) any later version.                                        #
+#                                                                                    #
+#         This program is distributed in the hope that it will be useful,            #
+#         but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#         GNU General Public License for more details.                               #
+#                                                                                    #
+#         You should have received a copy of the GNU General Public License          #
+#         along with this program.  If not, see <https://www.gnu.org/licenses/>.     #
+#                                                                                    #
+# ---------------------------------------------------------------------------------- #

@@ -3,10 +3,8 @@ import copy
 import numpy as np
 import pandas as pd
 
-from .reaction_classes_utilities.reaction_classes_calc import (
-    reaction_classes_assign, reaction_fluxes)
-from .reaction_classes_utilities.reaction_classes_groups import \
-    ReadReactionsGroups
+from .reaction_classes_utilities.reaction_classes_calc import reaction_classes_assign, reaction_fluxes
+from .reaction_classes_utilities.reaction_classes_groups import ReadReactionsGroups
 
 
 def assignclass(kinmap, classes_definition):
@@ -14,10 +12,10 @@ def assignclass(kinmap, classes_definition):
     reactions_all = []
     for i in range(kinmap.NumberOfReactions):
         reaction = {
-            'index': i+1,
-            'name': kinmap.reaction_names[i],
-            'class': kinmap.rxnclass[i+1],
-            'reactiontype': kinmap.rxnsubclass[i+1]
+            "index": i + 1,
+            "name": kinmap.reaction_names[i],
+            "class": kinmap.rxnclass[i + 1],
+            "reactiontype": kinmap.rxnsubclass[i + 1],
         }
         reactions_all.append(reaction)
 
@@ -44,8 +42,7 @@ class FluxByClass:
         # input tot_rop_dct: dictionary with ROPA performed for a set of
         # species {spc: {ropa dct}}
         # reinitialize
-        self.flux_sorted = reaction_fluxes(
-            self.rxns_sorted.rxn_class_df, self.verbose)
+        self.flux_sorted = reaction_fluxes(self.rxns_sorted.rxn_class_df, self.verbose)
 
         # add fluxes
         for species in species_list:
@@ -60,11 +57,12 @@ class FluxByClass:
 
             tot_rop_df = None
             for sp in sps:
-                tot_rop_df0 = pd.DataFrame(tot_rop_dct[sp]['coefficients'],
-                                           index=np.array(
-                                               tot_rop_dct[sp]['reaction_indices'])+1,
-                                           columns=['flux_{}'.format(spname)],
-                                           dtype=np.float32)
+                tot_rop_df0 = pd.DataFrame(
+                    tot_rop_dct[sp]["coefficients"],
+                    index=np.array(tot_rop_dct[sp]["reaction_indices"]) + 1,
+                    columns=["flux_{}".format(spname)],
+                    dtype=np.float32,
+                )
                 #  quello sotto dovrebbe essere sufficiente
                 # tot_rop_df0 = tot_rop_df0.groupby(level=0).sum() # sum rxns with same indexes
                 if isinstance(tot_rop_df, pd.DataFrame):
@@ -89,7 +87,9 @@ class FluxByClass:
 
         self.flux_sorted.netfluxes()
 
-    def sort_and_filter(self, sortlist, filter_dct: dict = {}, thresh: float = 1e-3, weigh: str = 'false', dropunsorted: bool = True):
+    def sort_and_filter(
+        self, sortlist, filter_dct: dict = {}, thresh: float = 1e-3, weigh: str = "false", dropunsorted: bool = True
+    ):
         # weight options: normbyspecies, omegaij, false
         # deepcopy if you need to do it multiple times
         # filter rxns
@@ -99,8 +99,7 @@ class FluxByClass:
         # filter flux
         rxns_sorted.filter_flux(threshold=thresh)
         # sum same speciestype-classgroup-reactiontype together
-        sortdf = rxns_sorted.sortby(
-            sortlist, weigh=weigh, dropunsorted=dropunsorted)
+        sortdf = rxns_sorted.sortby(sortlist, weigh=weigh, dropunsorted=dropunsorted)
 
         return sortdf
 
@@ -130,8 +129,7 @@ def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
         pdnew = dffull.loc[all_sp]
         # rename indexes according to simul name
         if tosum is False:
-            pdnew = pdnew.rename(
-                index=lambda spname: spname + '-' + str(sim_name))
+            pdnew = pdnew.rename(index=lambda spname: spname + "-" + str(sim_name))
 
         if len(dftot) == 0:
             dftot = pdnew
@@ -148,7 +146,7 @@ def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
 
             dftot = pd.concat([dftot, pdnew])
         elif tosum is True:
-            dftot = dftot.add(pdnew, fill_value=0.)
+            dftot = dftot.add(pdnew, fill_value=0.0)
 
     # replace nan with 0
     dftot = dftot.replace(np.nan, 0)
@@ -159,10 +157,9 @@ def merge_maps_byspecies(sorted_dfs_dct, tosum: bool = False):
     return dftot
 
 
-def FDI(sorted_dfs_dct: dict, fditype: str = 'global', speciesi: str = '', classj: str = ''):
+def FDI(sorted_dfs_dct: dict, fditype: str = "global", speciesi: str = "", classj: str = ""):
     """
-    computes FDIs for a given set of flames
-    see https://doi.org/10.1016/j.combustflame.2022.112073
+    computes FDIs for a given set of flames see https://doi.org/10.1016/j.combustflame.2022.112073
 
     Args:
         sorted_dfs ({idx: dataframe}): sorted dataframes with fluxes.
@@ -173,10 +170,8 @@ def FDI(sorted_dfs_dct: dict, fditype: str = 'global', speciesi: str = '', class
     """
     # simul names
     sim_names = sorted_dfs_dct.keys()
-    species_lists = np.concatenate(
-        [np.array(sorted_dfs_dct[sim_name].index) for sim_name in sim_names])
-    classes_list = np.concatenate(
-        [np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names])
+    species_lists = np.concatenate([np.array(sorted_dfs_dct[sim_name].index) for sim_name in sim_names])
+    classes_list = np.concatenate([np.array(sorted_dfs_dct[sim_name].columns) for sim_name in sim_names])
     # list of all species and classes
     all_sp = np.array(list(set(species_lists)))
     all_cl = np.sort(np.array(list(set(classes_list))))
@@ -185,16 +180,13 @@ def FDI(sorted_dfs_dct: dict, fditype: str = 'global', speciesi: str = '', class
     for _, df_sim in sorted_dfs_dct.items():
         for cl in all_cl:
             if cl not in df_sim.columns:
-                df_sim[cl] = 0.
+                df_sim[cl] = 0.0
         for sp in all_sp:
             if sp not in df_sim.index:
-                df_sim.loc[sp] = 0.
+                df_sim.loc[sp] = 0.0
 
     # dataframe of FDIs
-    df_FDI = pd.DataFrame(0.,
-                          index=sim_names,
-                          columns=sim_names,
-                          dtype=np.float64)
+    df_FDI = pd.DataFrame(0.0, index=sim_names, columns=sim_names, dtype=np.float64)
 
     # calculate the differences in the omega: (om_ijn-om_ijm)^2
     df_FDI.sort_index(axis=0, inplace=True)
@@ -205,25 +197,22 @@ def FDI(sorted_dfs_dct: dict, fditype: str = 'global', speciesi: str = '', class
                 sim_m = sorted_dfs_dct[m]
                 sim_n = sorted_dfs_dct[n]
 
-                df_diff_square = (sim_n-sim_m)**2  # operations by indices
+                df_diff_square = (sim_n - sim_m) ** 2  # operations by indices
                 # print(sim_n, df_diff_square)
                 # now calculate FDI based on type
-                if fditype == 'global':
-                    df_FDI.loc[n, m] = np.power(
-                        np.sum(df_diff_square.values), 0.5)
-                elif fditype == 'species':
+                if fditype == "global":
+                    df_FDI.loc[n, m] = np.power(np.sum(df_diff_square.values), 0.5)
+                elif fditype == "species":
                     # sum_j: all classes for one species
-                    df_FDI.loc[n, m] = np.power(
-                        np.sum(df_diff_square.loc['flux_' + speciesi]), 0.5)
-                elif fditype == 'class':
+                    df_FDI.loc[n, m] = np.power(np.sum(df_diff_square.loc["flux_" + speciesi]), 0.5)
+                elif fditype == "class":
                     # sum_i: all species for one class
-                    df_FDI.loc[n, m] = np.power(
-                        np.sum(df_diff_square[classj]), 0.5)
+                    df_FDI.loc[n, m] = np.power(np.sum(df_diff_square[classj]), 0.5)
                 # print(df_FDI[m][n])
     # print(df_FDI)
     # compute mu = 1/N sum(n,m) (FDI), n != m
-    setofnm = len(sim_names)*(len(sim_names)-1)/2
-    mu = np.sum(df_FDI.values)/setofnm
+    setofnm = len(sim_names) * (len(sim_names) - 1) / 2
+    mu = np.sum(df_FDI.values) / setofnm
     # print(mu, len(sim_names))
     # final FDI scaled by mu
     for nn, n in enumerate(df_FDI.index):

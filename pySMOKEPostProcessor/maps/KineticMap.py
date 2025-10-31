@@ -1,18 +1,28 @@
-"""
-@Authors:
-    Alberto Cuoci [1], Timoteo Dinelli [1], Luna Pratali Maffei [1]
-    [1]: CRECK Modeling Lab, Department of Chemistry, Materials, and Chemical Engineering, Politecnico di Milano
-@Contacts:
-    alberto.cuoci@polimi.it
-    timoteo.dinelli@polimi.it
-    luna.pratalimaffei@polimi.it
-@Additional notes:
-    - This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-      Please report any bug to: timoteo.dinelli@polimi.it
-    - This is a modified class frome the original one KineticMechanism.py inside PyTools4OpenSMOKE modified by Timoteo
-      Dinelli and Luna Pratali Maffei to accomodate different new features.
-"""
-
+# ---------------------------------------------------------------------------------- #
+#                                                                                    #
+#                              _____  __  ___ ____   __ __  ______                   #
+#                ____   __  __/ ___/ /  |/  // __ \ / //_/ / ____/____   ____        #
+#               / __ \ / / / /\__ \ / /|_/ // / / // ,<   / __/  / __ \ / __ \       #
+#              / /_/ // /_/ /___/ // /  / // /_/ // /| | / /___ / /_/ // /_/ /       #
+#             / .___/ \__, //____//_/  /_/ \____//_/ |_|/_____// .___// .___/        #
+#            /_/     /____/                                   /_/    /_/             #
+#                                                                                    #
+#                                                                                    #
+# ---------------------------------------------------------------------------------- #
+# Please refer to the copyright statement and license                                #
+# information at the end of this file.                                               #
+# ---------------------------------------------------------------------------------- #
+#                                                                                    #
+#         Authors: Timoteo Dinelli     <timoteo.dinelli@polimi.it>                   #
+#                  Luna Pratali Maffei <luna.pratali@polimi.it>                      #
+#                  Edoardo Ramalli     <edoardo.ramalli@polimi.it>                   #
+#                  Andrea Nobili       <edoardo.ramalli@polimi.it>                   #
+#                                                                                    #
+#         CRECK Modeling Group <http://creckmodeling.chem.polimi.it>                 #
+#         Department of Chemistry, Materials and Chemical Engineering                #
+#         Politecnico di Milano, P.zza Leonardo da Vinci 32, 20133 Milano            #
+#                                                                                    #
+# ---------------------------------------------------------------------------------- #
 import os
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -36,7 +46,11 @@ class KineticMap:
     @staticmethod
     def parse_reaction_names(reaction_names_xml: str) -> list:
         """
-        Read the file named reaction_names.xml and returns a list containing the names of the reactions.
+        Function that parse the XML file named reaction_names.xml
+        Args:
+            reaction_names_xml (str): complete path to the file named reaction_names.xml.
+        Returns:
+            (list): list of string containing the names of all the reactions inside a mechanism.
         """
         reaction_names_tree = ET.parse(reaction_names_xml)
         rn_root = reaction_names_tree.getroot()
@@ -45,7 +59,11 @@ class KineticMap:
         return reaction_names
 
     def parse_kinetic(self, kinetics_xml: str) -> None:
-        """ """
+        """
+        Function that parses the file named kinetics.xml extrating all the informations contained within the mechanism.
+        Args:
+            kinetics_xml (str): complete path to the file named kinetics.xml.
+        """
         tree = ET.parse(kinetics_xml)
         root = tree.getroot()
 
@@ -114,7 +132,8 @@ class KineticMap:
 
     def read_reactionclasses(self) -> dict:
         """
-        Read reaction classes if present.
+        Read reaction classes if present, within the kinetic mechanism, requires the scheme to be compiled with
+        OpenSMOKE version >= 0.20.0.
         Raises:
             Exception: If no reaction classes definitions found raise exception.
         """
@@ -151,9 +170,9 @@ class KineticMap:
         """
         Function that given the index of a reaction returns its name.
         Args:
-            reaction_index: Index of the reaction (0-based).
+            reaction_index (int): Index of the reaction (0-based).
         Returns:
-            Name of the reaction.
+            (str): Name of the reaction.
         """
         if reaction_index < self._number_of_reactions:
             return f"R{reaction_index + 1}: {self._reaction_names[reaction_index]}"
@@ -171,9 +190,9 @@ class KineticMap:
         Function that given the name of the reaction returns the corresponding index whithin the list of the reactions.
         Warning: this is the index of the reaction 0-based pay attention to cabr and falloff reactions.
         Args:
-            name: reaction name.
+            name (str): reaction name.
         Returns:
-            Index of the reaction.
+            (int): index of the reaction.
         """
         try:
             return self._reaction_names.index(name)
@@ -184,9 +203,9 @@ class KineticMap:
         """
         Function that given an index returns the coressponding species name.
         Args:
-            index: Species index.
+            index (int): Species index.
         Returns:
-            Name of the species.
+            (str): name of the species.
         """
         if 0 <= index < len(self._species):
             return self._species[index]
@@ -265,3 +284,26 @@ class KineticMap:
     @property
     def indices_of_cabr_reactions(self):
         return self._indices_of_cabr_reactions
+# ---------------------------------------------------------------------------------- #
+#                                                                                    #
+#         Python wrapper around the OpenSMOKEpp Graphical Post Processor.            #
+#         Copyright (C) 2024                                                         #
+#             Timoteo Dinelli     <timoteo.dinelli@polimi.it>                        #
+#             Luna Pratali Maffei <luna.pratali@polimi.it>                           #
+#             Edoardo Ramalli     <edoardo.ramalli@polimi.it>                        #
+#             Andrea Nobili       <anobili@stanford.edu>                             #
+#                                                                                    #
+#         This program is free software: you can redistribute it and/or modify       #
+#         it under the terms of the GNU General Public License as published by       #
+#         the Free Software Foundation, either version 3 of the License, or          #
+#         (at your option) any later version.                                        #
+#                                                                                    #
+#         This program is distributed in the hope that it will be useful,            #
+#         but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#         GNU General Public License for more details.                               #
+#                                                                                    #
+#         You should have received a copy of the GNU General Public License          #
+#         along with this program.  If not, see <https://www.gnu.org/licenses/>.     #
+#                                                                                    #
+# ---------------------------------------------------------------------------------- #

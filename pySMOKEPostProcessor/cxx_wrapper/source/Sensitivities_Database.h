@@ -1,109 +1,112 @@
-/*-----------------------------------------------------------------------*\
-|    ___                   ____  __  __  ___  _  _______                  |
-|   / _ \ _ __   ___ _ __ / ___||  \/  |/ _ \| |/ / ____| _     _         |
-|  | | | | '_ \ / _ \ '_ \\___ \| |\/| | | | | ' /|  _| _| |_ _| |_       |
-|  | |_| | |_) |  __/ | | |___) | |  | | |_| | . \| |__|_   _|_   _|      |
-|   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
-|        |_|                                                              |
-|                                                                         |
-|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
-|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>				  |
-|   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
-|   Department of Chemistry, Materials and Chemical Engineering           |
-|   Politecnico di Milano                                                 |
-|   P.zza Leonardo da Vinci 32, 20133 Milano                              |
-|                                                                         |
-|-------------------------------------------------------------------------|
-|                                                                         |
-|   This file is part of OpenSMOKE++ framework.                           |
-|                                                                         |
-|	License																  |
-|                                                                         |
-|   Copyright(C) 2016-2012  Alberto Cuoci                                 |
-|   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
-|   it under the terms of the GNU General Public License as published by  |
-|   the Free Software Foundation, either version 3 of the License, or     |
-|   (at your option) any later version.                                   |
-|                                                                         |
-|   OpenSMOKE++ is distributed in the hope that it will be useful,        |
-|   but WITHOUT ANY WARRANTY; without even the implied warranty of        |
-|   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         |
-|   GNU General Public License for more details.                          |
-|                                                                         |
-|   You should have received a copy of the GNU General Public License     |
-|   along with OpenSMOKE++. If not, see <http://www.gnu.org/licenses/>.   |
-|                                                                         |
-\*-----------------------------------------------------------------------*/
-
-#ifndef SENSITIVITIES_DATABASE_H
-#define SENSITIVITIES_DATABASE_H
-
+// clang-format off
+/*----------------------------------------------------------------------------------*\
+|                                                                                    |
+|                              _____  __  ___ ____   __ __  ______                   |
+|                ____   __  __/ ___/ /  |/  // __ \ / //_/ / ____/____   ____        |
+|               / __ \ / / / /\__ \ / /|_/ // / / // ,<   / __/  / __ \ / __ \       |
+|              / /_/ // /_/ /___/ // /  / // /_/ // /| | / /___ / /_/ // /_/ /       |
+|             / .___/ \__, //____//_/  /_/ \____//_/ |_|/_____// .___// .___/        |
+|            /_/     /____/                                   /_/    /_/             |
+|                                                                                    |
+|                                                                                    |
+| ---------------------------------------------------------------------------------- |
+| Please refer to the copyright statement and license                                |
+| information at the end of this file.                                               |
+| ---------------------------------------------------------------------------------- |
+|                                                                                    |
+|         Authors: Timoteo Dinelli     <timoteo.dinelli@polimi.it>                   |
+|                  Luna Pratali Maffei <luna.pratali@polimi.it>                      |
+|                  Edoardo Ramalli     <edoardo.ramalli@polimi.it>                   |
+|                  Andrea Nobili       <edoardo.ramalli@polimi.it>                   |
+|                                                                                    |
+|         CRECK Modeling Group <http://creckmodeling.chem.polimi.it>                 |
+|         Department of Chemistry, Materials and Chemical Engineering                |
+|         Politecnico di Milano, P.zza Leonardo da Vinci 32, 20133 Milano            |
+|                                                                                    |
+\*----------------------------------------------------------------------------------*/
+// clang-format on
+#pragma once
 #include "ProfilesDatabase.h"
 #include "Utilities.h"
 
-class Sensitivities_Database
-{
-  public:
-    Sensitivities_Database(void);
-    ~Sensitivities_Database(void);
+class Sensitivities_Database {
+ public:
+  explicit Sensitivities_Database();
 
-    void SetDatabase(ProfilesDatabase *data);
+  ~Sensitivities_Database();
 
-    void ReadParentFile();
-    void ReadFromChildFile(const std::string name);
-    std::vector<double> NormalizedProfile(const unsigned int index, bool local_normalization);
-    double NormalizedProfile(const unsigned int index, bool local_normalization, unsigned int point);
+  void set_database(ProfilesDatabase *data);
 
-    boost::property_tree::ptree xml_main_input;
+  void read_parent_file();
 
-    const std::vector<std::string> &names() const
-    {
-        return names_;
-    }
-    unsigned int number_of_variables() const
-    {
-        return number_of_variables_;
-    }
-    const std::vector<double> &variable() const
-    {
-        return variable_;
-    }
+  void read_from_child_file(const std::string name);
 
-    const std::vector<std::string> &string_list_reactions() const
-    {
-        return string_list_reactions_;
-    }
-    const std::vector<unsigned int> &current_coarse_index() const
-    {
-        return current_coarse_index_;
-    }
+  std::vector<double> normalized_profile(const size_t index, bool local_normalization);
 
-    void ReactionsCoarsening(const double threshold);
-    void ReactionsReset();
+  double normalized_profile(const size_t index, bool local_normalization, size_t point);
 
-    unsigned int number_of_parameters() const
-    {
-        return number_of_parameters_;
-    }
+  void ReactionsCoarsening(const double threshold);
 
-  private:
-    ProfilesDatabase *data_;
-    unsigned int number_of_variables_;
-    unsigned int number_of_parameters_;
-    unsigned int number_of_points_;
-    unsigned int number_of_species_;
-    std::vector<unsigned int> local_index_;
-    std::vector<unsigned int> global_index_;
-    std::vector<std::string> names_;
-    std::vector<std::vector<double>> coefficients_;
-    std::vector<double> parameters_;
+  void ReactionsReset();
 
-    std::vector<double> variable_;
-    unsigned int current_local_index_;
+  const std::vector<std::string> &names() const { return names_; }
 
-    std::vector<std::string> string_list_reactions_;
-    std::vector<unsigned int> current_coarse_index_;
+  size_t number_of_variables() const { return number_of_variables_; }
+
+  const std::vector<double> &variable() const { return variable_; }
+
+  const std::vector<std::string> &string_list_reactions() const { return string_list_reactions_; }
+
+  const std::vector<size_t> &current_coarse_index() const { return current_coarse_index_; }
+
+  size_t number_of_parameters() const { return number_of_parameters_; }
+
+ private:
+
+  ProfilesDatabase *data_;
+
+  boost::property_tree::ptree xml_main_input;
+
+  size_t number_of_variables_;
+  size_t number_of_parameters_;
+  size_t number_of_points_;
+  size_t number_of_species_;
+  std::vector<size_t> local_index_;
+  std::vector<size_t> global_index_;
+  std::vector<std::string> names_;
+  std::vector<std::vector<double>> coefficients_;
+  std::vector<double> parameters_;
+
+  std::vector<double> variable_;
+  size_t current_local_index_;
+
+  std::vector<std::string> string_list_reactions_;
+  std::vector<size_t> current_coarse_index_;
 };
 
 #include "Sensitivities_Database.hpp"
-#endif // SENSITIVITIES_DATABASE_H
+// clang-format off
+/*----------------------------------------------------------------------------------*\
+|                                                                                    |
+|         Python wrapper around the OpenSMOKEpp Graphical Post Processor.            |
+|         Copyright (C) 2024                                                         |
+|             Timoteo Dinelli     <timoteo.dinelli@polimi.it>                        |
+|             Luna Pratali Maffei <luna.pratali@polimi.it>                           |
+|             Edoardo Ramalli     <edoardo.ramalli@polimi.it>                        |
+|             Andrea Nobili       <anobili@stanford.edu>                             |
+|                                                                                    |
+|         This program is free software: you can redistribute it and/or modify       |
+|         it under the terms of the GNU General Public License as published by       |
+|         the Free Software Foundation, either version 3 of the License, or          |
+|         (at your option) any later version.                                        |
+|                                                                                    |
+|         This program is distributed in the hope that it will be useful,            |
+|         but WITHOUT ANY WARRANTY; without even the implied warranty of             |
+|         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              |
+|         GNU General Public License for more details.                               |
+|                                                                                    |
+|         You should have received a copy of the GNU General Public License          |
+|         along with this program.  If not, see <https://www.gnu.org/licenses/>.     |
+|                                                                                    |
+\*----------------------------------------------------------------------------------*/
+// clang-format on
