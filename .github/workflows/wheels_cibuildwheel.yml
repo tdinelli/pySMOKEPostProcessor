@@ -24,7 +24,7 @@ jobs:
       # Configure git to use GitHub token for private repos
       - name: Configure git credentials
         run: |
-          git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${{ secrets.OPENSMOKE_ACCESS_TOKEN }}@github.com/".insteadOf "https://github.com/"
         shell: bash
 
       # Install platform-specific system dependencies
@@ -64,7 +64,7 @@ jobs:
             # Create symlinks for boost169
             ln -sf /usr/include/boost169/boost /usr/include/boost || true
             # Configure git credentials for private repos
-            git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+            git config --global url."https://${{ secrets.OPENSMOKE_ACCESS_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
           # Set environment variables for Linux builds
           CIBW_ENVIRONMENT_LINUX: >
@@ -74,12 +74,12 @@ jobs:
           CIBW_BEFORE_BUILD_MACOS: |
             brew install boost eigen || true
             # Configure git credentials for private repos
-            git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+            git config --global url."https://${{ secrets.OPENSMOKE_ACCESS_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
           CIBW_BEFORE_BUILD_WINDOWS: |
             pip install delvewheel
             # Configure git credentials for private repos
-            git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+            git config --global url."https://${{ secrets.OPENSMOKE_ACCESS_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
           # Test the wheel after building
           CIBW_TEST_COMMAND: "python -c \"import pySMOKEPostProcessor; print('Import successful')\""
@@ -131,4 +131,4 @@ jobs:
         with:
           files: dist/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.OPENSMOKE_ACCESS_TOKEN }}
