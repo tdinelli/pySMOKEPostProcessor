@@ -1,28 +1,36 @@
 # -----------------------------------------------------------------------------
-# FetchContent configuration for OpenSMOKEpp
+# Configuration for OpenSMOKEpp
 # -----------------------------------------------------------------------------
-include(FetchContent)
-
 message(STATUS "Configuring OpenSMOKEpp...")
 
-# -----------------------------------------------------------------------------
-# OpenSMOKEpp is a header-only library, we just need to fetch it
-FetchContent_Declare(
-  opensmoke
-  GIT_REPOSITORY https://github.com/acuoci/OpenSMOKEpp.git
-  GIT_TAG v0.22
-  GIT_SHALLOW TRUE
-  GIT_PROGRESS TRUE
-  SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/opensmoke-src
-)
+# First, check if OpenSMOKEpp is vendored in the repository
+set(VENDORED_OPENSMOKE_PATH "${CMAKE_SOURCE_DIR}/external/opensmoke/source")
 
-FetchContent_MakeAvailable(opensmoke)
+if(EXISTS ${VENDORED_OPENSMOKE_PATH})
+    message(STATUS "Using vendored OpenSMOKEpp from: ${VENDORED_OPENSMOKE_PATH}")
+    set(OPENSMOKE_INCLUDE ${VENDORED_OPENSMOKE_PATH} CACHE PATH "Path to OpenSMOKE library")
+else()
+    # Fallback: Try to fetch from GitHub (requires authentication)
+    message(STATUS "Vendored OpenSMOKEpp not found, attempting to fetch from GitHub...")
+    message(WARNING "Note: OpenSMOKEpp repository may require authentication!")
 
-# Set the include path for OpenSMOKEpp
-set(OPENSMOKE_INCLUDE
-  ${opensmoke_SOURCE_DIR}/source
-  CACHE PATH "Path to OpenSMOKE library"
-)
+    include(FetchContent)
 
-message(STATUS "OpenSMOKEpp v0.22 fetched successfully")
+    FetchContent_Declare(
+      opensmoke
+      GIT_REPOSITORY https://github.com/acuoci/OpenSMOKEpp.git
+      GIT_TAG v0.22
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE
+      SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/opensmoke-src
+    )
+
+    FetchContent_MakeAvailable(opensmoke)
+
+    set(OPENSMOKE_INCLUDE
+      ${opensmoke_SOURCE_DIR}/source
+      CACHE PATH "Path to OpenSMOKE library"
+    )
+endif()
+
 message(STATUS "OpenSMOKEpp include path: ${OPENSMOKE_INCLUDE}")
