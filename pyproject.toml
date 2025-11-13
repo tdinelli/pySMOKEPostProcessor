@@ -1,6 +1,6 @@
 [project]
 name = "pySMOKEPostProcessor"
-version = "0.2.0"
+version = "0.3.0"
 authors = [
     {name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it"},
     {name = "Luna Pratali Maffei", email = "lpratali@polimi.it"},
