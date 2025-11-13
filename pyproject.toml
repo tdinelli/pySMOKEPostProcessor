@@ -1,4 +1,3 @@
-# For the details see: https://github.com/pybind/cmake_example/blob/master/pyproject.toml
 [project]
 name = "pySMOKEPostProcessor"
 version = "0.2.0"
@@ -12,11 +11,34 @@ maintainers = [
     {name = "Timoteo Dinelli", email = "timoteo.dinelli@polimi.it"},
     {name = "Luna Pratali Maffei", email = "lpratali@polimi.it"},
 ]
-description="Python wapper to the OpenSMOKEpp Graphical Post Processor"
+description = "Python wrapper to the OpenSMOKEpp Graphical Post Processor"
 readme = "README.md"
 license = {file = "LICENSE.md"}
-dependencies = ["numpy", "pandas", "pyarrow", "matplotlib", "networkx", "pydot", "graphviz", "scipy",]
+dependencies = [
+    "numpy>=1.20",
+    "pandas>=1.3",
+    "pyarrow>=6.0",
+    "matplotlib>=3.3",
+    "networkx>=2.5",
+    "pydot>=1.4",
+    "graphviz>=0.16",
+    "scipy>=1.7",
+]
 requires-python = ">= 3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
 
 [project.urls]
 Homepage = "https://creckmodeling.chem.polimi.it/"
@@ -25,25 +47,27 @@ Issues = "https://github.com/tdinelli/pySMOKEPostProcessor/issues"
 
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
+    "scikit-build-core>=0.8.0",
+    "pybind11>=2.11.0",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
 
-[tool.setuptools]
-include-package-data = true
+[tool.scikit-build]
+cmake.build-type = "Release"
+cmake.verbose = false
+minimum-version = "0.8"
+wheel.packages = ["pySMOKEPostProcessor"]
+wheel.install-dir = "pySMOKEPostProcessor"
+wheel.exclude = ["**.cpp", "**.hpp", "**.h", "**/CMakeLists.txt", "**/.git*"]
 
-[tool.setuptools.packages.find]
-exclude = ["docs*", "tests*", "Test*", "external*", "doc*", "__pycache__", "__pycache__*"]
+[tool.scikit-build.cmake.define]
+BUILD_PYTHON_INTERFACE = "ON"
+CMAKE_BUILD_TYPE = "Release"
 
 [tool.mypy]
-files = "setup.py"
+files = "pySMOKEPostProcessor"
 python_version = "3.8"
-strict = true
+strict = false
 show_error_codes = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
-
-[[tool.mypy.overrides]]
-module = ["ninja"]
 ignore_missing_imports = true

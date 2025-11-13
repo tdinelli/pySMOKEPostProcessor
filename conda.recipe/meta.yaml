@@ -1,0 +1,63 @@
+{% set name = "pySMOKEPostProcessor" %}
+{% set version = "0.2.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv
+  skip: true  # [py<38]
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake >=3.16
+    - ninja
+    - git
+  host:
+    - python
+    - pip
+    - scikit-build-core >=0.8.0
+    - pybind11 >=2.11.0
+    - boost-cpp >=1.70
+    - eigen >=3.3
+  run:
+    - python
+    - numpy >=1.20
+    - pandas >=1.3
+    - pyarrow >=6.0
+    - matplotlib-base >=3.3
+    - networkx >=2.5
+    - pydot >=1.4
+    - graphviz >=0.16
+    - scipy >=1.7
+    - boost-cpp >=1.70
+
+test:
+  imports:
+    - pySMOKEPostProcessor
+  commands:
+    - python -c "import pySMOKEPostProcessor; print('Import successful')"
+
+about:
+  home: https://creckmodeling.chem.polimi.it/
+  license: GPL-3.0-only
+  license_family: GPL
+  license_file: LICENSE.md
+  summary: Python wrapper to the OpenSMOKEpp Graphical Post Processor
+  description: |
+    pySMOKEPostProcessor is a Python wrapper around the OpenSMOKEpp Graphical
+    post processor developed by Professor Alberto Cuoci at Politecnico di Milano.
+    It exports and interfaces the computational C++ core of the original project
+    while extending its capabilities for chemical kinetics analysis.
+  doc_url: https://github.com/tdinelli/pySMOKEPostProcessor
+  dev_url: https://github.com/tdinelli/pySMOKEPostProcessor
+
+extra:
+  recipe-maintainers:
+    - tdinelli
