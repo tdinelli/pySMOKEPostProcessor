@@ -8,13 +8,37 @@ target_link_libraries(
         Eigen3::Eigen
 )
 
-# Link Boost libraries - modern Boost (1.70+) is mostly header-only
+# Link Boost libraries
+# Modern Boost (1.70+) is mostly header-only, but filesystem, timer, etc. still need linking
 if(TARGET Boost::headers)
     # Modern Boost CONFIG mode (1.70+)
+    # Need to manually find and link non-header-only libraries
     target_link_libraries(${PROJECT_NAME} PRIVATE Boost::headers)
+
+    # Find Boost library directory
+    find_library(BOOST_FILESYSTEM_LIB NAMES boost_filesystem PATHS ${Boost_LIBRARY_DIRS})
+    find_library(BOOST_SYSTEM_LIB NAMES boost_system PATHS ${Boost_LIBRARY_DIRS})
+
+    if(BOOST_FILESYSTEM_LIB)
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${BOOST_FILESYSTEM_LIB})
+    endif()
+    if(BOOST_SYSTEM_LIB)
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${BOOST_SYSTEM_LIB})
+    endif()
 elseif(TARGET Boost::boost)
     # Alternative modern Boost target
     target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
+
+    # Still need to link non-header-only libraries
+    find_library(BOOST_FILESYSTEM_LIB NAMES boost_filesystem PATHS ${Boost_LIBRARY_DIRS})
+    find_library(BOOST_SYSTEM_LIB NAMES boost_system PATHS ${Boost_LIBRARY_DIRS})
+
+    if(BOOST_FILESYSTEM_LIB)
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${BOOST_FILESYSTEM_LIB})
+    endif()
+    if(BOOST_SYSTEM_LIB)
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${BOOST_SYSTEM_LIB})
+    endif()
 else()
     # Legacy Boost with components (pre-1.70 or FindBoost module)
     target_link_libraries(
