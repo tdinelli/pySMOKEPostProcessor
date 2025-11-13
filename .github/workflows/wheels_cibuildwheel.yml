@@ -21,6 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Configure git to use GitHub token for private repos
+      - name: Configure git credentials
+        run: |
+          git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+        shell: bash
+
       # Install platform-specific system dependencies
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
@@ -57,6 +63,8 @@ jobs:
             yum install -y boost169-devel eigen3-devel git
             # Create symlinks for boost169
             ln -sf /usr/include/boost169/boost /usr/include/boost || true
+            # Configure git credentials for private repos
+            git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
           # Set environment variables for Linux builds
           CIBW_ENVIRONMENT_LINUX: >
@@ -65,9 +73,13 @@ jobs:
 
           CIBW_BEFORE_BUILD_MACOS: |
             brew install boost eigen || true
+            # Configure git credentials for private repos
+            git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
           CIBW_BEFORE_BUILD_WINDOWS: |
             pip install delvewheel
+            # Configure git credentials for private repos
+            git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
           # Test the wheel after building
           CIBW_TEST_COMMAND: "python -c \"import pySMOKEPostProcessor; print('Import successful')\""
