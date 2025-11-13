@@ -21,9 +21,20 @@ The [examples](examples) folder contains a collection of [notebooks](examples/no
 - Sensitivity Coefficients plots. [notebook](examples/Sensitivity_Coefficients.ipynb).
 - Rate Of Production Analysis by means of reaction classes. [notebook](examples/notebooks/Reaction_Classes.ipynb), [notebook-soot-FDI](examples/notebooks/Reaction_Classes_FDI.ipynb).
 
-## Compile and Install
+## Installation
 
-The detail explanation on how to build and install the package can be found inside the relative [documentation](doc/INSTALL.md).
+### Quick Start
+
+```bash
+# Create conda environment with dependencies
+conda env create -f environment.yml
+conda activate pySMOKEPostProcessor
+
+# Install the package
+pip install .
+```
+
+For detailed installation instructions, build options, and troubleshooting, see the [installation guide](doc/INSTALL.md).
 
 # LICENSE
 

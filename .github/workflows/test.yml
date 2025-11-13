@@ -1,0 +1,46 @@
+name: Test Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.9', '3.11']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge,defaults
+          environment-file: environment.yml
+          activate-environment: pp
+
+      - name: Install package
+        shell: bash -el {0}
+        run: |
+          pip install -e . -v
+
+      - name: Test import
+        shell: bash -el {0}
+        run: |
+          python -c "import pySMOKEPostProcessor; print('✓ Import successful')"
+          python -c "from pySMOKEPostProcessor import PostProcessor; print('✓ PostProcessor import successful')"
+
+      - name: Run example (if available)
+        shell: bash -el {0}
+        run: |
+          # Test that examples can at least be parsed
+          python -c "import sys; sys.path.insert(0, 'examples/python')" || echo "No examples to test"

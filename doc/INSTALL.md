@@ -1,58 +1,225 @@
-# Installation guide
+# Installation Guide for pySMOKEPostProcessor
 
-The installation is composed by the following steps:
+This guide provides instructions for installing pySMOKEPostProcessor from source or from pre-built packages.
 
-1. Cloning this repository.
-2. Create the conda environment to automatically manage the dependencies.
-3. Install python package via "pip".
+---
 
-**N.B** Some of the commands here reported may change depending on the operating system you are using.
+## Quick Installation (Recommended)
 
-## 1. Cloning this repository
-
-Clone this repository into your system.
+### Option 1: Install from pre-built wheels (when available)
 
 ```bash
-> git clone https://github.com/Titodinelli/pySMOKEPostProcessor
+pip install pySMOKEPostProcessor
 ```
 
-## 2. Create the conda environment.
+**Note**: Pre-built wheels will be available on GitHub Releases or PyPI in future releases.
 
-This is step is in principle optional, however it is strongly recommended unless you do not really know what you are doing. The package rely on an interfaced wrapper between a C++ code and python. Thus the project, has the following dependencies.
+---
 
-- **OpenSMOKEpp** distibuted under request contact Alberto Cuoci <alberto.cuoci@polimi.it>, within the project this dependency is automatically handled as a sub-module by cmake and git, just be sure to have access to the GitHub repository.
-- **Eigen** (https://eigen.tuxfamily.org/index.php?title=Main_Page), handled by conda.
-- **Boost** (https://www.boost.org/), handled by conda.
-- **pybind11** (https://pybind11.readthedocs.io/en/stable/), handled as a sub-module by cmake and git.
+## Installation from Source
 
-Go into the [conda.recipe](conda.recipe) directory, and run the following commands:
+### Prerequisites
+
+You need a C++ compiler and conda/mamba package manager.
+
+### Step 1: Create a conda environment
+
+Create and activate a new conda environment with all required dependencies:
 
 ```bash
-> conda env create -f environment-linux.yaml
+# Clone the repository
+git clone https://github.com/tdinelli/pySMOKEPostProcessor.git
+cd pySMOKEPostProcessor
+
+# Create conda environment from environment.yml
+conda env create -f environment.yml
+
+# Activate the environment
+conda activate pySMOKEPostProcessor
 ```
 
-## 3. Install python package via "pip" 
-Work from the base folder pySMOKEPostProcessor.
+### Step 2: Install the package
+
+#### For users (install mode):
+
 ```bash
-> conda activate pp
-> source export_var.sh
-> python -m pip install .
+pip install .
 ```
 
-If everything worked fine something like this should be on your screen:
+#### For developers (editable mode):
 
 ```bash
-> Successfully installed pySMOKEPostProcessor-0.3.0
+pip install -e .
 ```
 
-## Development functionalities
+The `-e` flag installs in editable mode, so changes to Python files take effect immediately.
 
-Way of controlling the installation procedure of the package run the pip install command in verbose mode:
-```bash
-> python -m pip install . -vvv
-``` 
+---
 
-In order to update the package after changing source code files.
+## What happens during installation?
+
+The build system will automatically:
+
+1. ✅ Detect Boost and Eigen3 from conda environment
+2. ✅ Fetch pybind11 (if not found in system)
+3. ✅ Fetch OpenSMOKEpp v0.22 from GitHub
+4. ✅ Compile the C++ extension module
+5. ✅ Install the Python package
+
+Build time: ~2-5 minutes (depending on your machine)
+
+---
+
+## Platform-Specific Notes
+
+### Linux
+
+Ensure you have a C++ compiler:
+
 ```bash
-> python -m pip install . -U
-``` 
+# Ubuntu/Debian
+sudo apt-get install build-essential
+
+# CentOS/RHEL
+sudo yum groupinstall "Development Tools"
+```
+
+### macOS
+
+Install Xcode Command Line Tools:
+
+```bash
+xcode-select --install
+```
+
+### Windows
+
+Install Visual Studio 2019 or later with C++ support, or use conda-provided compilers:
+
+```bash
+conda install cxx-compiler
+```
+
+---
+
+## Verifying the Installation
+
+Test your installation:
+
+```python
+import pySMOKEPostProcessor
+print("Installation successful!")
+```
+
+Run the examples:
+
+```bash
+# Navigate to examples
+cd examples/python
+
+# Run a sample script
+python RateOfProductionAnalysis_1.py
+```
+
+---
+
+## Troubleshooting
+
+### CMake not found
+
+```bash
+conda install cmake
+```
+
+### Boost not found
+
+```bash
+conda install boost-cpp
+```
+
+### Eigen3 not found
+
+Eigen3 should be fetched automatically, but you can install it via conda:
+
+```bash
+conda install eigen
+```
+
+### Build fails with "OpenSMOKEpp not found"
+
+The build system should fetch OpenSMOKEpp automatically. If it fails:
+
+1. Check your internet connection
+2. Ensure you have git installed: `conda install git`
+3. Try cleaning the build: `pip install . --no-build-isolation -v`
+
+### Verbose build output
+
+For debugging build issues:
+
+```bash
+pip install . -vvv
+```
+
+---
+
+## Advanced: Building wheels for distribution
+
+To build distributable wheels:
+
+```bash
+# Install build tools
+pip install build
+
+# Build wheel
+python -m build --wheel
+
+# Wheel will be in dist/
+```
+
+---
+
+## Uninstalling
+
+```bash
+pip uninstall pySMOKEPostProcessor
+```
+
+To also remove the conda environment:
+
+```bash
+conda deactivate
+conda env remove -n pySMOKEPostProcessor
+```
+
+---
+
+## Dependencies Summary
+
+### Required (automatically installed):
+- **OpenSMOKEpp v0.22**: Fetched from GitHub during build
+- **pybind11 ≥2.11**: Fetched if not found
+- **Eigen3 ≥3.3**: Fetched if not found
+
+### Required (must be installed):
+- **Python ≥3.8**
+- **Boost ≥1.70**: Install via conda (`conda install boost-cpp`)
+- **CMake ≥3.16**: Install via conda (`conda install cmake`)
+
+### Python packages:
+- numpy ≥1.20
+- pandas ≥1.3
+- pyarrow ≥6.0
+- matplotlib ≥3.3
+- networkx ≥2.5
+- pydot ≥1.4
+- graphviz ≥0.16
+- scipy ≥1.7
+
+---
+
+## Getting Help
+
+- **Issues**: https://github.com/tdinelli/pySMOKEPostProcessor/issues
+- **Examples**: See the `examples/` directory
+- **Documentation**: https://creckmodeling.chem.polimi.it/

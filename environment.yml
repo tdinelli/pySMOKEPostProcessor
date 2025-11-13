@@ -1,4 +1,4 @@
-name: pySMOKEPostProcessor
+name: pp
 channels:
   - conda-forge
   - defaults
