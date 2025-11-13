@@ -1,18 +1,27 @@
 # Installation Guide for pySMOKEPostProcessor
 
-This guide provides instructions for installing pySMOKEPostProcessor from source or from pre-built packages.
+This guide provides instructions for installing pySMOKEPostProcessor from pre-built packages or from source.
 
 ---
 
 ## Quick Installation (Recommended)
 
-### Option 1: Install from pre-built wheels (when available)
+### Option 1: Install from pre-built wheels
+
+Pre-built wheels are automatically generated for each release and are available on the [GitHub Releases page](https://github.com/tdinelli/pySMOKEPostProcessor/releases).
+
+#### Download and install a wheel:
 
 ```bash
-pip install pySMOKEPostProcessor
+# Download the wheel for your platform and Python version from the latest release
+# Example for macOS ARM64 with Python 3.12:
+pip install pySMOKEPostProcessor-0.2.0-cp312-cp312-macosx_14_0_arm64.whl
 ```
 
-**Note**: Pre-built wheels will be available on GitHub Releases or PyPI in future releases.
+**Currently available platforms:**
+- macOS ARM64 (Apple Silicon M1/M2/M3) for Python 3.10, 3.11, 3.12
+
+**Note**: Additional platforms (Linux, Windows) may be added in future releases.
 
 ---
 
@@ -60,11 +69,11 @@ The `-e` flag installs in editable mode, so changes to Python files take effect 
 
 The build system will automatically:
 
-1. ✅ Detect Boost and Eigen3 from conda environment
-2. ✅ Fetch pybind11 (if not found in system)
-3. ✅ Fetch OpenSMOKEpp v0.22 from GitHub
-4. ✅ Compile the C++ extension module
-5. ✅ Install the Python package
+1. Detect Boost and Eigen3 from conda environment
+2. Fetch pybind11 (if not found in system)
+3. Fetch OpenSMOKEpp v0.22 from GitHub
+4. Compile the C++ extension module
+5. Install the Python package
 
 Build time: ~2-5 minutes (depending on your machine)
 
