@@ -19,6 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Configure git to use GitHub token for private repos
+      - name: Configure git credentials
+        run: |
+          git config --global url."https://${{ secrets.OPENSMOKE_ACCESS_TOKEN }}@github.com/".insteadOf "https://github.com/"
+        shell: bash
+
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
