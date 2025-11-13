@@ -3,10 +3,16 @@
 # -----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16)
 
-project(pySMOKEPostProcessor
-    VERSION 1.0.0
-    DESCRIPTION "Python wrapper of the OpenSMOKEpp Graphical Post Processor"
-    LANGUAGES CXX
+# Set policies for modern CMake behavior
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)  # Use BoostConfig.cmake if available
+endif()
+
+project(
+  pySMOKEPostProcessor
+  VERSION 1.0.0
+  DESCRIPTION "Python wrapper of the OpenSMOKEpp Graphical Post Processor"
+  LANGUAGES CXX
 )
 
 # -----------------------------------------------------------------------------
@@ -42,19 +48,18 @@ endif()
 # Compulsory libraries
 # -----------------------------------------------------------------------------
 # Boost (Required by OpenSMOKEpp) Inside the installation to ease the life of
-# everyone the boost package is installed using pip/conda pipeline
+# everyone the boost package is installed using brew/apt/pip/conda
 message(STATUS "Searching for Boost...")
 
-# Set policy to use new FindBoost behavior (CMake 3.30+)
-if(POLICY CMP0167)
-  cmake_policy(SET CMP0167 NEW)
-endif()
-
+# -----------------------------------------------------------------------------
 # Try to find Boost with modern config first (Boost 1.70+)
+# If not found, fall back to FindBoost module for older versions
+# (e.g., manylinux boost169)
 find_package(Boost 1.70 QUIET CONFIG)
 
 if(NOT Boost_FOUND)
-  # Fallback to FindBoost module for older versions
+  # Fallback to FindBoost module for older versions (Boost < 1.70)
+  # This is needed for manylinux which uses boost169 (Boost 1.69)
   find_package(Boost REQUIRED
       COMPONENTS
           date_time

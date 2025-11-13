@@ -5,6 +5,9 @@ include(FetchContent)
 
 message(STATUS "Configuring pybind11...")
 
+# Tell pybind11 to use FindPython instead of deprecated FindPythonLibs
+set(PYBIND11_FINDPYTHON ON)
+
 # -----------------------------------------------------------------------------
 # Try to find system-installed pybind11 first
 find_package(pybind11 2.11.0 QUIET CONFIG)

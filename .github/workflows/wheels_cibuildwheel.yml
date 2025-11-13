@@ -16,9 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # Temporarily only macOS for testing
-        os: [macos-13]
-        # os: [ubuntu-22.04, macos-13, macos-14, windows-2022]
+        os: [ubuntu-22.04, macos-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +53,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.5
         env:
           # Configure cibuildwheel
-          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
+          CIBW_BUILD: "cp310-* cp311-* cp312-*"
           CIBW_SKIP: "*-musllinux_* *-manylinux_i686 *-win32"
 
           # Install build dependencies before building
@@ -65,6 +63,7 @@ jobs:
             yum install -y boost169-devel eigen3-devel git
             # Create symlinks for boost169
             ln -sf /usr/include/boost169/boost /usr/include/boost || true
+            ln -sf /usr/lib64/boost169 /usr/lib64/boost || true
             # Configure git credentials for private repos
             git config --global url."https://${{ secrets.OPENSMOKE_ACCESS_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
@@ -72,6 +71,7 @@ jobs:
           CIBW_ENVIRONMENT_LINUX: >
             BOOST_ROOT=/usr/include/boost169
             Boost_INCLUDE_DIR=/usr/include/boost169
+            Boost_LIBRARY_DIRS=/usr/lib64/boost169
 
           CIBW_BEFORE_BUILD_MACOS: |
             brew install boost eigen || true
@@ -82,6 +82,10 @@ jobs:
             pip install delvewheel
             # Configure git credentials for private repos
             git config --global url."https://${{ secrets.OPENSMOKE_ACCESS_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+          # Repair wheels to bundle dependencies
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
 
           # Test the wheel after building
           CIBW_TEST_COMMAND: "python -c \"import pySMOKEPostProcessor; print('Import successful')\""
