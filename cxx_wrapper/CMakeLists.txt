@@ -6,14 +6,29 @@ target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
         Eigen3::Eigen
-        Boost::date_time
-        Boost::filesystem
-        Boost::program_options
-        Boost::system
-        Boost::regex
-        Boost::timer
-        Boost::chrono
 )
+
+# Link Boost libraries - modern Boost (1.70+) is mostly header-only
+if(TARGET Boost::headers)
+    # Modern Boost CONFIG mode (1.70+)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::headers)
+elseif(TARGET Boost::boost)
+    # Alternative modern Boost target
+    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
+else()
+    # Legacy Boost with components (pre-1.70 or FindBoost module)
+    target_link_libraries(
+        ${PROJECT_NAME}
+        PRIVATE
+            Boost::date_time
+            Boost::filesystem
+            Boost::program_options
+            Boost::system
+            Boost::regex
+            Boost::timer
+            Boost::chrono
+    )
+endif()
 
 target_include_directories(
     ${PROJECT_NAME}
