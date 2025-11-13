@@ -51,9 +51,17 @@ jobs:
           CIBW_SKIP: "*-musllinux_* *-manylinux_i686 *-win32"
 
           # Install build dependencies before building
+          # manylinux2014 uses CentOS 7, need EPEL for some packages
           CIBW_BEFORE_BUILD_LINUX: |
-            yum install -y boost-devel eigen3-devel || \
-            apt-get update && apt-get install -y libboost-all-dev libeigen3-dev
+            yum install -y epel-release
+            yum install -y boost169-devel eigen3-devel git
+            # Create symlinks for boost169
+            ln -sf /usr/include/boost169/boost /usr/include/boost || true
+
+          # Set environment variables for Linux builds
+          CIBW_ENVIRONMENT_LINUX: >
+            BOOST_ROOT=/usr/include/boost169
+            Boost_INCLUDE_DIR=/usr/include/boost169
 
           CIBW_BEFORE_BUILD_MACOS: |
             brew install boost eigen || true
