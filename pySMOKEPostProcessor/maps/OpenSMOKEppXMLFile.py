@@ -1,4 +1,4 @@
-'''
+"""
 MODULE: OpenSMOKEppXMLFile
 @Authors:
     Alberto Cuoci [1], Timoteo Dinelli[1]
@@ -9,70 +9,72 @@ MODULE: OpenSMOKEppXMLFile
 @Additional notes:
     This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     Please report any bug to: alberto.cuoci@polimi.it
-    This is a modified class frome the original one OpenSMOKEppXMLFile.py inside PyTools4OpenSMOKE 
+    This is a modified class frome the original one OpenSMOKEppXMLFile.py inside PyTools4OpenSMOKE
     modified by Timoteo Dinelli in order to perform post processing analysis for gas phase simulations
-'''
+"""
 
 import os
-import xml.etree.ElementTree as ET
-import numpy as np
 import warnings
+import xml.etree.ElementTree as ET
+
+import numpy as np
 
 from .KineticMap import KineticMap
 
 
 class OpenSMOKEppXMLFile:
-
-    '''
+    """
     Description of the OpenSMOKEppXMLFile class
     TODO
-    '''
+    """
 
     def __init__(self, outputFolder: str, kineticFolder: str):
         kin = KineticMap(kineticFolder)
-        xml_file_name = os.path.join(outputFolder, 'Output.xml')
+        xml_file_name = os.path.join(outputFolder, "Output.xml")
         # xml_file_name = os.path.join(OutputFolder, 'overall.xml')
         # xml_file_name = os.path.join(OutputFolder, 'rectangle.xml')
         tree = ET.parse(xml_file_name)
         root = tree.getroot()
 
         # System type
-        systemType = ((root.find('Type')).text).strip()
-        if (systemType != "HomogeneousReactor" and
-            systemType != "Flamelet" and
-            systemType != "Flame1D" and
-                systemType != "Flame2D"):
-            if (systemType == "BatchReactor" or
-               systemType == "PlugFlowReactor" or
-               systemType == "PerfectlyStirredReactor"):
+        systemType = ((root.find("Type")).text).strip()
+        if (
+            systemType != "HomogeneousReactor"
+            and systemType != "Flamelet"
+            and systemType != "Flame1D"
+            and systemType != "Flame2D"
+        ):
+            if (
+                systemType == "BatchReactor"
+                or systemType == "PlugFlowReactor"
+                or systemType == "PerfectlyStirredReactor"
+            ):
                 warnings.warn(
-                    " * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained! Some of the functions in this class may not work!")
+                    " * WARNING: You are running an older version of OpenSMOKE++ that is no longer mantained! Some of the functions in this class may not work!"
+                )
             else:
                 raise Exception(f"Unknown system type: {systemType}")
 
         # Check simulation/kinetics consistency
-        dummy = root.find('mass-fractions')
+        dummy = root.find("mass-fractions")
         dummy = (dummy.text).split()
         list_names = []
         column_index_of_massfractions_profiles = []
         for i in range(int(dummy[0])):
-            list_names.append(dummy[1+i*3])
-            column_index_of_massfractions_profiles.append(int(dummy[3+i*3]))
-        if (len(list_names) != kin.NumberOfSpecies):
-            raise Exception(
-                "The kinetic mechanism is not consistent with the simulation")
+            list_names.append(dummy[1 + i * 3])
+            column_index_of_massfractions_profiles.append(int(dummy[3 + i * 3]))
+        if len(list_names) != kin.NumberOfSpecies:
+            raise Exception("The kinetic mechanism is not consistent with the simulation")
         for i in range(kin.NumberOfSpecies):
-            if (list_names[i] != kin.species[i]):
-                raise Exception(
-                    "The kinetic mechanism is not consistent with the simulation")
+            if list_names[i] != kin.species[i]:
+                raise Exception("The kinetic mechanism is not consistent with the simulation")
 
         # Recover additional variables
-        dummy = root.find('additional')
-        dummy = (dummy.text).split('\n')
-        dummy = [i for i in dummy if not i.isnumeric() and i != '']
+        dummy = root.find("additional")
+        dummy = (dummy.text).split("\n")
+        dummy = [i for i in dummy if not i.isnumeric() and i != ""]
         n_additional = len(dummy)
-        additional_variable = [i.split()[0] + ' ' + i.split()[1]
-                               for i in dummy]
+        additional_variable = [i.split()[0] + " " + i.split()[1] for i in dummy]
         index = [int(i.split()[-1]) for i in dummy]
         add_var_idx = index
 
@@ -127,64 +129,64 @@ class OpenSMOKEppXMLFile:
         index_fvSOOT = None
 
         for i, j in enumerate(additional_variable):
-            if ('temperature' in j):
+            if "temperature" in j:
                 index_T = index[i] - 2
-            if ('pressure' in j):
+            if "pressure" in j:
                 index_P = index[i] - 2
-            if ('mol-weight' in j):
+            if "mol-weight" in j:
                 index_MW = index[i] - 2
-            if ('density' in j):
+            if "density" in j:
                 index_rho = index[i] - 2
-            if ('heat-release' in j):
+            if "heat-release" in j:
                 index_Q = index[i] - 2
-            if ('x-coord' in j):
+            if "x-coord" in j:
                 index_x_coord = index[i] - 2
-            if ('y-coord' in j):
+            if "y-coord" in j:
                 index_y_coord = index[i] - 2
-            if ('z-coord' in j):
+            if "z-coord" in j:
                 index_z_coord = index[i] - 2
-            if ('x-vel' in j):
+            if "x-vel" in j:
                 index_x_vel = index[i] - 2
-            if ('y-vel' in j):
+            if "y-vel" in j:
                 index_y_vel = index[i] - 2
-            if ('z-vel' in j):
+            if "z-vel" in j:
                 index_z_vel = index[i] - 2
-            if ('volume' in j):
+            if "volume" in j:
                 index_V = index[i] - 2
-            if ('tau' in j):
+            if "tau" in j:
                 index_tau = index[i] - 2
-            if ('chi-st' in j):
+            if "chi-st" in j:
                 index_chi_st = index[i] - 2
-            if ('strain-rate' in j):
+            if "strain-rate" in j:
                 index_strain_rate = index[i] - 2
-            if ('curvature' in j):
+            if "curvature" in j:
                 index_curvature = index[i] - 2
-            if ('enthalpy-sens' in j):
+            if "enthalpy-sens" in j:
                 index_enthalpy_sens = index[i] - 2
-            if ('cp' in j):
+            if "cp" in j:
                 index_cp = index[i] - 2
-            if ('therm-cond' in j):
+            if "therm-cond" in j:
                 index_therm_cond = index[i] - 2
-            if ('viscosity' in j):
+            if "viscosity" in j:
                 index_viscosity = index[i] - 2
-            if ('YSoot' in j):
+            if "YSoot" in j:
                 index_YSoot = index[i] - 2
-            if ('csi' in j):
+            if "csi" in j:
                 index_csi = index[i] - 2
-            if ('mixture-fraction' in j or 'mix-fract' in j):
+            if "mixture-fraction" in j or "mix-fract" in j:
                 index_csi = index[i] - 2
-            if ('axial-coordinate' in j):
+            if "axial-coordinate" in j:
                 index_csi = index[i] - 2
-            if ('fvSoot' in j):
+            if "fvSoot" in j:
                 index_fvSOOT = index[i] - 2
 
         # Read profiles
-        profiles_size = root.find('profiles-size')
+        profiles_size = root.find("profiles-size")
         profiles_size = (profiles_size.text).split()
         npts = int(profiles_size[0])
         nc = n_additional + kin.NumberOfSpecies
 
-        profiles = root.find('profiles')
+        profiles = root.find("profiles")
         profiles = (profiles.text).split()
         profiles = np.reshape(profiles, (npts, nc))
         profiles = np.float32(profiles)
@@ -215,22 +217,22 @@ class OpenSMOKEppXMLFile:
         self._viscosity = profiles[:, index_viscosity]
         self._YSoot = profiles[:, index_YSoot]
 
-        if (systemType == 'Flame1D'):
+        if systemType == "Flame1D":
             self._csi = profiles[:, index_csi]
-        elif (systemType == 'Flamelet'):
-            self._csi = [1]*npts - profiles[:, index_csi]
+        elif systemType == "Flamelet":
+            self._csi = [1] * npts - profiles[:, index_csi]
         else:
-            self._csi = [0]*npts
+            self._csi = [0] * npts
 
         # Composition
-        Y = profiles[:, -kin.NumberOfSpecies:]
-        X = Y*self._MW.reshape(-1, 1)/np.transpose(kin.mws.reshape(-1, 1))
+        Y = profiles[:, -kin.NumberOfSpecies :]
+        X = Y * self._MW.reshape(-1, 1) / np.transpose(kin.mws.reshape(-1, 1))
 
         # Additional variables name
         for i in range(len(column_index_of_massfractions_profiles)):
             # Warning this can generate bugs
-            if (Y[0, column_index_of_massfractions_profiles[i] - len(additional_variable)] > 1e-8):
-                additional_variable.append('conversion-' + list_names[i])
+            if Y[0, column_index_of_massfractions_profiles[i] - len(additional_variable)] > 1e-8:
+                additional_variable.append("conversion-" + list_names[i])
 
         # Assign internal members
 

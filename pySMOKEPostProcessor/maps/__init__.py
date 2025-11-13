@@ -1,3 +1,3 @@
 from .KineticMap import KineticMap
-from .StoichiometricMap import StoichiometricMap
 from .OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
+from .StoichiometricMap import StoichiometricMap

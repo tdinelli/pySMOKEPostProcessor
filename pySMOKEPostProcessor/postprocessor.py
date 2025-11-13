@@ -1,8 +1,9 @@
-import pandas as pd
 import numpy as np
-from .pySMOKEPostProcessor import ProfilesDatabase, ROPA, Sensitivity
-from .maps.KineticMap import KineticMap
+import pandas as pd
+
 from .graph_writer import GraphWriter
+from .maps.KineticMap import KineticMap
+from .pySMOKEPostProcessor import ROPA, ProfilesDatabase, Sensitivity
 
 
 class PostProcessor:
@@ -16,7 +17,6 @@ class PostProcessor:
     """
 
     def __init__(self, kineticFolder: str, outputFolder: str) -> None:
-
         self.db = ProfilesDatabase()
         self.db.readFileResults(outputFolder)
         self.db.readKineticMechanism(kineticFolder)
@@ -26,9 +26,18 @@ class PostProcessor:
 
         self.km = KineticMap(self.kineticFolder)
 
-    def RateOfProductionAnalysis(self, species: str, ropa_type: str, local_value: float = 0, lower_value: float = 0,
-                                 upper_value: float = 0, number_of_reactions: int = 10, two_dimensions: bool = False,
-                                 region_location: dict = None, mass_ropa: bool = False,) -> dict:
+    def RateOfProductionAnalysis(
+        self,
+        species: str,
+        ropa_type: str,
+        local_value: float = 0,
+        lower_value: float = 0,
+        upper_value: float = 0,
+        number_of_reactions: int = 10,
+        two_dimensions: bool = False,
+        region_location: dict = None,
+        mass_ropa: bool = False,
+    ) -> dict:
         """
         Function that performs the [R]ate [O]f [P]roduction [A]nalysis
         Args:
@@ -50,7 +59,7 @@ class PostProcessor:
                 Containing the ROPA coefficients, the reaction names and the indices of the reactions.
         """
 
-        if (two_dimensions is False):
+        if two_dimensions is False:
             widget = ROPA()
             widget.setDataBase(self.db)
             widget.setROPAType(ropa_type)
@@ -69,22 +78,26 @@ class PostProcessor:
                 reaction_names.append(self.km.ReactionNameFromIndex(i))
 
             if mass_ropa:
-                ropa_coefficients = self.convert_tomass(ropa_coefficients,
-                                                        species)
+                ropa_coefficients = self.convert_tomass(ropa_coefficients, species)
 
-            ropa_result = {'coefficients': ropa_coefficients,
-                           'reaction_names': reaction_names,
-                           'reaction_indices': reaction_indices}
+            ropa_result = {
+                "coefficients": ropa_coefficients,
+                "reaction_names": reaction_names,
+                "reaction_indices": reaction_indices,
+            }
 
             return ropa_result
         else:
-            return self.RateOfProductionAnalysis2D(species, ropa_type,
-                                                   number_of_reactions,
-                                                   region_location,
-                                                   mass_ropa)
+            return self.RateOfProductionAnalysis2D(species, ropa_type, number_of_reactions, region_location, mass_ropa)
 
-    def RateOfProductionAnalysis2D(self, species: str, ropa_type: str, number_of_reactions: int = 10,
-                                   region_location: dict = None, mass_ropa: bool = False) -> dict:
+    def RateOfProductionAnalysis2D(
+        self,
+        species: str,
+        ropa_type: str,
+        number_of_reactions: int = 10,
+        region_location: dict = None,
+        mass_ropa: bool = False,
+    ) -> dict:
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.setROPAType(ropa_type)
@@ -93,17 +106,22 @@ class PostProcessor:
         widget.setLowerBound(0)
         widget.setUpperBound(0)
 
-        local_value_x = region_location['local_value_x']
-        local_value_z = region_location['local_value_z']
-        lower_value_x = region_location['lower_value_x']
-        lower_value_z = region_location['lower_value_z']
-        upper_value_x = region_location['upper_value_x']
-        upper_value_z = region_location['upper_value_z']
+        local_value_x = region_location["local_value_x"]
+        local_value_z = region_location["local_value_z"]
+        lower_value_x = region_location["lower_value_x"]
+        lower_value_z = region_location["lower_value_z"]
+        upper_value_x = region_location["upper_value_x"]
+        upper_value_z = region_location["upper_value_z"]
 
-        widget.RateOfProductionAnalysis2D(number_of_reactions, local_value_x,
-                                          local_value_z, lower_value_x,
-                                          upper_value_x, lower_value_z,
-                                          upper_value_z)
+        widget.RateOfProductionAnalysis2D(
+            number_of_reactions,
+            local_value_x,
+            local_value_z,
+            lower_value_x,
+            upper_value_x,
+            lower_value_z,
+            upper_value_z,
+        )
 
         reaction_indices = widget.reactions()
         ropa_coefficients = widget.coefficients()
@@ -113,19 +131,27 @@ class PostProcessor:
             reaction_names.append(self.km.ReactionNameFromIndex(i))
 
         if mass_ropa:
-            ropa_coefficients = self.convert_tomass(ropa_coefficients,
-                                                    species)
+            ropa_coefficients = self.convert_tomass(ropa_coefficients, species)
 
-        ropa_result = {'coefficients': ropa_coefficients,
-                       'reaction_names': reaction_names,
-                       'reaction_indices': reaction_indices}
+        ropa_result = {
+            "coefficients": ropa_coefficients,
+            "reaction_names": reaction_names,
+            "reaction_indices": reaction_indices,
+        }
 
         return ropa_result
 
-    def SensitivityAnalysis(self, target: str, sensitivity_type: str, ordering_type: str, normalization_type: str,
-                            local_value: float = 0, lower_value: float = 0, upper_value: float = 0,
-                            number_of_reactions: int = 10) -> dict:
-
+    def SensitivityAnalysis(
+        self,
+        target: str,
+        sensitivity_type: str,
+        ordering_type: str,
+        normalization_type: str,
+        local_value: float = 0,
+        lower_value: float = 0,
+        upper_value: float = 0,
+        number_of_reactions: int = 10,
+    ) -> dict:
         # SENSITIVITY HERE
         widget = Sensitivity()
 
@@ -148,16 +174,27 @@ class PostProcessor:
         for i in reaction_indices:
             reaction_names.append(self.km.ReactionNameFromIndex(i))
 
-        sensitivity_result = {'coefficients': sensitivity_coefficients,
-                              'reaction_names': reaction_names,
-                              'reaction_indices': reaction_indices}
+        sensitivity_result = {
+            "coefficients": sensitivity_coefficients,
+            "reaction_names": reaction_names,
+            "reaction_indices": reaction_indices,
+        }
 
         return sensitivity_result
 
-    def FluxAnalysis(self, species: str, element: str, flux_analysis_type: str, thickness: str,
-                     thickness_log_scale: bool, label_type: str, depth: int = 2, width: int = 5,
-                     threshold: float = 0, local_value: float = 0.01):
-
+    def FluxAnalysis(
+        self,
+        species: str,
+        element: str,
+        flux_analysis_type: str,
+        thickness: str,
+        thickness_log_scale: bool,
+        label_type: str,
+        depth: int = 2,
+        width: int = 5,
+        threshold: float = 0,
+        local_value: float = 0.01,
+    ):
         widget = ROPA()
 
         widget.setDataBase(self.db)
@@ -183,23 +220,20 @@ class PostProcessor:
         secondNames = []
         for i, j in enumerate(indexFirstName):
             firstNames.append(self.km.SpeciesNameFromIndex(j))
-            secondNames.append(
-                self.km.SpeciesNameFromIndex(indexSecondName[i]))
+            secondNames.append(self.km.SpeciesNameFromIndex(indexSecondName[i]))
         Graph = GraphWriter(flux_analysis_type)  # , species, element)
-        Graph = Graph.CreateGraph(
-            firstNames, secondNames, computedThickness, computedLabel)
+        Graph = Graph.CreateGraph(firstNames, secondNames, computedThickness, computedLabel)
 
         return Graph
 
     def GetReactionRates(self, reaction_name: list = None, reaction_index: list = None, sum_rates: bool = False):
         if reaction_name is not None:
-            reaction_index = [self.km.ReactionIndexFromName(
-                name=i) for i in reaction_name]
+            reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.getReactionRates(reaction_index, sum_rates)
 
-        if (sum_rates):
+        if sum_rates:
             reaction_rates = [widget.sumOfRates()]
         else:
             reaction_rates = widget.reactionRates()
@@ -214,9 +248,13 @@ class PostProcessor:
 
         return formationRates
 
-    def SensitivityCoefficients(self, target: str, normalization_type: str,
-                                reaction_name: str = None, reaction_index: int = None):
-
+    def SensitivityCoefficients(
+        self,
+        target: str,
+        normalization_type: str,
+        reaction_name: str = None,
+        reaction_index: int = None,
+    ):
         if reaction_name is not None:
             reaction_index = self.km.ReactionIndexFromName(name=reaction_name)
 
@@ -226,9 +264,9 @@ class PostProcessor:
         widget.setOrderingType("peak-values")
         widget.setNormalizationType(normalization_type)
         widget.setTarget(target)
-        widget.setLocalValue(0.)
-        widget.setLowerBound(0.)
-        widget.setUpperBound(0.)
+        widget.setLocalValue(0.0)
+        widget.setLowerBound(0.0)
+        widget.setUpperBound(0.0)
         widget.prepare()
         widget.readSensitivityCoefficients()
         widget.getSensitivityProfile(reaction_index)
@@ -249,7 +287,7 @@ class PostProcessor:
         """
         sp_idx = self.km.IndexFromSpeciesName(species)
         mwi = self.km.mws[sp_idx]
-        ropa_coefficients = [c*mwi for c in ropa_coefficients]
+        ropa_coefficients = [c * mwi for c in ropa_coefficients]
 
         return ropa_coefficients
 
@@ -272,7 +310,13 @@ class PostProcessor:
 
         return rates_df
 
-    def cumulativerates(self, xaxis: list, ropa_dct: dict, rate_type: str = 'PC', threshold: float = 0.01):
+    def cumulativerates(
+        self,
+        xaxis: list,
+        ropa_dct: dict,
+        rate_type: str = "PC",
+        threshold: float = 0.01,
+    ):
         # cumulative reaction rate matrix extract
         # rate_type: PC, P, C (net, production, consumption)
         # threshold: delete rates based on % contribution (default: keep only those contributing > 1%)
@@ -280,28 +324,31 @@ class PostProcessor:
 
         # 0. ropa DCT: sum coefficients for duplicates
         coefficients, indices, names, names_split = [], [], [], []
-        allindices_array = np.array(ropa_dct['reaction_indices'])
-        allcoeffs_array = np.array(ropa_dct['coefficients'])
+        allindices_array = np.array(ropa_dct["reaction_indices"])
+        allcoeffs_array = np.array(ropa_dct["coefficients"])
         for i, idx in enumerate(allindices_array):
             if idx not in indices:
                 indices.append(idx)
-                names.append(ropa_dct['reaction_names'][i])
-                names_split.append(ropa_dct['reaction_names'][i].split(': ')[1])
-                if ropa_dct['reaction_indices'].count(idx) > 1:
+                names.append(ropa_dct["reaction_names"][i])
+                names_split.append(ropa_dct["reaction_names"][i].split(": ")[1])
+                if ropa_dct["reaction_indices"].count(idx) > 1:
                     positions = np.where((allindices_array == idx))[0]
                     coefficients.append(np.sum(allcoeffs_array[positions]))
                 else:
                     coefficients.append(allcoeffs_array[i])
 
         # 1. ropa DF: indexes (positive or negative) and reaction names
-        factor = [1.0 - 2.0*(coeff < 0) for coeff in coefficients]
-        ropa_df = pd.DataFrame(np.array([factor, names, names_split], dtype=object).T,
-                               index=indices, columns=['factor', 'reaction_names', 'reaction_names_split'])
+        factor = [1.0 - 2.0 * (coeff < 0) for coeff in coefficients]
+        ropa_df = pd.DataFrame(
+            np.array([factor, names, names_split], dtype=object).T,
+            index=indices,
+            columns=["factor", "reaction_names", "reaction_names_split"],
+        )
 
-        if rate_type == 'P':
-            ropa_df = ropa_df[ropa_df['factor'].values > 0]
-        elif rate_type == 'C':
-            ropa_df = ropa_df[ropa_df['factor'] < 0]
+        if rate_type == "P":
+            ropa_df = ropa_df[ropa_df["factor"].values > 0]
+        elif rate_type == "C":
+            ropa_df = ropa_df[ropa_df["factor"] < 0]
 
         # 2. get reaction rates
         # if cumulative rate and ropa sign agree: don't change sign; otherwise, do
@@ -310,41 +357,40 @@ class PostProcessor:
 
         rrdel = []
         scannedidxs = []
-        for idx in ropa_df.index:  
+        for idx in ropa_df.index:
             check = False
-                    
+
             rr_idx = np.array(self.GetReactionRates(reaction_index=[idx])[0])
 
             rrsum_idx = np.trapz(y=rr_idx, x=xaxis)
-            if (rrsum_idx * float(ropa_df['factor'][idx])) < 0:
+            if (rrsum_idx * float(ropa_df["factor"][idx])) < 0:
                 # integral and ropa have opposite signs: change sign
                 rr_idx *= -1
                 rrsum_idx *= -1
 
             # if the reaction corresponds to the bw rxn of an irrev rxn already treated: sum
             # look for bw rxn
-            if '=>' in ropa_df['reaction_names_split'][idx]:
-                
-                prod, reac = ropa_df['reaction_names_split'][idx].split('=>')
-                bwname = '=>'.join([reac, prod])
-                idxrs = ropa_df.index[ropa_df['reaction_names_split'] == bwname].tolist()
+            if "=>" in ropa_df["reaction_names_split"][idx]:
+                prod, reac = ropa_df["reaction_names_split"][idx].split("=>")
+                bwname = "=>".join([reac, prod])
+                idxrs = ropa_df.index[ropa_df["reaction_names_split"] == bwname].tolist()
                 for idxr in idxrs:
                     if idxr in scannedidxs:
                         rr[idxr] += rr_idx
                         rrsum[idxr] += rrsum_idx
-                        ropa_df.loc[idxr,'reaction_names'] = ropa_df['reaction_names'][idx].replace("=>", "=")
+                        ropa_df.loc[idxr, "reaction_names"] = ropa_df["reaction_names"][idx].replace("=>", "=")
                         rrdel.append(idx)
                         check = True
 
             # if a reaction with the same name was already analyzed: add flux to that
-            rxnname = ropa_df['reaction_names_split'][idx]
-            idxrs = ropa_df.index[ropa_df['reaction_names_split'] == rxnname].tolist()
+            rxnname = ropa_df["reaction_names_split"][idx]
+            idxrs = ropa_df.index[ropa_df["reaction_names_split"] == rxnname].tolist()
             idxr_scanned = [idxr for idxr in idxrs if idxr in scannedidxs]
             if len(idxr_scanned) > 0:
                 idxr = idxr_scanned[0]
                 rr[idxr] += rr_idx
                 rrsum[idxr] += rrsum_idx
-                ropa_df.loc[idxr,'reaction_names'] = ropa_df['reaction_names'][idx].replace("=>", "=")
+                ropa_df.loc[idxr, "reaction_names"] = ropa_df["reaction_names"][idx].replace("=>", "=")
                 rrdel.append(idx)
                 check = True
 
@@ -366,12 +412,13 @@ class PostProcessor:
         # add to the names the cumulative % contribution
         names_wpct = []
         for idx in filteredidxs:
-            name = ropa_df['reaction_names_split'][idx]
+            name = ropa_df["reaction_names_split"][idx]
             pct = rrsum[idx] * 100
-            names_wpct.append('{} {:.5f}%'.format(name, pct))
+            names_wpct.append("{} {:.5f}%".format(name, pct))
         cumulativerates_df = pd.DataFrame(np.array(filtered_rr).T, columns=names_wpct, index=xaxis)
 
         return cumulativerates_df
+
 
 # alternative : do a local ropa to set values; if you don't find the reaction,
 # set the value to zero

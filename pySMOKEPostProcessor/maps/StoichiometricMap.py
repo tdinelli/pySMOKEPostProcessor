@@ -1,4 +1,4 @@
-'''
+"""
 MODULE: ReadStoichiometry
 @Authors:
     Alberto Cuoci [1], Timoteo Dinelli [1]
@@ -9,25 +9,24 @@ MODULE: ReadStoichiometry
 @Additional notes:
     This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     Please report any bug to: alberto.cuoci@polimi.it
-'''
+"""
+
+import os
+import sys
+import xml.etree.ElementTree as ET
 
 # Import external libraries
 import numpy as np
-import xml.etree.ElementTree as ET
 from scipy import sparse
-import sys
-import os
 
 # Import internal modules
 from .KineticMap import KineticMap
 
 
 class StoichiometricMap:
-
     def __init__(self, kineticFolder):
-
         self.kinetics = KineticMap(kineticFolder)
-        kinetic_xml = os.path.join(kineticFolder, 'kinetics.xml')
+        kinetic_xml = os.path.join(kineticFolder, "kinetics.xml")
         self.ReadMechFile(kinetic_xml)
         self.stoichiometryProcessing()
         self.nur = self.StoichiometryCoeffReactants(self.kinetics)
@@ -35,23 +34,22 @@ class StoichiometricMap:
 
     def ReadVectorInt(self, vector, pos):
         length = int(vector[pos])
-        subvector = vector[pos+1:pos+length+1]
-        return np.int32(subvector), pos+length+1
+        subvector = vector[pos + 1 : pos + length + 1]
+        return np.int32(subvector), pos + length + 1
 
     def ReadVectorFloat64(self, vector, pos):
         length = int(vector[pos])
-        subvector = vector[pos+1:pos+length+1]
-        return np.float64(subvector), pos+length+1
+        subvector = vector[pos + 1 : pos + length + 1]
+        return np.float64(subvector), pos + length + 1
 
     def ReadMechFile(self, kinetics_xml):
         tree = ET.parse(kinetics_xml)
         root = tree.getroot()
-        kinetics_element = root.find('Kinetics')
-        stoichiometry_element = kinetics_element.find('Stoichiometry')
+        kinetics_element = root.find("Kinetics")
+        stoichiometry_element = kinetics_element.find("Stoichiometry")
         self.stoichiometry = (stoichiometry_element.text).split()
 
     def stoichiometryProcessing(self):
-
         stoichiometry = self.stoichiometry
 
         pos = 0
@@ -80,11 +78,11 @@ class StoichiometricMap:
         jDir5, pos = self.ReadVectorInt(stoichiometry, pos)
         valueDir5, pos = self.ReadVectorFloat64(stoichiometry, pos)
 
-        jDir1 = jDir1-1
-        jDir2 = jDir2-1
-        jDir3 = jDir3-1
-        jDir4 = jDir4-1
-        jDir5 = jDir5-1
+        jDir1 = jDir1 - 1
+        jDir2 = jDir2 - 1
+        jDir3 = jDir3 - 1
+        jDir4 = jDir4 - 1
+        jDir5 = jDir5 - 1
 
         jRevTot1, pos = self.ReadVectorInt(stoichiometry, pos)
         jRevTot2, pos = self.ReadVectorInt(stoichiometry, pos)
@@ -93,11 +91,11 @@ class StoichiometricMap:
         jRevTot5, pos = self.ReadVectorInt(stoichiometry, pos)
         valueRevTot5, pos = self.ReadVectorFloat64(stoichiometry, pos)
 
-        jRevTot1 = jRevTot1-1
-        jRevTot2 = jRevTot2-1
-        jRevTot3 = jRevTot3-1
-        jRevTot4 = jRevTot4-1
-        jRevTot5 = jRevTot5-1
+        jRevTot1 = jRevTot1 - 1
+        jRevTot2 = jRevTot2 - 1
+        jRevTot3 = jRevTot3 - 1
+        jRevTot4 = jRevTot4 - 1
+        jRevTot5 = jRevTot5 - 1
 
         jRevEq1, pos = self.ReadVectorInt(stoichiometry, pos)
         jRevEq2, pos = self.ReadVectorInt(stoichiometry, pos)
@@ -106,18 +104,17 @@ class StoichiometricMap:
         jRevEq5, pos = self.ReadVectorInt(stoichiometry, pos)
         valueRevEq5, pos = self.ReadVectorFloat64(stoichiometry, pos)
 
-        jRevEq1 = jRevEq1-1
-        jRevEq2 = jRevEq2-1
-        jRevEq3 = jRevEq3-1
-        jRevEq4 = jRevEq4-1
-        jRevEq5 = jRevEq5-1
+        jRevEq1 = jRevEq1 - 1
+        jRevEq2 = jRevEq2 - 1
+        jRevEq3 = jRevEq3 - 1
+        jRevEq4 = jRevEq4 - 1
+        jRevEq5 = jRevEq5 - 1
 
         changeOfMoles, pos = self.ReadVectorFloat64(stoichiometry, pos)
         explicit_reaction_orders = int(stoichiometry[pos])
 
         # Elementary reactions only
-        if (explicit_reaction_orders == 0):
-
+        if explicit_reaction_orders == 0:
             lambda_numDir1 = numDir1
             lambda_numDir2 = numDir2
             lambda_numDir3 = numDir3
@@ -225,37 +222,36 @@ class StoichiometricMap:
             for k in range(self.numDir1[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir1[count1])
-                react_nu.append(1.)
-                count1 = count1+1
+                react_nu.append(1.0)
+                count1 = count1 + 1
 
             for k in range(self.numDir2[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir2[count2])
-                react_nu.append(2.)
-                count2 = count2+1
+                react_nu.append(2.0)
+                count2 = count2 + 1
 
             for k in range(self.numDir3[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir3[count3])
-                react_nu.append(3.)
-                count3 = count3+1
+                react_nu.append(3.0)
+                count3 = count3 + 1
 
             for k in range(self.numDir4[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir4[count4])
                 react_nu.append(0.5)
-                count4 = count4+1
+                count4 = count4 + 1
 
             for k in range(self.numDir5[i]):
                 react_species.append(i)
                 react_reaction.append(self.jDir5[count5])
                 react_nu.append(self.valueDir5[count5])
-                count5 = count5+1
+                count5 = count5 + 1
 
-        self.nur = sparse.coo_matrix((react_nu,
-                                      (react_reaction, react_species)),
-                                     shape=(kinetics.NumberOfReactions,
-                                            kinetics.NumberOfSpecies))
+        self.nur = sparse.coo_matrix(
+            (react_nu, (react_reaction, react_species)), shape=(kinetics.NumberOfReactions, kinetics.NumberOfSpecies)
+        )
 
         return self.nur
 
@@ -270,41 +266,39 @@ class StoichiometricMap:
         count4 = 0
         count5 = 0
         for i in range(kinetics.NumberOfSpecies):
-
             for k in range(self.numRevTot1[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot1[count1])
-                react_nu.append(1.)
-                count1 = count1+1
+                react_nu.append(1.0)
+                count1 = count1 + 1
 
             for k in range(self.numRevTot2[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot2[count2])
-                react_nu.append(2.)
-                count2 = count2+1
+                react_nu.append(2.0)
+                count2 = count2 + 1
 
             for k in range(self.numRevTot3[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot3[count3])
-                react_nu.append(3.)
-                count3 = count3+1
+                react_nu.append(3.0)
+                count3 = count3 + 1
 
             for k in range(self.numRevTot4[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot4[count4])
                 react_nu.append(0.5)
-                count4 = count4+1
+                count4 = count4 + 1
 
             for k in range(self.numRevTot5[i]):
                 react_species.append(i)
                 react_reaction.append(self.jRevTot5[count5])
                 react_nu.append(self.valueRevTot5[count5])
-                count5 = count5+1
+                count5 = count5 + 1
 
-        self.nup = sparse.coo_matrix((react_nu,
-                                      (react_reaction, react_species)),
-                                     shape=(kinetics.NumberOfReactions,
-                                            kinetics.NumberOfSpecies))
+        self.nup = sparse.coo_matrix(
+            (react_nu, (react_reaction, react_species)), shape=(kinetics.NumberOfReactions, kinetics.NumberOfSpecies)
+        )
 
         return self.nup
 
@@ -322,37 +316,37 @@ class StoichiometricMap:
             for k in range(self.lambda_numDir1[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir1[count1])
-                react_lambda.append(1.)
-                count1 = count1+1
+                react_lambda.append(1.0)
+                count1 = count1 + 1
 
             for k in range(self.lambda_numDir2[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir2[count2])
-                react_lambda.append(2.)
-                count2 = count2+1
+                react_lambda.append(2.0)
+                count2 = count2 + 1
 
             for k in range(self.lambda_numDir3[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir3[count3])
-                react_lambda.append(3.)
-                count3 = count3+1
+                react_lambda.append(3.0)
+                count3 = count3 + 1
 
             for k in range(self.lambda_numDir4[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir4[count4])
                 react_lambda.append(0.5)
-                count4 = count4+1
+                count4 = count4 + 1
 
             for k in range(self.lambda_numDir5[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jDir5[count5])
                 react_lambda.append(self.lambda_valueDir5[count5])
-                count5 = count5+1
+                count5 = count5 + 1
 
-        self.lambdar = sparse.coo_matrix((react_lambda,
-                                          (react_reaction, react_species)),
-                                         shape=(kinetics.NumberOfReactions,
-                                                kinetics.NumberOfSpecies))
+        self.lambdar = sparse.coo_matrix(
+            (react_lambda, (react_reaction, react_species)),
+            shape=(kinetics.NumberOfReactions, kinetics.NumberOfSpecies),
+        )
 
         return self.lambdar
 
@@ -370,36 +364,36 @@ class StoichiometricMap:
             for k in range(self.lambda_numRevEq1[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq1[count1])
-                react_lambda.append(1.)
-                count1 = count1+1
+                react_lambda.append(1.0)
+                count1 = count1 + 1
 
             for k in range(self.lambda_numRevEq2[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq2[count2])
-                react_lambda.append(2.)
-                count2 = count2+1
+                react_lambda.append(2.0)
+                count2 = count2 + 1
 
             for k in range(self.lambda_numRevEq3[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq3[count3])
-                react_lambda.append(3.)
-                count3 = count3+1
+                react_lambda.append(3.0)
+                count3 = count3 + 1
 
             for k in range(self.lambda_numRevEq4[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq4[count4])
                 react_lambda.append(0.5)
-                count4 = count4+1
+                count4 = count4 + 1
 
             for k in range(self.lambda_numRevEq5[i]):
                 react_species.append(i)
                 react_reaction.append(self.lambda_jRevEq5[count5])
                 react_lambda.append(self.lambda_valueRevEq5[count5])
-                count5 = count5+1
+                count5 = count5 + 1
 
-        self.lambdap = sparse.coo_matrix((react_lambda,
-                                          (react_reaction, react_species)),
-                                         shape=(kinetics.NumberOfReactions,
-                                                kinetics.NumberOfSpecies))
+        self.lambdap = sparse.coo_matrix(
+            (react_lambda, (react_reaction, react_species)),
+            shape=(kinetics.NumberOfReactions, kinetics.NumberOfSpecies),
+        )
 
         return self.lambdap

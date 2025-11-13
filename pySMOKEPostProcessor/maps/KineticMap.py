@@ -1,5 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
+
 import numpy as np
 
 """
@@ -24,19 +25,19 @@ MODULE: KineticMechanism
 
 
 class KineticMap:
-
     def __init__(self, KineticFolder: str):
-
         reactionNames_xml = os.path.join(KineticFolder, "reaction_names.xml")
         if not os.path.isfile(reactionNames_xml):
-            raise ValueError("The kinetic folder does not contain any reaction_names.xml file! \
-                              Please provide a valid mechanism")
+            raise ValueError(
+                "The kinetic folder does not contain any reaction_names.xml file! Please provide a valid mechanism"
+            )
 
         kinetic_xml = os.path.join(KineticFolder, "kinetics.xml")
 
         if not os.path.isfile(kinetic_xml):
-            raise ValueError("The kinetic folder does not contain any kinetics.xml file! \
-                              Please provide a valid mechanism")
+            raise ValueError(
+                "The kinetic folder does not contain any kinetics.xml file! Please provide a valid mechanism"
+            )
 
         self.ParseReactionNames(reaction_names=reactionNames_xml)
         self.ParseKinetic(kinetics_file=kinetic_xml)
@@ -70,7 +71,7 @@ class KineticMap:
         NumberOfSpecies = len(species)  # ns
 
         # Atomic composition
-        atomic = np.fromstring(root.find("AtomicComposition").text, dtype=np.float32, sep=' ')
+        atomic = np.fromstring(root.find("AtomicComposition").text, dtype=np.float32, sep=" ")
         atomic = atomic.reshape((NumberOfSpecies, NumberOfElements))
 
         # Elements molecular weights
@@ -81,7 +82,7 @@ class KineticMap:
             "N": 14.0069999694824,
             "HE": 4.002999782562256,
             "AR": 39.948001861572270,
-            "S": 32.065
+            "S": 32.065,
         }
 
         mwe = np.array([element_weights.get(elem, 0.0) for elem in elements], dtype=np.float32)
@@ -112,9 +113,9 @@ class KineticMap:
         kinetic_parameters = kinetics.find("KineticParameters")
         direct = kinetic_parameters.find("Direct")
 
-        self.A = np.exp(np.fromstring(direct.findtext("lnA"), dtype=np.float64, sep=' ')[1:])
-        self.Beta = np.fromstring(direct.findtext("Beta"), dtype=np.float64, sep=' ')[1:]
-        self.E_over_R = np.fromstring(direct.findtext("E_over_R"), dtype=np.float64, sep=' ')[1:]
+        self.A = np.exp(np.fromstring(direct.findtext("lnA"), dtype=np.float64, sep=" ")[1:])
+        self.Beta = np.fromstring(direct.findtext("Beta"), dtype=np.float64, sep=" ")[1:]
+        self.E_over_R = np.fromstring(direct.findtext("E_over_R"), dtype=np.float64, sep=" ")[1:]
 
         # Assign internal members
 
@@ -145,8 +146,8 @@ class KineticMap:
             raise Exception("The kinetic mechanism provided does not contain any reaction class!")
 
         # TODO (TD): Luna PPM I don't really like the following two lines I am thinking on how to rewrite them better.
-        self.rxnclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
-        self.rxnsubclass = dict.fromkeys(np.arange(1, self.NumberOfReactions+1))
+        self.rxnclass = dict.fromkeys(np.arange(1, self.NumberOfReactions + 1))
+        self.rxnsubclass = dict.fromkeys(np.arange(1, self.NumberOfReactions + 1))
         classes = {}
 
         for child in reaction_classes:
@@ -183,8 +184,9 @@ class KineticMap:
             global_index = self.IndicesOfFallOffReactions[reactionIndex - self.NumberOfReactions]
             return f"R{global_index}(inf): {self.reaction_names[global_index - 1]}"
         else:
-            global_index = self.IndicesOfCabrReactions[reactionIndex -
-                                                       self.NumberOfReactions - self.NumberOfFallOffReactions]
+            global_index = self.IndicesOfCabrReactions[
+                reactionIndex - self.NumberOfReactions - self.NumberOfFallOffReactions
+            ]
             return f"R{global_index}(inf): {self.reaction_names[global_index - 1]}"
 
     def ReactionIndexFromName(self, name: str) -> int:

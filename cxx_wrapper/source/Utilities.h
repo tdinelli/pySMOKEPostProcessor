@@ -6,8 +6,8 @@
 |   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
 |        |_|                                                              |
 |                                                                         |
-|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
-|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>				  |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>                  |
+|            Edoardo Ramalli <edoardo.ramalli@polimi.it>                  |
 |   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
 |   Department of Chemistry, Materials and Chemical Engineering           |
 |   Politecnico di Milano                                                 |
@@ -17,7 +17,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License																  |
+| License                                                                 |
 |                                                                         |
 |   Copyright(C) 2016-2012  Alberto Cuoci                                 |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -37,18 +37,20 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-void MergePositiveAndNegativeBars(const std::vector<unsigned int> &positive_indices,
-                                  const std::vector<unsigned int> &negative_indices,
-                                  const std::vector<double> &positive_coefficients,
-                                  const std::vector<double> &negative_coefficients, std::vector<int> &indices,
-                                  std::vector<double> &coefficients);
+void MergePositiveAndNegativeBars(const std::vector<unsigned int>& positive_indices,
+                                  const std::vector<unsigned int>& negative_indices,
+                                  const std::vector<double>& positive_coefficients,
+                                  const std::vector<double>& negative_coefficients,
+                                  std::vector<int>& indices, std::vector<double>& coefficients);
 
-void MergeBars(const std::vector<unsigned int> &total_indices, const std::vector<double> &total_coefficients,
-               std::vector<int> &indices, std::vector<double> &coefficients);
+void MergeBars(const std::vector<unsigned int>& total_indices,
+               const std::vector<double>& total_coefficients, std::vector<int>& indices,
+               std::vector<double>& coefficients);
 
-void MergeBars(const std::vector<unsigned int> &total_indices, const std::vector<double> &total_coefficients,
-               const std::vector<double> &total_peaks, std::vector<int> &indices, std::vector<double> &coefficients,
-               std::vector<double> &peaks);
+void MergeBars(const std::vector<unsigned int>& total_indices,
+               const std::vector<double>& total_coefficients,
+               const std::vector<double>& total_peaks, std::vector<int>& indices,
+               std::vector<double>& coefficients, std::vector<double>& peaks);
 
 #include "Utilities.hpp"
-#endif // UTILITIES_H
+#endif  // UTILITIES_H

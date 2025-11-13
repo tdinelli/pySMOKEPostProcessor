@@ -28,7 +28,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/program_options.hpp>
 
-// Eigen 
+// Eigen
 #include <Eigen/Dense>
 
 // pyBIND11

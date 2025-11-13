@@ -6,8 +6,8 @@
 |   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
 |        |_|                                                              |
 |                                                                         |
-|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
-|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>				  |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>                  |
+|            Edoardo Ramalli <edoardo.ramalli@polimi.it>                  |
 |   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
 |   Department of Chemistry, Materials and Chemical Engineering           |
 |   Politecnico di Milano                                                 |
@@ -17,7 +17,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-|	License								                                  |
+| License                                                                 |
 |                                                                         |
 |   Copyright(C) 2016-2012  Alberto Cuoci                                 |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -38,25 +38,23 @@
 #ifndef POST_PROCESSOR_FLUX_MAP
 #define POST_PROCESSOR_FLUX_MAP
 
-namespace pySMOKEPostProcessor
-{
-class PostProcessorFluxMap : public OpenSMOKE::FluxAnalysisMap
-{
-  public:
-    PostProcessorFluxMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN &thermodynamicsMapXML,
-                         OpenSMOKE::KineticsMap_CHEMKIN &kineticsMapXML);
+namespace pySMOKEPostProcessor {
+class PostProcessorFluxMap : public OpenSMOKE::FluxAnalysisMap {
+ public:
+  PostProcessorFluxMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML,
+                       OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML);
 
-    void ComputeFluxAnalysis();
-    void ComputeValues(const unsigned int index_j, std::vector<unsigned int> &local_indices,
-                       std::vector<double> &local_thickness, std::vector<double> &local_normal_fluxes,
-                       std::vector<double> &local_fluxes);
+  void ComputeFluxAnalysis();
+  void ComputeValues(const unsigned int index_j, std::vector<unsigned int>& local_indices,
+                     std::vector<double>& local_thickness, std::vector<double>& local_normal_fluxes,
+                     std::vector<double>& local_fluxes);
 
-    std::vector<int> IndexFirstName;
-    std::vector<int> IndexSecondName;
-    std::vector<double> ComputedLabelValue;
-    std::vector<double> ComputedThicknessValue;
+  std::vector<int> IndexFirstName;
+  std::vector<int> IndexSecondName;
+  std::vector<double> ComputedLabelValue;
+  std::vector<double> ComputedThicknessValue;
 };
-} // namespace pySMOKEPostProcessor
+}  // namespace pySMOKEPostProcessor
 
 #include "PostProcessorFluxMap.hpp"
-#endif // POST_PROCESSOR_FLUX_MAP
+#endif  // POST_PROCESSOR_FLUX_MAP
