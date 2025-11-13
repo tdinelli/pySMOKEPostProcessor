@@ -44,19 +44,36 @@ endif()
 # Boost (Required by OpenSMOKEpp) Inside the installation to ease the life of
 # everyone the boost package is installed using pip/conda pipeline
 message(STATUS "Searching for Boost...")
-find_package(Boost REQUIRED
-    COMPONENTS
-        date_time
-        filesystem
-        program_options
-        system
-        regex
-        timer
-        chrono
-)
+
+# Set policy to use new FindBoost behavior (CMake 3.30+)
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
+# Try to find Boost with modern config first (Boost 1.70+)
+find_package(Boost 1.70 QUIET CONFIG)
+
+if(NOT Boost_FOUND)
+  # Fallback to FindBoost module for older versions
+  find_package(Boost REQUIRED
+      COMPONENTS
+          date_time
+          filesystem
+          program_options
+          system
+          regex
+          timer
+          chrono
+  )
+endif()
+
 if(Boost_FOUND)
   message(STATUS "Boost found: ${Boost_VERSION}")
-  message(STATUS "Boost include: ${Boost_INCLUDE_DIRS}")
+  if(Boost_INCLUDE_DIRS)
+    message(STATUS "Boost include: ${Boost_INCLUDE_DIRS}")
+  elseif(Boost_INCLUDE_DIR)
+    message(STATUS "Boost include: ${Boost_INCLUDE_DIR}")
+  endif()
 endif()
 
 # -----------------------------------------------------------------------------
