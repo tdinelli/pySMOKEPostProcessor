@@ -1,63 +1,79 @@
-#--------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Preliminary Settings
-#--------------------------------------------------------------------
-cmake_minimum_required (VERSION 3.16)
+# -----------------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.16)
 
-project (pySMOKEPostProcessor
-    DESCRIPTION
-    "Python wrapper of the OpenSMOKEpp Graphical Post Processor"
-    LANGUAGES
-    CXX
+project(pySMOKEPostProcessor
+    VERSION 1.0.0
+    DESCRIPTION "Python wrapper of the OpenSMOKEpp Graphical Post Processor"
+    LANGUAGES CXX
 )
 
-# --- install location
-# Not super sure about this
-set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor")
+# -----------------------------------------------------------------------------
+# Set module path in order to use custom CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-# --- Set module path in order to use custom CMake modules
-set (CMAKE_COLOR_MAKEFILE ON)
-set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+# -----------------------------------------------------------------------------
+# C++ Standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set (CMAKE_CXX_STANDARD 14)
+# -----------------------------------------------------------------------------
+# Detect if building via scikit-build-core
+if(DEFINED SKBUILD)
+  message(STATUS "Building via scikit-build-core")
+  set(SKBUILD_BUILD ON)
+  # scikit-build sets installation directory
+  set(CMAKE_INSTALL_PREFIX ${SKBUILD_PLATLIB_DIR}/pySMOKEPostProcessor)
+else()
+  message(STATUS "Building via standard CMake")
+  set(SKBUILD_BUILD OFF)
+  # For manual builds, install to project directory
+  if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(
+      CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/pySMOKEPostProcessor"
+      CACHE PATH "Install prefix" FORCE
+    )
+  endif()
+endif()
 
-set (CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-set (PROJECT_VERSION_MAJOR 1)
-set (PROJECT_VERSION_MINOR 0)
-set (PROJECT_VERSION_PATCH 0)
-set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-
-#--------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Compulsory libraries
-#--------------------------------------------------------------------
-
-# --- Boost (Compulsory required by OpenSMOKEpp)
-find_package (Boost
-    REQUIRED
+# -----------------------------------------------------------------------------
+# Boost (Required by OpenSMOKEpp) Inside the installation to ease the life of
+# everyone the boost package is installed using pip/conda pipeline
+message(STATUS "Searching for Boost...")
+find_package(Boost REQUIRED
     COMPONENTS
-    date_time
-    filesystem
-    program_options
-    system
-    regex
-    timer
-    chrono
+        date_time
+        filesystem
+        program_options
+        system
+        regex
+        timer
+        chrono
 )
+if(Boost_FOUND)
+  message(STATUS "Boost found: ${Boost_VERSION}")
+  message(STATUS "Boost include: ${Boost_INCLUDE_DIRS}")
+endif()
 
-# --- Eigen (Compulsory rquired by OpenSMOKEpp)
-find_package (Eigen3 REQUIRED)
+# -----------------------------------------------------------------------------
+# External dependencies (FetchContent)
+# -----------------------------------------------------------------------------
+# Fetch Eigen3 (with system fallback)
+include(cmake/external/Eigen3.cmake)
 
-#--------------------------------------------------------------------
-# External submodules
-#--------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Fetch pybind11 (with system fallback)
+include(cmake/external/pybind11.cmake)
 
-# Note: pyBIND11 and OpenSMOKEpp are included as submodules in order
-# to ease the installation of the python package
-include(cmake/UpdateSubmodules.cmake)
-add_subdirectory(external)
+# -----------------------------------------------------------------------------
+# Fetch OpenSMOKEpp v0.22
+include(cmake/external/OpenSMOKEpp.cmake)
 
-#--------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Source code subdirectories
-#--------------------------------------------------------------------
-
+# -----------------------------------------------------------------------------
 add_subdirectory(cxx_wrapper)

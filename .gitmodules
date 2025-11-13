@@ -1,8 +1,0 @@
-[submodule "external/opensmoke"]
-	path = external/opensmoke
-	url = https://github.com/acuoci/OpenSMOKEpp.git
-	branch = v0.21
-[submodule "external/pybind11"]
-	path = external/pybind11
-	url = ../../pybind/pybind11
-	branch = stable

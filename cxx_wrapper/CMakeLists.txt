@@ -4,42 +4,50 @@ pybind11_add_module(${PROJECT_NAME}
 
 target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC
-    Eigen3::Eigen
-    Boost::date_time
-    Boost::filesystem
-    Boost::program_options
-    Boost::system
-    Boost::regex
-    Boost::timer
-    Boost::chrono
+    PRIVATE
+        Eigen3::Eigen
+        Boost::date_time
+        Boost::filesystem
+        Boost::program_options
+        Boost::system
+        Boost::regex
+        Boost::timer
+        Boost::chrono
 )
 
 target_include_directories(
     ${PROJECT_NAME}
-    PUBLIC
-    ${OPENSMOKE_INCLUDE}
-    ${CMAKE_CURRENT_LIST_DIR}/source
+    PRIVATE
+        ${OPENSMOKE_INCLUDE}
+        ${CMAKE_CURRENT_LIST_DIR}/source
 )
 
-target_compile_options(${PROJECT_NAME}
-    PRIVATE
-    -Wno-unused-value
-    -Wno-mismatched-new-delete
-    -Wno-switch
-)
+# Compiler-specific warning suppression
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            -Wno-unused-value
+            -Wno-mismatched-new-delete
+            -Wno-switch
+    )
+elseif(MSVC)
+  target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            /wd4018  # signed/unsigned mismatch
+            /wd4267  # conversion warnings
+    )
+endif()
 
 target_compile_definitions(${PROJECT_NAME}
-    PUBLIC
-    VERSION_INFO=${EXAMPLE_VERSION_INFO}
+    PRIVATE
+        VERSION_INFO="${PROJECT_VERSION}"
 )
 
 # --------------------------------------------------------------------
-# Installing options
+# Installation
 # --------------------------------------------------------------------
-
-install(TARGETS
-    ${PROJECT_NAME}
-    DESTINATION
-    ${CMAKE_INSTALL_PREFIX}
+install(
+    TARGETS ${PROJECT_NAME}
+    LIBRARY DESTINATION .
+    RUNTIME DESTINATION .
 )
