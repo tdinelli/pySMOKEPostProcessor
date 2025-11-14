@@ -633,7 +633,7 @@ the "copyright" line and a pointer to where the full notice is found.
 
     Python wrapper around the OpenSMOKEpp Graphical Post Processor made
     originally by Professor Alberto Cuoci.
-    Copyright (C) 2024 Timoteo Dinelli et al.
+    Copyright (C) 2025 Timoteo Dinelli et al.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -653,7 +653,7 @@ Also add information on how to contact you by electronic and paper mail.
   If the program does terminal interaction, make it output a short
 notice like this when it starts in an interactive mode:
 
-    pySMOKEPostProcessor Copyright (C) 2024  Timoteo Dinelli et al.
+    pySMOKEPostProcessor Copyright (C) 2025 Timoteo Dinelli et al.
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
