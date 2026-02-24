@@ -22,6 +22,11 @@
 #include "math/PhysicalConstants.h"
 #include "kernel/kinetics/KineticsUtilityFunctions.h"
 
+// Surface phase additions
+#include "kernel/kinetics/ReactionPolicy_Surface_CHEMKIN.h"     // Maybe not used -- let's see
+#include "maps/ThermodynamicsMap_Surface_CHEMKIN.h"
+#include "maps/KineticsMap_Surface_CHEMKIN.h"
+
 // Boost library
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>

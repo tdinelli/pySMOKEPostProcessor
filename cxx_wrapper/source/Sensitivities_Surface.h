@@ -35,17 +35,17 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#ifndef SENSITIVITIES_H
-#define SENSITIVITIES_H
+#ifndef SENSITIVITIES_SURFACE_H
+#define SENSITIVITIES_SURFACE_H
 
 #include "ProfilesDatabase.h"
-#include "Sensitivities_Database.h"
+#include "Sensitivities_Database_Surface.h"
 
-class Sensitivities {
+class Sensitivities_Surface {
  public:
-  Sensitivities();
+  Sensitivities_Surface();
 
-  ~Sensitivities();
+  ~Sensitivities_Surface();
 
   void SetDatabase(ProfilesDatabase* data);
 
@@ -69,18 +69,18 @@ class Sensitivities {
 
   void ReadSensitvityCoefficients();
 
-  void GetSensitivityProfile(unsigned int reaction_index); // Un getter void è sospetto
+  void GetSensitivityProfile(unsigned int reaction_index);
 
   inline const std::vector<unsigned int>& reactions() const { return reactions_; };
 
-  inline const std::vector<double>& senitivityCoefficients() const {
+  inline const std::vector<double>& sensitivityCoefficients() const {
     return sensitivity_coefficients_;
   };
 
  private:
   ProfilesDatabase* data_;
 
-  Sensitivities_Database* sensitivities;
+  Sensitivities_Database_Surface* sensitivities;
 
   std::string normalizationType_;
   std::string sensitivityType_;
@@ -96,5 +96,5 @@ class Sensitivities {
   std::vector<unsigned int> reactions_;
 };
 
-#include "Sensitivities.hpp"
+#include "Sensitivities_Surface.hpp"
 #endif  // SENSITIVITIES_H

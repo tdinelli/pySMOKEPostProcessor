@@ -6,9 +6,9 @@
 |   \___/| .__/ \___|_| |_|____/|_|  |_|\___/|_|\_\_____||_|   |_|        |
 |        |_|                                                              |
 |                                                                         |
-|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>                  |
-|            Edoardo Ramalli <edoardo.ramalli@polimi.it>                  |
-|   CRECK Modeling Group <www.creckmodeling.polimi.it>                    |
+|   Authors: Timoteo Dinelli <timoteo.dinelli@polimi.it>				  |
+|			 Edoardo Ramalli <edoardo.ramalli@polimi.it>				  |
+|   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            |
 |   Department of Chemistry, Materials and Chemical Engineering           |
 |   Politecnico di Milano                                                 |
 |   P.zza Leonardo da Vinci 32, 20133 Milano                              |
@@ -17,7 +17,7 @@
 |                                                                         |
 |   This file is part of OpenSMOKE++ framework.                           |
 |                                                                         |
-| License                                                                 |
+|	License																  |
 |                                                                         |
 |   Copyright(C) 2016-2012  Alberto Cuoci                                 |
 |   OpenSMOKE++ is free software: you can redistribute it and/or modify   |
@@ -35,66 +35,75 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-#ifndef SENSITIVITIES_H
-#define SENSITIVITIES_H
+#ifndef SENSITIVITIES_DATABASE_SURFACE_H
+#define SENSITIVITIES_DATABASE_SURFACE_H
 
 #include "ProfilesDatabase.h"
-#include "Sensitivities_Database.h"
+#include "Utilities.h"
 
-class Sensitivities {
- public:
-  Sensitivities();
+class Sensitivities_Database_Surface
+{
+  public:
+    Sensitivities_Database_Surface(void);
+    ~Sensitivities_Database_Surface(void);
 
-  ~Sensitivities();
+    void SetDatabase(ProfilesDatabase *data);
 
-  void SetDatabase(ProfilesDatabase* data);
+    void ReadParentFile();
+    void ReadFromChildFile(const std::string name);
+    std::vector<double> NormalizedProfile(const unsigned int index, bool local_normalization);
+    double NormalizedProfile(const unsigned int index, bool local_normalization, unsigned int point);
 
-  void SetNormalizationType(std::string normalizationType);
+    boost::property_tree::ptree xml_main_input;
 
-  void SetSensitivityType(std::string sensitivityType);
+    const std::vector<std::string> &names() const
+    {
+        return names_;
+    }
+    unsigned int number_of_variables() const
+    {
+        return number_of_variables_;
+    }
+    const std::vector<double> &variable() const
+    {
+        return variable_;
+    }
 
-  void SetOrderingType(std::string orderingType);
+    const std::vector<std::string> &string_list_reactions() const
+    {
+        return string_list_reactions_;
+    }
+    const std::vector<unsigned int> &current_coarse_index() const
+    {
+        return current_coarse_index_;
+    }
 
-  void SetTarget(std::string target);
+    void ReactionsCoarsening(const double threshold);
+    void ReactionsReset();
 
-  void SetLocalValue(double localValue);
+    unsigned int number_of_parameters() const
+    {
+        return number_of_parameters_;
+    }
 
-  void SetLowerBound(double lowerBound);
+  private:
+    ProfilesDatabase *data_;
+    unsigned int number_of_variables_;
+    unsigned int number_of_parameters_;
+    unsigned int number_of_points_;
+    unsigned int number_of_species_;
+    std::vector<unsigned int> local_index_;
+    std::vector<unsigned int> global_index_;
+    std::vector<std::string> names_;
+    std::vector<std::vector<double>> coefficients_;
+    std::vector<double> parameters_;
 
-  void SetUpperBound(double upperBound);
+    std::vector<double> variable_;
+    unsigned int current_local_index_;
 
-  void Prepare();
-
-  void Sensitivity_Analysis(const unsigned int number_of_reactions);
-
-  void ReadSensitvityCoefficients();
-
-  void GetSensitivityProfile(unsigned int reaction_index); // Un getter void è sospetto
-
-  inline const std::vector<unsigned int>& reactions() const { return reactions_; };
-
-  inline const std::vector<double>& senitivityCoefficients() const {
-    return sensitivity_coefficients_;
-  };
-
- private:
-  ProfilesDatabase* data_;
-
-  Sensitivities_Database* sensitivities;
-
-  std::string normalizationType_;
-  std::string sensitivityType_;
-  std::string orderingType_;
-  std::string target_;
-
-  double localValue_;
-  double lowerBound_;
-  double upperBound_;
-
-  bool iLocalNormalization = false;
-  std::vector<double> sensitivity_coefficients_;
-  std::vector<unsigned int> reactions_;
+    std::vector<std::string> string_list_reactions_;
+    std::vector<unsigned int> current_coarse_index_;
 };
 
-#include "Sensitivities.hpp"
-#endif  // SENSITIVITIES_H
+#include "Sensitivities_Database_Surface.hpp"
+#endif // SENSITIVITIES_DATABASE_H
