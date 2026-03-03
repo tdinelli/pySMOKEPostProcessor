@@ -35,17 +35,18 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-// Change log: with respecto to gas-phase file, I only modified the names of the class (Sensitivities_Database to Sensitivities_Database_Surface)
-// and the paths from "Sensitivities.xml" to "Sensitivities.Surface.xml" and relative child files.
-
 Sensitivities_Database_Surface::Sensitivities_Database_Surface(void) {}
 
 Sensitivities_Database_Surface::~Sensitivities_Database_Surface(void) {}
 
 void Sensitivities_Database_Surface::SetDatabase(ProfilesDatabase* data) { data_ = data; }
 
-void Sensitivities_Database_Surface::ReadParentFile() {
-  boost::filesystem::path path_results = data_->path_folder_results_ / "Sensitivities.Surface.xml";
+void Sensitivities_Database_Surface::ReadParentFile(bool heterogeneousSensitivity) {
+  boost::filesystem::path path_results;
+  if (heterogeneousSensitivity == true)
+    path_results = data_->path_folder_results_ / "Sensitivities.Surface.xml";
+  else
+    path_results = data_->path_folder_results_ / "Sensitivities.xml";
   boost::property_tree::read_xml((path_results).string(), xml_main_input);
 
   {
@@ -76,7 +77,8 @@ void Sensitivities_Database_Surface::ReadParentFile() {
     std::stringstream stream;
     stream.str(xml_main_input.get<std::string>("opensmoke.constant-parameters"));
 
-    for (unsigned int j = 0; j < number_of_parameters_; j++) stream >> parameters_[j];
+    for (unsigned int j = 0; j < number_of_parameters_; j++) 
+      stream >> parameters_[j];
   }
 
   {
@@ -94,43 +96,55 @@ void Sensitivities_Database_Surface::ReadParentFile() {
 
   // Names of reactions
   {
+    unsigned int NR;
+    if (heterogeneousSensitivity == true)
+      NR = data_->kineticsMapSurfaceXML->NumberOfReactions();
+    else
+      NR = data_->kineticsMapXML->NumberOfReactions();
+
     string_list_reactions_.reserve(number_of_parameters_);
     for (unsigned int j = 0; j < number_of_parameters_; j++) {
-      if (j + 1 <= data_->kineticsMapSurfaceXML->NumberOfReactions()) {
+      if (j + 1 <= NR) {
         std::stringstream index;
         index << j + 1;
         std::string tmp = "R" + index.str() + ": " + data_->reaction_strings_[j];
         string_list_reactions_.push_back(tmp);
       } else {
-        unsigned int local_index = j + 1 - data_->kineticsMapSurfaceXML->NumberOfReactions();
-
-        // Non ho nè falloff nè CABR. Ho tecnicamente delle coverage ma le devo togliere, fanculo.
-        // if (local_index <= data_->kineticsMapXML->NumberOfFallOffReactions()) {
-        //   unsigned int global_index =
-        //       data_->kineticsMapXML->IndicesOfFalloffReactions()[local_index - 1];
-        //   std::stringstream index;
-        //   index << global_index;
-        //   std::string tmp =
-        //       "R" + index.str() + "(inf): " + data_->reaction_strings_[global_index - 1];
-        //   string_list_reactions_.push_back(tmp);
-        // } else {
-        //   unsigned int global_index =
-        //       data_->kineticsMapXML
-        //           ->IndicesOfCabrReactions()[local_index -
-        //                                      data_->kineticsMapXML->NumberOfReactions() - 1];
-        //   std::stringstream index;
-        //   index << global_index;
-        //   std::string tmp =
-        //       "R" + index.str() + "(inf): " + data_->reaction_strings_[global_index - 1];
-        //   string_list_reactions_.push_back(tmp);
-        // }
+        unsigned int local_index = j + 1 - NR;
+        if (heterogeneousSensitivity == false)
+        {
+          if (local_index <= data_->kineticsMapXML->NumberOfFallOffReactions()) {
+            unsigned int global_index =
+                data_->kineticsMapXML->IndicesOfFalloffReactions()[local_index - 1];
+            std::stringstream index;
+            index << global_index;
+            std::string tmp =
+                "R" + index.str() + "(inf): " + data_->reaction_strings_[global_index - 1];
+            string_list_reactions_.push_back(tmp);
+          } else {
+            unsigned int global_index =
+                data_->kineticsMapXML
+                    ->IndicesOfCabrReactions()[local_index -
+                                              data_->kineticsMapXML->NumberOfReactions() - 1];
+            std::stringstream index;
+            index << global_index;
+            std::string tmp =
+                "R" + index.str() + "(inf): " + data_->reaction_strings_[global_index - 1];
+            string_list_reactions_.push_back(tmp);
+          }
+        }
       }
     }
   }
 }
 
-void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name) {
-  std::string local_name = "Sensitivities.Surface." + name + ".xml";
+void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name,bool heterogeneousSensitivity) {
+  std::string local_name;
+  if (heterogeneousSensitivity == true)
+    local_name = "Sensitivities.Surface." + name + ".xml";
+  else
+    local_name = "Sensitivities." + name + ".xml";
+
   boost::property_tree::ptree ptree;
   try {
     boost::filesystem::path path_file = data_->path_folder_results_ / local_name;
@@ -141,8 +155,7 @@ void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name) {
     exit(-1);
   }
 
-  boost::optional<boost::property_tree::ptree&> child =
-      ptree.get_child_optional("opensmoke.coefficients");
+  boost::optional<boost::property_tree::ptree&> child = ptree.get_child_optional("opensmoke.coefficients");
 
   if (!child) {
     std::cout << "Corrupted xml file: missing the coefficients leaf" << std::endl;
@@ -152,7 +165,8 @@ void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name) {
     stream.str(ptree.get<std::string>("opensmoke.coefficients"));
 
     for (unsigned int i = 0; i < number_of_points_; i++)
-      for (unsigned int j = 0; j < number_of_parameters_; j++) stream >> coefficients_[j][i];
+      for (unsigned int j = 0; j < number_of_parameters_; j++) 
+        stream >> coefficients_[j][i];
   }
 
   for (unsigned int j = 0; j < number_of_variables_; j++)
@@ -180,10 +194,9 @@ void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name) {
         break;
       }
 
-    // from mass to mole fractions
+    // from mass to mole fractions (only performed on gas-phase species)
     for (unsigned int i = 0; i < number_of_points_; i++)
-      variable_[i] = data_->omega[species_index][i] * data_->additional[data_->index_MW][i] /
-                     data_->mw_species_[species_index];
+      variable_[i] = data_->omega[species_index][i] * data_->additional[data_->index_MW][i] / data_->mw_species_[species_index];
   }
 }
 
@@ -192,7 +205,7 @@ std::vector<double> Sensitivities_Database_Surface::NormalizedProfile(const unsi
                                                               bool local_normalization) {
   std::vector<double> profile = coefficients_[index];
   if (local_normalization == true) {
-    const double local_threshold = 1.e-16;
+    const double local_threshold = 1.e-40;
 
     for (unsigned int i = 0; i < number_of_points_; i++)
       if (fabs(variable_[i]) > local_threshold)

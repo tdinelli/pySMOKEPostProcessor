@@ -89,10 +89,11 @@ void Sensitivities_Surface::SetLowerBound(double lowerBound) { lowerBound_ = low
 
 void Sensitivities_Surface::SetUpperBound(double upperBound) { upperBound_ = upperBound; }
 
-void Sensitivities_Surface::Prepare() {
+void Sensitivities_Surface::Prepare(bool heterogeneousSensitivity) {
+  heterogeneousSensitivity_ = heterogeneousSensitivity;
   sensitivities = new Sensitivities_Database_Surface();
   sensitivities->SetDatabase(data_);
-  sensitivities->ReadParentFile();
+  sensitivities->ReadParentFile(heterogeneousSensitivity_);
 
   // Widget: reactions
   {
@@ -128,16 +129,25 @@ void Sensitivities_Surface::Sensitivity_Analysis(const unsigned int number_of_re
 
     // Evaluates the coefficients
     std::vector<double> total_coefficients(sensitivities->number_of_parameters());
-    for (unsigned int j = 0; j < sensitivities->number_of_parameters(); j++)
+    for (unsigned int j = 0; j < sensitivities->number_of_parameters(); j++) {
       total_coefficients[j] = sensitivities->NormalizedProfile(j, iLocalNormalization, index);
-
+      if (total_coefficients[j] != 0)
+        std::cout << total_coefficients[j] << std::endl;
+    }
     // Reorder the coefficients
     MergeBars(total_indices, total_coefficients, indices, coefficients);
 
     // Fill the vector containing the reaction strings
     std::vector<std::string> reaction_names(indices.size());
-    for (unsigned int i = 0; i < indices.size(); i++)
-      reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
+    if (heterogeneousSensitivity_ == true)
+    {
+      for (unsigned int i = 0; i < indices.size(); i++)
+        reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
+    } else {
+      for (unsigned int i = 0; i < indices.size(); i++)
+        reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
+    }
+    
 
     // Printaggio risultati
     // for (int i = 0; i < std::min<int>(len, coefficients.size()); i++) {
@@ -235,7 +245,6 @@ void Sensitivities_Surface::Sensitivity_Analysis(const unsigned int number_of_re
     for (unsigned int i = 0; i < indices.size(); i++)
       reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
   }
-
   // indices it's 1-based since we have to postprocess here it is returned 0-based
   sensitivity_coefficients_.resize(std::min<int>(number_of_reactions, coefficients.size()));
   reactions_.resize(std::min<int>(number_of_reactions, coefficients.size()));
@@ -248,7 +257,7 @@ void Sensitivities_Surface::Sensitivity_Analysis(const unsigned int number_of_re
 void Sensitivities_Surface::ReadSensitvityCoefficients() {
   if (target_ == "") throw std::invalid_argument("Select a target!");
 
-  sensitivities->ReadFromChildFile(target_);
+  sensitivities->ReadFromChildFile(target_,heterogeneousSensitivity_);
 }
 
 void Sensitivities_Surface::GetSensitivityProfile(unsigned int reaction_index) {

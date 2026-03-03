@@ -112,9 +112,8 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name) {
   return true;
 }
 
-bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& folder_name,const std::string& phase_name) {
-  // To reduce duplicate, since the homogeneous function is a bool type, I just call it and update the variable at the same time
-  // then only deal with heterogeneous stuff in here
+bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& folder_name, const std::string& phase_name) {
+  // phase name is not used right now, but it can be in the future (e.g. phase_name == Surface or Liquid etc)
   is_mechanism_heterogeneous_ = ReadKineticMechanism(folder_name);
   path_folder_mechanism_ = folder_name;
 
@@ -123,7 +122,7 @@ bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& fold
 
   if (!boost::filesystem::exists(path_mechanism_het)) {
     throw std::invalid_argument(
-        "The folder of the kinetic mechanism does not contains any heterogeneous kinetics.xml!"
+        "The folder of the kinetic mechanism does not contains the heterogeneous kinetics.xml!"
     );
   }
 
@@ -163,7 +162,7 @@ bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& fold
       // Names of reactions
       {
         std::stringstream stream;
-        stream.str(ptree_het.get<std::string>("opensmoke.reaction-names"));   // As far as I understand this is in the XML, <opensmoke> then <reaction-names>, it is exactly the same for surface
+        stream.str(ptree_het.get<std::string>("opensmoke.reaction-names"));
 
         reaction_strings_heterogeneous_.reserve(kineticsMapSurfaceXML->NumberOfReactions());
         for (unsigned int j = 0; j < kineticsMapSurfaceXML->NumberOfReactions(); j++) {
@@ -179,24 +178,28 @@ bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& fold
   return true;
 }
 
-bool ProfilesDatabase::ReadFileResults(const std::string& folder_name) {
+bool ProfilesDatabase::ReadFileResults(const std::string& folder_name, bool isHeterogeneous) {
   path_folder_results_ = folder_name;
-  boost::filesystem::path path_results = path_folder_results_ / "Output.xml";   // My results are all in the same output.xml file (same as homogeneous)
+  boost::filesystem::path path_results = path_folder_results_ / "Output.xml";   // Results are all in the same output.xml file (same as homogeneous)
 
   if (!boost::filesystem::exists(path_results)) {
     throw std::invalid_argument("Output folder does not contain the Output.xml file");
   }
 
   boost::property_tree::read_xml((path_results).string(), xml_main_input);
+  is_mechanism_heterogeneous_ = isHeterogeneous;
 
-  Prepare();
+  if (is_mechanism_heterogeneous_ == true)
+    PrepareHeterogeneous();
+  else
+    Prepare();
 
   boost::filesystem::path path_sensitivities = path_folder_results_ / "Sensitivities.xml";
   if (boost::filesystem::exists(path_sensitivities)) 
     iSensitivityEnabled_ = true;
   if (is_mechanism_heterogeneous_ == true)
   {
-    boost::filesystem::path path_sensitivities = path_folder_results_ / "Sensitivities.Surface.xml";
+    boost::filesystem::path path_sensitivities_heterogeneous_ = path_folder_results_ / "Sensitivities.Surface.xml";
     if (boost::filesystem::exists(path_sensitivities)) 
       iSensitivityHeterogeneousEnabled_ = true;
   }
@@ -486,21 +489,17 @@ void ProfilesDatabase::PrepareHeterogeneous() {
       column_index_of_surfacefractions_profiles.resize(number_of_surfacefractions_profiles);
       string_list_surfacefractions_unsorted.reserve(number_of_surfacefractions_profiles);
 
-      // This should not be required
-      // mw_species_.resize(number_of_surfacefractions_profiles);
-      // for (unsigned int j = 0; j < number_of_surfacefractions_profiles; j++) {
-      //   std::string dummy;
-      //   stream >> dummy;
-      //   string_list_massfractions_unsorted.push_back(dummy);
+      for (unsigned int j = 0; j < number_of_surfacefractions_profiles; j++) {
+        std::string dummy;
+        stream >> dummy;
+        string_list_surfacefractions_unsorted.push_back(dummy);
 
-      //   stream >> mw_species_[j];
-      //   stream >> column_index_of_massfractions_profiles[j];
-      // }
-
+        stream >> dummy;
+        stream >> column_index_of_surfacefractions_profiles[j];
+      }
       string_list_surfacefractions_sorted = string_list_surfacefractions_unsorted;
 
       std::sort(string_list_surfacefractions_sorted.begin(), string_list_surfacefractions_sorted.end());
-      // string_list_massfractions_sorted.sort();
 
       sorted_index_surface.resize(number_of_surfacefractions_profiles);
       for (unsigned int j = 0; j < number_of_surfacefractions_profiles; j++)
@@ -508,12 +507,11 @@ void ProfilesDatabase::PrepareHeterogeneous() {
           if (string_list_surfacefractions_sorted[j] == string_list_surfacefractions_unsorted[k]) {
             sorted_index_surface[j] = k;
             break;
-          }
+        }
     } else {
-      throw std::invalid_argument("Corrupted xml file: missing the surface-mole-fractions leaf");
+      throw std::invalid_argument("Corrupted xml file: missing the surface-moles-fractions leaf");
     }
   }
-
   // Species (bulk masses)
   std::vector<std::string> string_list_bulkmasses_unsorted;
   {
@@ -531,16 +529,14 @@ void ProfilesDatabase::PrepareHeterogeneous() {
       column_index_of_bulkmasses_profiles.resize(number_of_bulkmasses_profiles);
       string_list_bulkmasses_unsorted.reserve(number_of_bulkmasses_profiles);
 
-      // This should not be required
-      // mw_species_.resize(number_of_surfacefractions_profiles);
-      // for (unsigned int j = 0; j < number_of_surfacefractions_profiles; j++) {
-      //   std::string dummy;
-      //   stream >> dummy;
-      //   string_list_massfractions_unsorted.push_back(dummy);
+      for (unsigned int j = 0; j < number_of_bulkmasses_profiles; j++) {
+        std::string dummy;
+        stream >> dummy;
+        string_list_bulkmasses_unsorted.push_back(dummy);
 
-      //   stream >> mw_species_[j];
-      //   stream >> column_index_of_massfractions_profiles[j];
-      // }
+        stream >> dummy;
+        stream >> column_index_of_bulkmasses_profiles[j];
+      }
 
       string_list_bulkmasses_sorted = string_list_bulkmasses_unsorted;
 
@@ -636,7 +632,7 @@ void ProfilesDatabase::PrepareHeterogeneous() {
     }
   }
 
-  // Conversions
+  // Conversions (probably not required in general)
   // This is wrong there is no mass loss correction. Not a priority right now but it has to be changed. I'll do it eventually.
   {
     for (unsigned int j = 0; j < number_of_gas_species; j++) {
@@ -656,8 +652,7 @@ void ProfilesDatabase::SpeciesCoarsening(const double threshold) {
   current_sorted_index.resize(0);
   for (unsigned int k = 0; k < string_list_massfractions_sorted.size(); k++)
     if (sorted_max[k] > threshold) current_sorted_index.push_back(k);
-}     // I'm not sure if we need to update this for surface species as well. For sure, not for bulk since we only have 2
-
+}     // This function is not used.
 
 // 0-based
 void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index,

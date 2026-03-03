@@ -73,7 +73,7 @@ class Sensitivities {
 
   inline const std::vector<unsigned int>& reactions() const { return reactions_; };
 
-  inline const std::vector<double>& senitivityCoefficients() const {
+  inline const std::vector<double>& sensitivityCoefficients() const {
     return sensitivity_coefficients_;
   };
 

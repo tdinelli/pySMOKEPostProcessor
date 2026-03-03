@@ -63,7 +63,7 @@ class Sensitivities_Surface {
 
   void SetUpperBound(double upperBound);
 
-  void Prepare();
+  void Prepare(bool heterogeneousSensitivity);
 
   void Sensitivity_Analysis(const unsigned int number_of_reactions);
 
@@ -94,6 +94,8 @@ class Sensitivities_Surface {
   bool iLocalNormalization = false;
   std::vector<double> sensitivity_coefficients_;
   std::vector<unsigned int> reactions_;
+
+  bool heterogeneousSensitivity_;
 };
 
 #include "Sensitivities_Surface.hpp"

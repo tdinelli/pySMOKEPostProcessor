@@ -48,11 +48,10 @@ class ProfilesDatabase {
   bool ReadKineticMechanism(const std::string& folder_name);
   bool ReadHeterogeneousKineticMechanism(const std::string& folder_name, const std::string& phase_name);
 
-  bool ReadFileResults(const std::string& folder_name);
+  bool ReadFileResults(const std::string& folder_name, bool isHeterogeneous);
 
   void Prepare();
-  void PrepareHeterogeneous();  // Scusami Tito ma non so come non sdoppiarla causa nomi differenti, non voglio romperla per fase gas.
-                                // Most of the code is the same, sono solo i nomi,  Magari basta creare un paio di subfunctions
+  void PrepareHeterogeneous();
 
   void SpeciesCoarsening(const double threshold);
 
@@ -100,9 +99,11 @@ class ProfilesDatabase {
   unsigned int number_of_gas_species;
   unsigned int number_of_surface_species;
   unsigned int number_of_bulk_species;
-  // Ti odio ho 800 variabilii in più solo perché le vuoi sortare qui e non nelle ropa/sensitivity
 
-  std::vector<double> mw_species_;
+  std::vector<double> mw_species_;  // Note: for now, saving only the gas-phase molecular weights. 
+      // Since surface species are already saved in molar fractions, and bulk species are in mass, 
+      // but their activity is 1, no need to save their MW (no use for it)
+      // Maybe, in different phases it is required to save those.
 
   boost::property_tree::ptree xml_main_input;
 
@@ -131,6 +132,7 @@ class ProfilesDatabase {
 
   std::string name_reactions_;
   std::string name_reactions_heterogeneous_;
+  
   std::vector<std::string> reaction_strings_;
   std::vector<std::string> reaction_strings_heterogeneous_;
 };

@@ -49,8 +49,8 @@ class Sensitivities_Database_Surface
 
     void SetDatabase(ProfilesDatabase *data);
 
-    void ReadParentFile();
-    void ReadFromChildFile(const std::string name);
+    void ReadParentFile(bool heterogeneousSensitivity);
+    void ReadFromChildFile(const std::string name, bool heterogeneousSensitivity);
     std::vector<double> NormalizedProfile(const unsigned int index, bool local_normalization);
     double NormalizedProfile(const unsigned int index, bool local_normalization, unsigned int point);
 
@@ -60,10 +60,8 @@ class Sensitivities_Database_Surface
     {
         return names_;
     }
-    unsigned int number_of_variables() const
-    {
-        return number_of_variables_;
-    }
+    unsigned int number_of_variables() const {return number_of_variables_;}
+
     const std::vector<double> &variable() const
     {
         return variable_;
@@ -81,10 +79,7 @@ class Sensitivities_Database_Surface
     void ReactionsCoarsening(const double threshold);
     void ReactionsReset();
 
-    unsigned int number_of_parameters() const
-    {
-        return number_of_parameters_;
-    }
+    unsigned int number_of_parameters() const {return number_of_parameters_;}
 
   private:
     ProfilesDatabase *data_;

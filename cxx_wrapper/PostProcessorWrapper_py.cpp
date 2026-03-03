@@ -79,6 +79,6 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m) {
       .def("getSensitivityProfile", &Sensitivities::GetSensitivityProfile,
            py::call_guard<py::gil_scoped_release>())
       .def("reactions", &Sensitivities::reactions, py::call_guard<py::gil_scoped_release>())
-      .def("sensitivityCoefficients", &Sensitivities::senitivityCoefficients,
+      .def("sensitivityCoefficients", &Sensitivities::sensitivityCoefficients,
            py::call_guard<py::gil_scoped_release>());
 }
