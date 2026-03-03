@@ -97,20 +97,27 @@ void Sensitivities_Database_Surface::ReadParentFile(bool heterogeneousSensitivit
   // Names of reactions
   {
     unsigned int NR;
-    if (heterogeneousSensitivity == true)
+    std::vector<std::string> reaction_strings;
+    if (heterogeneousSensitivity == true){
       NR = data_->kineticsMapSurfaceXML->NumberOfReactions();
-    else
+      reaction_strings = data_->reaction_strings_heterogeneous_;
+    }
+    else{
       NR = data_->kineticsMapXML->NumberOfReactions();
+      reaction_strings = data_->reaction_strings_;
+    }
 
     string_list_reactions_.reserve(number_of_parameters_);
+
     for (unsigned int j = 0; j < number_of_parameters_; j++) {
       if (j + 1 <= NR) {
         std::stringstream index;
         index << j + 1;
-        std::string tmp = "R" + index.str() + ": " + data_->reaction_strings_[j];
+        std::string tmp = "R" + index.str() + ": " + reaction_strings[j];
         string_list_reactions_.push_back(tmp);
       } else {
         unsigned int local_index = j + 1 - NR;
+
         if (heterogeneousSensitivity == false)
         {
           if (local_index <= data_->kineticsMapXML->NumberOfFallOffReactions()) {
