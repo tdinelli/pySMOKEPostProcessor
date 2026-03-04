@@ -132,8 +132,15 @@ bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& fold
     boost::property_tree::read_xml((path_mechanism_het).string(), ptree_het);
 
     // These names will be changed to heterogeneous maybe (notice in the surface map the bool is not required, this is general also to liquid and solid)
+    
+    std::streambuf* old_buf = std::cout.rdbuf();   // When calling the thermoSurfaceMap, the code prints a lot of (useless) stuff;
+    std::ofstream null_stream("/dev/null");        // this is to deal with it.
+    std::cout.rdbuf(null_stream.rdbuf());          // Basically: sends buffer to null, but only for a second
+
     thermodynamicsMapSurfaceXML = new OpenSMOKE::ThermodynamicsMap_Surface_CHEMKIN(ptree_het);
     kineticsMapSurfaceXML = new OpenSMOKE::KineticsMap_Surface_CHEMKIN(*thermodynamicsMapSurfaceXML, ptree_het);
+
+    std::cout.rdbuf(old_buf);                      // Restores the buffer to the original (goes back to printing on screen)
   }
 
   // Disabling this check because number of species is no longer the same (e.g. in surface I have surface fractions etc)
@@ -145,7 +152,7 @@ bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& fold
   //       "Output.xml file contains only a subset of the total species in the kinetic mechanism"
   //   );
   // }
-  iROPAHeterogeneousEnabled_ = false;   // REMINDER THIS HAS TO BE TRUE - FIRST I WANT TO RUN WIHOUT IT
+  iROPAHeterogeneousEnabled_ = true;
 
   // Read the reaction strings
   { // The reaction_names file has a different name depending on phase. for me it's that, for liquid its reaction_names.liquid.xml, for solid no file exists (@Riccardo)

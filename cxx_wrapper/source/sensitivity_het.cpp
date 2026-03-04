@@ -33,6 +33,7 @@ int main(int argc, char** argv)
     
     Sensitivities_Surface sensi;
     bool heterogeneousSensitivity = false;
+    const unsigned int NR = 5;
 
     sensi.SetDatabase(&profiles_db);
     sensi.SetSensitivityType("global");
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
     // Homogeneous sensitivity analysis
     sensi.Prepare(heterogeneousSensitivity);
     sensi.ReadSensitvityCoefficients();
-    sensi.Sensitivity_Analysis(5);
+    sensi.Sensitivity_Analysis(NR);
     std::vector<unsigned int> reactions = sensi.reactions();
     std::vector<double> sensicoeffs = sensi.sensitivityCoefficients();
 
@@ -57,7 +58,7 @@ int main(int argc, char** argv)
     heterogeneousSensitivity = true;
     sensi.Prepare(heterogeneousSensitivity);
     sensi.ReadSensitvityCoefficients();
-    sensi.Sensitivity_Analysis(5);
+    sensi.Sensitivity_Analysis(NR);
     std::vector<unsigned int> reactions_het = sensi.reactions();
     std::vector<double> sensicoeffs_het = sensi.sensitivityCoefficients();
 
