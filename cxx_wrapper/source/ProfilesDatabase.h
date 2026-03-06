@@ -46,12 +46,12 @@ class ProfilesDatabase {
   ~ProfilesDatabase(void);
 
   bool ReadKineticMechanism(const std::string& folder_name);
-  bool ReadHeterogeneousKineticMechanism(const std::string& folder_name, const std::string& phase_name);
+  bool ReadHeterogeneousKineticMechanism(const std::string& folder_name, const std::string& phase_name); // Function added
 
-  bool ReadFileResults(const std::string& folder_name, bool isHeterogeneous);
+  bool ReadFileResults(const std::string& folder_name, bool isHeterogeneous); // Modified number of input (added the isHeterogeneous variable)
 
   void Prepare();
-  void PrepareHeterogeneous();
+  void PrepareHeterogeneous();  // Function added
 
   void SpeciesCoarsening(const double threshold);
 
@@ -125,15 +125,16 @@ class ProfilesDatabase {
   boost::filesystem::path path_folder_mechanism_;   // the folder of the mechanism is the same as that of the heterogeneous -- no need to duplicate
 
   void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int>& indices);
-  void ReactionsAssociatedToSpecies_Surface(const unsigned int index, std::vector<unsigned int>& indices);
   void isReactantProduct(const unsigned int reaction_index, double& netStoichiometry);
-  void isReactantProduct_Surface(const unsigned int reaction_index, double& netStoichiometry);
+  
+  void ReactionsAssociatedToSpecies_Surface(const unsigned int index, std::vector<unsigned int>& indices);  // Function added
+  void isReactantProduct_Surface(const unsigned int reaction_index, double& netStoichiometry);              // Function added
   // In here I think its just adding a parameter kineticsMap and the functions are exactly the same, map template is required.
 
   std::string name_reactions_;
-  std::string name_reactions_heterogeneous_;
-  
   std::vector<std::string> reaction_strings_;
+  
+  std::string name_reactions_heterogeneous_;
   std::vector<std::string> reaction_strings_heterogeneous_;
 };
 

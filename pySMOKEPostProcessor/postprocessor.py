@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
+import os   # Added import for auto check surface mech
 
 from .graph_writer import GraphWriter
-from .maps.KineticMap import KineticMap
-from .pySMOKEPostProcessor import ROPA, ProfilesDatabase, Sensitivity
+from .maps.KineticMap import KineticMap, KineticMapSurface
+from .pySMOKEPostProcessor import ROPA, ProfilesDatabase, Sensitivity, ROPA_Surface, Sensitivity_Surface
 
 
 class PostProcessor:
@@ -18,13 +19,22 @@ class PostProcessor:
 
     def __init__(self, kineticFolder: str, outputFolder: str) -> None:
         self.db = ProfilesDatabase()
-        self.db.readFileResults(outputFolder)
-        self.db.readKineticMechanism(kineticFolder)
-
         self.kineticFolder = kineticFolder
         self.outputFolder = outputFolder
 
+        #   Check if surface kinetics is available
+        surface_file = os.path.join(self.kineticFolder, "kinetics.surface.xml")
+        self.isHeterogeneous = os.path.exists(surface_file)
+    
+        self.db.readFileResults(self.outputFolder, self.isHeterogeneous)
+        self.db.readKineticMechanism(self.kineticFolder)
+
         self.km = KineticMap(self.kineticFolder)
+
+        if self.isHeterogeneous:
+            self.db.readHeterogeneousKineticMechanism(self.kineticFolder,"Surface")
+            self.kms = KineticMapSurface(self.kineticFolder)
+
 
     def RateOfProductionAnalysis(
         self,
@@ -89,6 +99,75 @@ class PostProcessor:
             return ropa_result
         else:
             return self.RateOfProductionAnalysis2D(species, ropa_type, number_of_reactions, region_location, mass_ropa)
+
+    def RateOfProductionAnalysis_Surface(
+        self,
+        species: str,
+        ropa_type: str,
+        local_value: float = 0,
+        lower_value: float = 0,
+        upper_value: float = 0,
+        number_of_reactions: int = 10,
+        #   mass_ropa: bool = False     # Not sure we need the conversion to mass. I see the point, but for now not important
+    ) -> dict:
+        """
+        Function that performs the [R]ate [O]f [P]roduction [A]nalysis for the coupled gas mechanism with deposition (Surface)
+        Args:
+            species: Name of the target species for the ROPA
+            ropa_type: Type of ROPA to be performed available are: gloabal | local | region
+            local_value: Local value of the domain in where perform the ROPA
+            lower_value: Lower value of the domain for the region ROPA
+            upper_value: Upper value of the domain for the region ROPA
+            number_of_reactions: Number Of Reactions to return after the ROPA
+            mass_ropa: Return the ROPA coefficients in mass unit
+
+        Returns:
+            A dictionary as the following one:
+                ropa_results = {'coefficients': [...],
+                                'reaction_names': [...],
+                                'reaction_indices': [...],
+                                'het_coefficients': [...],
+                                'het_reaction_names': [...],
+                                'het_reaction_indices': [...],}
+                Containing the ROPA coefficients, the reaction names and the indices of the reactions, for both homogeneous and heterogeneous reactions
+        """
+        widget = ROPA_Surface()
+        widget.setDataBase(self.db)
+        widget.setROPAType(ropa_type)
+        widget.setSpecies(species)
+        widget.setLocalValue(local_value)
+        widget.setLowerBound(lower_value)
+        widget.setUpperBound(upper_value)
+
+        widget.rateOfProductionAnalysis(number_of_reactions)
+
+        reaction_indices = widget.reactions()
+        ropa_coefficients = widget.coefficients()
+
+        het_reaction_indices = widget.reactions_surface()
+        het_ropa_coefficients = widget.coefficients_surface()
+
+        reaction_names = []
+        for i in reaction_indices:
+            reaction_names.append(self.km.ReactionNameFromIndex(i))
+
+        het_reaction_names = []
+        for i in het_reaction_indices:
+            het_reaction_names.append(self.kms.ReactionNameFromIndex(i))
+
+        # if mass_ropa:
+        #     ropa_coefficients = self.convert_tomass(ropa_coefficients, species)
+
+        ropa_result = {
+            "coefficients": ropa_coefficients,
+            "reaction_names": reaction_names,
+            "reaction_indices": reaction_indices,
+            "het_coefficients": het_ropa_coefficients,
+            "het_reaction_names": het_reaction_names,
+            "het_reaction_indices": het_reaction_indices,
+        }
+
+        return ropa_result
 
     def RateOfProductionAnalysis2D(
         self,
@@ -173,6 +252,51 @@ class PostProcessor:
         reaction_names = []
         for i in reaction_indices:
             reaction_names.append(self.km.ReactionNameFromIndex(i))
+
+        sensitivity_result = {
+            "coefficients": sensitivity_coefficients,
+            "reaction_names": reaction_names,
+            "reaction_indices": reaction_indices,
+        }
+
+        return sensitivity_result
+    
+    def SensitivityAnalysis_Surface(
+        self,
+        target: str,
+        sensitivity_type: str,
+        ordering_type: str,
+        normalization_type: str,
+        local_value: float = 0,
+        lower_value: float = 0,
+        upper_value: float = 0,
+        number_of_reactions: int = 10,
+        heterogeneous_sensitivity: bool = False
+    ) -> dict:
+        # SENSITIVITY HERE
+        widget = Sensitivity_Surface()
+
+        widget.setDataBase(self.db)
+        widget.setSensitivityType(sensitivity_type)
+        widget.setOrderingType(ordering_type)
+        widget.setNormalizationType(normalization_type)
+        widget.setTarget(target)
+        widget.setLocalValue(local_value)
+        widget.setLowerBound(lower_value)
+        widget.setUpperBound(upper_value)
+        widget.prepare(heterogeneous_sensitivity)
+        widget.readSensitivityCoefficients()
+        widget.sensitivityAnalysis(number_of_reactions)
+
+        reaction_indices = widget.reactions()
+        sensitivity_coefficients = widget.sensitivityCoefficients()
+
+        reaction_names = []
+        for i in reaction_indices:
+            if heterogeneous_sensitivity:
+                reaction_names.append(self.kms.ReactionNameFromIndex(i))
+            else:
+                reaction_names.append(self.km.ReactionNameFromIndex(i))
 
         sensitivity_result = {
             "coefficients": sensitivity_coefficients,

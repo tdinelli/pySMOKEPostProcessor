@@ -228,3 +228,24 @@ class KineticMap:
             return self.species.index(name)
         except ValueError:
             raise ValueError("The kinetic mechanism does not contain the requested species!")
+
+class KineticMapSurface(KineticMap):    # Added this for compatibility 
+    def __init__(self, KineticFolder: str):
+        reactionNames_xml = os.path.join(KineticFolder, "surface_reaction_names.xml")
+        if not os.path.isfile(reactionNames_xml):
+            raise ValueError(
+                "The kinetic folder does not contain any surface_reaction_names.xml file! Please provide a valid mechanism"
+            )
+
+        kinetic_xml = os.path.join(KineticFolder, "kinetics.surface.xml")
+
+        if not os.path.isfile(kinetic_xml):
+            raise ValueError(
+                "The kinetic folder does not contain any kinetics.surface.xml file! Please provide a valid mechanism"
+            )
+
+        self.ParseReactionNames(reaction_names=reactionNames_xml)
+        #   self.ParseKinetic(kinetics_file=kinetic_xml)    # Override would be required, but it does not seem necessary for now
+    
+    def ReactionNameFromIndex(self, reactionIndex):     # Override "più leggero" visto che non ho tipi speciali.
+        return f"R{reactionIndex + 1}: {self.reaction_names[reactionIndex]}"

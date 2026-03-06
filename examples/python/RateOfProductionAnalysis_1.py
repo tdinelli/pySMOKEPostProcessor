@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 # from postprocessor import PostProcessor
 from pySMOKEPostProcessor.plotting_utilities.bar_plot import plot_bars
 
-kineticFolder = os.path.join("..", "data", "ROPA-01", "kinetics")
-resultsFolder = os.path.join("..", "data", "ROPA-01", "Output")
+kineticFolder = os.path.join("..", "data", "ROPA", "kinetics")
+resultsFolder = os.path.join("..", "data", "ROPA", "Output")
 
 pp = PostProcessor(kineticFolder, resultsFolder)
 
