@@ -6,7 +6,10 @@ message(STATUS "Configuring OpenSMOKEpp...")
 # First, check if OpenSMOKEpp is vendored in the repository
 set(VENDORED_OPENSMOKE_PATH "${CMAKE_SOURCE_DIR}/external/opensmoke/source")
 
-if(EXISTS ${VENDORED_OPENSMOKE_PATH})
+if(EXISTS "$ENV{OpenSMOKEpp_ROOT}")
+    message(STATUS "Using system-installed OpenSMOKEpp from: $ENV{OpenSMOKEpp_ROOT}/source")
+    set(OPENSMOKE_INCLUDE "$ENV{OpenSMOKEpp_ROOT}/source" CACHE PATH "Path to OpenSMOKE library")
+elseif(EXISTS ${VENDORED_OPENSMOKE_PATH})
     message(STATUS "Using vendored OpenSMOKEpp from: ${VENDORED_OPENSMOKE_PATH}")
     set(OPENSMOKE_INCLUDE ${VENDORED_OPENSMOKE_PATH} CACHE PATH "Path to OpenSMOKE library")
 else()
