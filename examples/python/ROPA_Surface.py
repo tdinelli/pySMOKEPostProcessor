@@ -13,27 +13,33 @@ resultsFolder = os.path.join("..","data","Surface_Data","Output")
 
 pp = PostProcessor(kineticFolder, resultsFolder)
 
-global_ropa = pp.RateOfProductionAnalysis_Surface(species='CH4',
+global_ropa_homo = pp.RateOfProductionAnalysis_Surface(species='CH4',
                                           ropa_type='global',
-                                          number_of_reactions=10)
+                                          number_of_reactions=10,
+                                          heterogeneous_reactions=False)
 
-global_ropa_homo = {
-    "coefficients": global_ropa["coefficients"],
-    "reaction_names": global_ropa["reaction_names"],
-    "reaction_indices": global_ropa["reaction_indices"]
+result_homo = {
+    "coefficients": global_ropa_homo["coefficients"],
+    "reaction_names": global_ropa_homo["reaction_names"],
+    "reaction_indices": global_ropa_homo["reaction_indices"]
 }
 
-global_ropa_het = {
-    "coefficients": global_ropa["het_coefficients"],
-    "reaction_names": global_ropa["het_reaction_names"],
-    "reaction_indices": global_ropa["het_reaction_indices"]
-}
-
-fig_1, ax_1 = plot_bars(global_ropa_homo)
+fig_1, ax_1 = plot_bars(result_homo)
 fig_1.suptitle("Homogeneous ROPA")
 fig_1.tight_layout()
 
-fig_2, ax_2 = plot_bars(global_ropa_het)
+global_ropa_het = pp.RateOfProductionAnalysis_Surface(species='CH4',
+                                          ropa_type='global',
+                                          number_of_reactions=10,
+                                          heterogeneous_reactions=True)
+
+result_het = {
+    "coefficients": global_ropa_het["coefficients"],
+    "reaction_names": global_ropa_het["reaction_names"],
+    "reaction_indices": global_ropa_het["reaction_indices"]
+}
+
+fig_2, ax_2 = plot_bars(result_het)
 fig_2.suptitle("Heterogeneous ROPA")
 fig_2.tight_layout()
 

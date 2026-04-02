@@ -108,6 +108,7 @@ class PostProcessor:
         lower_value: float = 0,
         upper_value: float = 0,
         number_of_reactions: int = 10,
+        heterogeneous_reactions: bool = False,
         #   mass_ropa: bool = False     # Not sure we need the conversion to mass. I see the point, but for now not important
     ) -> dict:
         """
@@ -125,10 +126,7 @@ class PostProcessor:
             A dictionary as the following one:
                 ropa_results = {'coefficients': [...],
                                 'reaction_names': [...],
-                                'reaction_indices': [...],
-                                'het_coefficients': [...],
-                                'het_reaction_names': [...],
-                                'het_reaction_indices': [...],}
+                                'reaction_indices': [...]}
                 Containing the ROPA coefficients, the reaction names and the indices of the reactions, for both homogeneous and heterogeneous reactions
         """
         widget = ROPA_Surface()
@@ -141,19 +139,22 @@ class PostProcessor:
 
         widget.rateOfProductionAnalysis(number_of_reactions)
 
-        reaction_indices = widget.reactions()
-        ropa_coefficients = widget.coefficients()
-
-        het_reaction_indices = widget.reactions_surface()
-        het_ropa_coefficients = widget.coefficients_surface()
-
         reaction_names = []
-        for i in reaction_indices:
-            reaction_names.append(self.km.ReactionNameFromIndex(i))
+        if heterogeneous_reactions:
+            reaction_indices = widget.reactions_surface()
+            ropa_coefficients = widget.coefficients_surface()
+            for i in reaction_indices:
+                reaction_names.append(self.kms.ReactionNameFromIndex(i))
+            
+        else:
+            reaction_indices = widget.reactions()
+            ropa_coefficients = widget.coefficients()
+            for i in reaction_indices:
+                reaction_names.append(self.km.ReactionNameFromIndex(i))
 
-        het_reaction_names = []
-        for i in het_reaction_indices:
-            het_reaction_names.append(self.kms.ReactionNameFromIndex(i))
+        
+        
+
 
         # if mass_ropa:
         #     ropa_coefficients = self.convert_tomass(ropa_coefficients, species)
@@ -161,10 +162,7 @@ class PostProcessor:
         ropa_result = {
             "coefficients": ropa_coefficients,
             "reaction_names": reaction_names,
-            "reaction_indices": reaction_indices,
-            "het_coefficients": het_ropa_coefficients,
-            "het_reaction_names": het_reaction_names,
-            "het_reaction_indices": het_reaction_indices,
+            "reaction_indices": reaction_indices
         }
 
         return ropa_result
