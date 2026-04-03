@@ -27,6 +27,11 @@
 #include "maps/ThermodynamicsMap_Surface_CHEMKIN.h"
 #include "maps/KineticsMap_Surface_CHEMKIN.h"
 
+
+// [LG] Additions 2026/04/02 - This thing did not work I had to add this ? 
+#include "source/ROPA_Surface.h"
+#include "source/Sensitivities_Surface.h"
+
 // Boost library
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>

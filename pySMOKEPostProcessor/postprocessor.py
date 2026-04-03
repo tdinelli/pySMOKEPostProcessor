@@ -152,10 +152,6 @@ class PostProcessor:
             for i in reaction_indices:
                 reaction_names.append(self.km.ReactionNameFromIndex(i))
 
-        
-        
-
-
         # if mass_ropa:
         #     ropa_coefficients = self.convert_tomass(ropa_coefficients, species)
 

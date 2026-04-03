@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <opensmoke version="0.1a">
 <variables>
-2
+3
 CH4 0 6
 C2H2 1 17
+H2 2 2
 </variables>
 <n-parameters> 
 849
 </n-parameters> 
 <points> 
-37
+36
 </points> 
 <constant-parameters> 
 1.50000000e+09

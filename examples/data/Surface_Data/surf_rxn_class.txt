@@ -1,0 +1,61 @@
+#	TODO: Divide reaction classes between Armchair and Zigzag (and fix the names...)
+classtype ADDITION
+    ADD_A1
+	ADD_D
+	ADD_T
+	ADD_DD
+	ADD_SRF		# This is a single ADD_A1 reaction, ADD_SRF should not exist
+	ADD_Hs
+	ADD_H
+	ADD_HHs
+	ADD_RTRANSFER
+end classtype
+
+classtype BETASCISSION
+    BETASCISSION_CC
+	BETASCISSION_CH
+end classtype
+
+classtype DECOMPOSITION
+	DECO_MASSLOSS
+	DECO_NOMASSLOSS
+end classtype
+
+# ADD_C3H6 and C4H4 will be re-absorbed into something else.
+classtype HABSTRACTION
+    HABS_H
+    HABS_CH3
+	HABS_C3H6
+    HABS_C4H4
+	HABS_D
+    HABS_T
+    HABS_C2H6
+	HABS_A1
+	HABS_SURF	# ????
+end classtype
+
+classtype IPSO
+	IPSO
+end classtype
+
+# [LG] Bad names
+classtype GROWTH-RADICAL
+	Cs-R,R
+	Cs-R,H
+	Cs-RSR,R
+	Cs-RSR,H
+	Cs-NRSR,R
+	Cs-RSR,Cs-RSR
+end classtype
+
+# [LG] These names will be changed I promise
+classtype COVERAGE
+	NEUTRAL
+	CH2
+	RSR
+	NRSR
+end classtype
+
+classtype UNSORTED
+    UNSORTED
+end classtype

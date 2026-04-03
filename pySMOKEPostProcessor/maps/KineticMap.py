@@ -149,7 +149,6 @@ class KineticMap:
         self.rxnclass = dict.fromkeys(np.arange(1, self.NumberOfReactions + 1))
         self.rxnsubclass = dict.fromkeys(np.arange(1, self.NumberOfReactions + 1))
         classes = {}
-
         for child in reaction_classes:
             if child.tag == "MainClass":
                 classname = child.attrib["name"]
@@ -233,19 +232,120 @@ class KineticMapSurface(KineticMap):    # Added this for compatibility
     def __init__(self, KineticFolder: str):
         reactionNames_xml = os.path.join(KineticFolder, "surface_reaction_names.xml")
         if not os.path.isfile(reactionNames_xml):
-            raise ValueError(
-                "The kinetic folder does not contain any surface_reaction_names.xml file! Please provide a valid mechanism"
-            )
+            raise ValueError("The kinetic folder does not contain any surface_reaction_names.xml file! Please provide a valid mechanism")
 
         kinetic_xml = os.path.join(KineticFolder, "kinetics.surface.xml")
 
         if not os.path.isfile(kinetic_xml):
-            raise ValueError(
-                "The kinetic folder does not contain any kinetics.surface.xml file! Please provide a valid mechanism"
-            )
+            raise ValueError("The kinetic folder does not contain any kinetics.surface.xml file! Please provide a valid mechanism")
 
         self.ParseReactionNames(reaction_names=reactionNames_xml)
         #   self.ParseKinetic(kinetics_file=kinetic_xml)    # Override would be required, but it does not seem necessary for now
     
-    def ReactionNameFromIndex(self, reactionIndex):     # Override "più leggero" visto che non ho tipi speciali.
+    def ReactionNameFromIndex(self, reactionIndex):     # Easier override since there are no special types in the surface mech.
         return f"R{reactionIndex + 1}: {self.reaction_names[reactionIndex]}"
+    
+    def ParseSurfaceKinetics(self, surface_kinetics_file: str) -> None:
+        """
+        Function that parse the kinetics.surface.xml file and define the necessary variables for the class.
+        Args:
+            kinetics_file: path to the file kinetics.surface.xml.
+        """
+        tree = ET.parse(surface_kinetics_file)
+        root = tree.getroot()
+
+        # List of elements
+        elements = root.find("NamesOfElements").text.split()
+        NumberOfElements = len(elements)  # NE
+
+        # List of species
+        species = root.find("NamesOfSpecies").text.split()
+        NumberOfSpecies = len(species)  # NSTot
+
+        # List of materials (= number of different surfaces)
+        NumberOfMaterials = root.find("NumberOfMaterials").text.split()
+
+        # List of surface species
+        siteSpecies = root.find("SiteSpecies").text.split()
+        NumberOfSiteSpecies = len(siteSpecies)  # NSS
+
+        # List of site occupancies
+        siteOccupancies = np.array(root.find("MaterialDescription/Site").text.split()[2:])  # First two elements are the number of site species (again) and Gamma
+        siteOccupancies = np.array(siteOccupancies.reshape((NumberOfSiteSpecies, 3))[:,1],dtype=np.float32) # Example from xml: CHCH3CH.CH3(S) 1.000000000000000000e+00 92
+
+        # TODO: change printing in the XML so that the bulks are not separated but as the Site species.
+        # List of bulk species
+        # bulkSpecies = root.find("MaterialDescription/BulkSpecies").text.split()
+        # NumberOfSiteSpecies = len(bulkSpecies)  # NSB
+        bulks = root.findall("MaterialDescription/Bulk")    
+        # Right now, two bulks with different index are printed
+        # Ideally, we want only one to exist, with two species (2x1 vs 1x2)
+
+        bulkDensity = []
+        bulkSpecies = []
+        for bulk in bulks:
+            lines = [l.strip() for l in bulk.text.splitlines() if l.strip()]
+            for line in lines:
+                parts = line.split()
+                if len(parts) == 3:
+                    bulkSpecies.append(parts[0])
+                    bulkDensity.append(float(parts[1]))
+
+        # Atomic composition
+        atomic = np.fromstring(root.find("AtomicComposition").text, dtype=np.float32, sep=" ")
+        atomic = atomic.reshape((NumberOfSpecies, NumberOfElements))
+
+        # Elements molecular weights
+        element_weights = {
+            "C": 12.010999679565430,
+            "H": 1.008000016212463,
+            "O": 15.998999595642090,
+            "N": 14.0069999694824,
+            "HE": 4.002999782562256,
+            "AR": 39.948001861572270,
+            "S": 32.065,
+        }
+
+        mwe = np.array([element_weights.get(elem, 0.0) for elem in elements], dtype=np.float32)
+
+        # Species molecular weights
+        mws = np.dot(atomic, mwe)
+
+        # Soot classes (if they exists)
+        # This is for postprocessing soot (currently not implemented)
+        # reaction_class_name = []
+        # reaction_class_size = []
+        # reaction_class_indices = []
+
+        # Kinetics
+        kinetics = root.find("Kinetics/MaterialKinetics")
+
+        # Number Of Reactions
+        NumberOfReactions = int(kinetics.findtext("NumberOfReactions"))
+
+        # Kinetic parameters
+        kinetic_parameters = kinetics.find("KineticParameters")
+        direct = kinetic_parameters.find("Direct")
+        # TODO: Add possibility of finding reverse parameters
+
+        self.A = np.exp(np.fromstring(direct.findtext("lnA"), dtype=np.float64, sep=" ")[1:])
+        self.Beta = np.fromstring(direct.findtext("Beta"), dtype=np.float64, sep=" ")[1:]
+        self.E_over_R = np.fromstring(direct.findtext("E_over_R"), dtype=np.float64, sep=" ")[1:]
+
+        # Assign internal members
+
+        self.elements = elements
+        self.atomic = atomic
+        self.species = species
+        self.siteSpecies = siteSpecies
+        self.siteOccupancies = siteOccupancies  # Probably unused for postProcessing ?
+        self.bulkSpecies = bulkSpecies
+        self.bulkDensities = bulkDensity
+        self.NumberOfElements = NumberOfElements
+        self.NumberOfSpecies = NumberOfSpecies
+        self.NumberOfReactions = NumberOfReactions
+        self.kinetics = kinetics
+
+        # I am not sure I'll use these, maybe take them out
+        self.mwe = mwe
+        self.mws = mws
