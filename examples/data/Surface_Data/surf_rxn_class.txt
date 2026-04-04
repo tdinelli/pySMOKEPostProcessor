@@ -21,6 +21,10 @@ classtype DECOMPOSITION
 	DECO_NOMASSLOSS
 end classtype
 
+classtype ELIMH2
+	ELIM_H2
+end classtype
+
 # ADD_C3H6 and C4H4 will be re-absorbed into something else.
 classtype HABSTRACTION
     HABS_H

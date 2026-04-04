@@ -71,6 +71,8 @@ class ROPA_Surface {
 
   void SetROPAType(const std::string kineticFolder);
 
+  void SetROPAPhase(const bool heterogeneous_reactions);
+
   void SetSpecies(const std::string kineticFolder);
 
   void SetLocalValue(double localValue);
@@ -99,10 +101,6 @@ class ROPA_Surface {
   inline const std::vector<unsigned int>& reactions() const { return reactions_; };
 
   inline const std::vector<double>& coefficients() const { return coefficients_; };
-
-  inline const std::vector<unsigned int>& reactions_surface() const { return reactions_surface_; };
-
-  inline const std::vector<double>& coefficients_surface() const { return coefficients_surface_; };
 
   inline const std::vector<int>& indexFirstName() const { return indexFirstName_; };
 
@@ -144,8 +142,6 @@ class ROPA_Surface {
 
   std::vector<unsigned int> reactions_;
   std::vector<double> coefficients_;
-  std::vector<unsigned int> reactions_surface_;
-  std::vector<double> coefficients_surface_;
 
   std::vector<int> indexFirstName_;
   std::vector<int> indexSecondName_;
@@ -155,6 +151,8 @@ class ROPA_Surface {
   std::vector<double> formationRates_;
   std::vector<std::vector<double>> reactionRates_;
   std::vector<double> sumOfRates_;
+
+  bool heterogeneous_reactions_;
 
 };
 

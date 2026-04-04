@@ -240,9 +240,9 @@ class KineticMapSurface(KineticMap):    # Added this for compatibility
             raise ValueError("The kinetic folder does not contain any kinetics.surface.xml file! Please provide a valid mechanism")
 
         self.ParseReactionNames(reaction_names=reactionNames_xml)
-        #   self.ParseKinetic(kinetics_file=kinetic_xml)    # Override would be required, but it does not seem necessary for now
+        self.ParseSurfaceKinetics(surface_kinetics_file=kinetic_xml)
     
-    def ReactionNameFromIndex(self, reactionIndex):     # Easier override since there are no special types in the surface mech.
+    def ReactionNameFromIndex(self, reactionIndex):     # Easier override since there are currently no special types in the surface mech.
         return f"R{reactionIndex + 1}: {self.reaction_names[reactionIndex]}"
     
     def ParseSurfaceKinetics(self, surface_kinetics_file: str) -> None:
@@ -326,7 +326,7 @@ class KineticMapSurface(KineticMap):    # Added this for compatibility
         # Kinetic parameters
         kinetic_parameters = kinetics.find("KineticParameters")
         direct = kinetic_parameters.find("Direct")
-        # TODO: Add possibility of finding reverse parameters
+        # TODO: Add possibility of finding reverse parameters for explicitly reversible reactions
 
         self.A = np.exp(np.fromstring(direct.findtext("lnA"), dtype=np.float64, sep=" ")[1:])
         self.Beta = np.fromstring(direct.findtext("Beta"), dtype=np.float64, sep=" ")[1:]

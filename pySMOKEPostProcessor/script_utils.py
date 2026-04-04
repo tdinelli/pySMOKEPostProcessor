@@ -2,20 +2,22 @@
 wrapper functions calling multiple functionalities
 """
 
-from .maps.KineticMap import KineticMap
+from .maps.KineticMap import KineticMap,KineticMapSurface
 from .maps.OpenSMOKEppXMLFile import OpenSMOKEppXMLFile
 from .postprocessor import PostProcessor
 from .reaction_classes import FluxByClass, assignclass
 from .reaction_classes_utilities.reaction_classes_calc import filter_class0, sortby0
 
 
-def get_sortedrxns(kin_xml_fld, class_groups_file):
+def get_sortedrxns(kin_xml_fld, class_groups_file,heterogeneous_reactions=False):
     """
     return dataframe of sorted reaction classes based on the specified class groups file
     """
-    km = KineticMap(
-        kin_xml_fld,
-    )
+    if heterogeneous_reactions == True:
+        km = KineticMapSurface(kin_xml_fld)
+    else:
+        km = KineticMap(kin_xml_fld)
+
     rxns_sorted_obj, _ = assignclass(km, class_groups_file)
 
     return rxns_sorted_obj
@@ -39,6 +41,7 @@ def process_classes(
     upper_value=0.0,
     lower_value=0.0,
     mass_ropa=False,
+    heterogeneous_reactions = False
 ):
     sortdfs = []
 
@@ -59,16 +62,30 @@ def process_classes(
         flat_species_list = species_list
 
     tot_rop_dct = dict.fromkeys(flat_species_list)
-    for sp in flat_species_list:
-        tot_rop_dct[sp] = pp.RateOfProductionAnalysis(
-            sp,
-            ropa_type,
-            local_value=local_value,
-            lower_value=lower_value,
-            upper_value=upper_value,
-            number_of_reactions=n_of_rxns,
-            mass_ropa=mass_ropa,
-        )
+    if not pp.isHeterogeneous:  # [LG] I'm the one who made this if/else and still I don't like it at all
+        for sp in flat_species_list:
+            tot_rop_dct[sp] = pp.RateOfProductionAnalysis(
+                sp,
+                ropa_type,
+                local_value=local_value,
+                lower_value=lower_value,
+                upper_value=upper_value,
+                number_of_reactions=n_of_rxns,
+                mass_ropa=mass_ropa,
+            )
+    else:
+        for sp in flat_species_list:
+            tot_rop_dct[sp] = pp.RateOfProductionAnalysis_Surface(
+                sp,
+                ropa_type,
+                local_value=local_value,
+                lower_value=lower_value,
+                upper_value=upper_value,
+                number_of_reactions=n_of_rxns,
+                #mass_ropa=mass_ropa,
+                heterogeneous_reactions=heterogeneous_reactions
+            )
+
 
     # assign flux and process according to selected criteria
     fluxbyclass.process_flux(

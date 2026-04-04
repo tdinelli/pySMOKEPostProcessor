@@ -48,7 +48,6 @@ class FluxByClass:
         # species {spc: {ropa dct}}
         # reinitialize
         self.flux_sorted = reaction_fluxes(self.rxns_sorted.rxn_class_df, self.verbose)
-
         # add fluxes
         for species in species_list:
             if isinstance(species, str):

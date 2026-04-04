@@ -132,13 +132,13 @@ class PostProcessor:
         widget = ROPA_Surface()
         widget.setDataBase(self.db)
         widget.setROPAType(ropa_type)
+        widget.setROPAPhase(heterogeneous_reactions)
         widget.setSpecies(species)
         widget.setLocalValue(local_value)
         widget.setLowerBound(lower_value)
         widget.setUpperBound(upper_value)
 
-        widget.rateOfProductionAnalysis(number_of_reactions)
-
+        widget.rateOfProductionAnalysis(number_of_reactions) #  Currently not working for reaction classes implementation
         reaction_names = []
         if heterogeneous_reactions:
             reaction_indices = widget.reactions_surface()
