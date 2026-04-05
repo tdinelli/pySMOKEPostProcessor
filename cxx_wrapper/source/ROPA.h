@@ -69,9 +69,9 @@ class ROPA {
 
   void SetOutputFolder(const std::string outputFolder);
 
-  void SetROPAType(const std::string kineticFolder);
+  void SetROPAType(const std::string type);
 
-  void SetSpecies(const std::string kineticFolder);
+  void SetSpecies(const std::string species);
 
   void SetLocalValue(double localValue);
 
@@ -113,7 +113,7 @@ class ROPA {
 
   inline const std::vector<double>& sumOfRates() const { return sumOfRates_; };
 
- private:
+ protected:
   ProfilesDatabase* data_;
   std::vector<unsigned int> indices_coarse_reactions_;
   std::vector<std::string> string_list_reactions;

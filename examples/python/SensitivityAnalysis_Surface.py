@@ -1,4 +1,3 @@
-# Only for dev purposes
 import os
 import sys
 
@@ -29,12 +28,12 @@ global_sensitivity = pp.SensitivityAnalysis_Surface(target=target_species,
                                             sensitivity_type='global',
                                             number_of_reactions=20,
                                             ordering_type='peak-values',
-                                            normalization_type='local',
+                                            normalization_type='max-value',
                                             heterogeneous_sensitivity=True)
 fig_2, ax_2 = plot_bars(global_sensitivity)
 fig_2.suptitle(target_species, fontweight="bold")
 ax_2.set_title("Heterogeneous Sensitivity")
-fig_2.set_size_inches(16, 10)
+fig_2.set_size_inches(14, 8)
 fig_2.tight_layout()
 
 plt.show()

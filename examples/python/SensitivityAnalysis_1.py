@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from pySMOKEPostProcessor.postprocessor import PostProcessor
 from pySMOKEPostProcessor.plotting_utilities.bar_plot import plot_bars
 
-kineticFolder = os.path.join("..", "data", "Sensitivity-01", "kinetics")
-resultsFolder = os.path.join("..", "data", "Sensitivity-01", "Output-01")
+kineticFolder = os.path.join("..", "data", "Sensitivity", "kinetics")
+resultsFolder = os.path.join("..", "data", "Sensitivity", "Output")
 
 pp = PostProcessor(kineticFolder, resultsFolder)
 

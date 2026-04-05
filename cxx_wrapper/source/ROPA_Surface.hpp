@@ -41,155 +41,133 @@
 #include "math/OpenSMOKEUtilities.h"
 
 ROPA_Surface::ROPA_Surface() {
-  ropaType_ = "global";
-  kineticFolder_ = "";
-  outputFolder_ = "";
-  species_ = "";
-
-  localValue_ = 0;
-  upperBound_ = 0;
-  lowerBound_ = 0;
-
+  ROPA(); // Fallback on parent constructor
   heterogeneous_reactions_ = false;
 }
 
-void ROPA_Surface::SetKineticFolder(const std::string kineticFolder) { kineticFolder_ = kineticFolder; }
+void ROPA_Surface::SetROPAPhase(const bool heterogeneous_reactions) { heterogeneous_reactions_=heterogeneous_reactions; }
 
-void ROPA_Surface::SetOutputFolder(const std::string outputFolder) { outputFolder_ = outputFolder; }
-
-void ROPA_Surface::SetROPAType(const std::string ropaType) {
-  if (ropaType != "global" && ropaType != "local" && ropaType != "region")
-    throw std::invalid_argument("Available ROPA types are: global | local | region");
-  ropaType_ = ropaType;
-}
-
-void ROPA_Surface::SetROPAPhase(const bool heterogeneous_reactions) { heterogeneous_reactions_ = heterogeneous_reactions; }
-
-void ROPA_Surface::SetSpecies(const std::string species) { species_ = species; }
-
-void ROPA_Surface::SetLocalValue(double localValue) { localValue_ = localValue; }
-
-void ROPA_Surface::SetLowerBound(double lowerBound) { lowerBound_ = lowerBound; }
-
-void ROPA_Surface::SetUpperBound(double upperBound) { upperBound_ = upperBound; }
-
-void ROPA_Surface::SetDatabase(ProfilesDatabase* data) { data_ = data; }
-
-void ROPA_Surface::SetElement(const std::string element) { element_ = element; }
-
-void ROPA_Surface::SetThickness(const std::string thickness) {
-  if (thickness != "absolute" && thickness != "relative")
-    throw std::invalid_argument("Available thickness types are: absolute | relative(%)");
-  thickness_ = thickness;
-}
-
-void ROPA_Surface::SetFluxAnalysisType(const std::string type) {
-  if (type != "production" && type != "destruction")
-    throw std::invalid_argument("Available flux analysis types are: production | destruction");
-  flux_type_ = type;
-}
-
-void ROPA_Surface::SetWidth(const int width) { width_ = width; }
-
-void ROPA_Surface::SetDepth(const int depth) { depth_ = depth; }
-
-void ROPA_Surface::SetThreshold(const double threshold) { threshold_ = threshold; }
-
-void ROPA_Surface::SetThicknessLogScale(bool thicknesslogscale) { thicknesslogscale_ = thicknesslogscale; }
-
-void ROPA_Surface::SetLabelType(std::string type) {
-  if (type != "absolute" && type != "relative")
-    throw std::invalid_argument("Available label types are: absolute | relative(%)");
-  label_type_ = type;
-}
-
-void ROPA_Surface::RateOfProductionAnalysis(const unsigned int number_of_reactions) {
-
-  // Select y variables among the species
-  // Note: this only works on gas-phase species; it has to be updated for it to work on surface/bulk species as well.
-  if (std::find(data_->string_list_massfractions_sorted.begin(),
-                data_->string_list_massfractions_sorted.end(),
-                species_) != data_->string_list_massfractions_sorted.end()) {
-    speciesIsSelected = true;
+void ROPA_Surface::RateOfProductionAnalysis(const unsigned int number_of_reactions, const bool heterogeneous_reactions) {
+  heterogeneous_reactions_ = heterogeneous_reactions; // Update internal variable (maybe useless)
+  if (heterogeneous_reactions_ == false) {
+    // It would be correct to throw an exception here if het_rxns == false and the selected species is from heterogeneous phase.
+    // Case homogeneous reactions: fallback on homogeneous ROPA functions
+    ROPA::RateOfProductionAnalysis(number_of_reactions);
   } else {
-    throw std::invalid_argument("Please select one of the available species!");
-  }
+    // Case heterogeneous reactions: dedicated implementation
+    if (std::find(data_->string_list_massfractions_sorted.begin(),
+                  data_->string_list_massfractions_sorted.end(),
+                  species_) != data_->string_list_massfractions_sorted.end()) {
+      speciesIsSelected = true;
+    } else if (std::find(data_->string_list_surfacefractions_sorted.begin(),
+                  data_->string_list_surfacefractions_sorted.end(),
+                  species_) != data_->string_list_surfacefractions_sorted.end()) {
+      speciesIsSelected = true;
+    } else if (std::find(data_->string_list_bulkmasses_sorted.begin(),
+                  data_->string_list_bulkmasses_sorted.end(),
+                  species_) != data_->string_list_bulkmasses_sorted.end()) {
+      speciesIsSelected = true;
+    } else {
+      throw std::invalid_argument("Please select one of the available species!");
+    }
+  
+    const unsigned int NSG = data_->thermodynamicsMapSurfaceXML->number_of_gas_species();
+    const unsigned int NSS = data_->thermodynamicsMapSurfaceXML->number_of_site_species();
+    const unsigned int NSB = data_->thermodynamicsMapSurfaceXML->number_of_bulk_species();
 
-  unsigned int index_of_species;    // This will have to be changed to account for ROPA on bulk (/surface) species.
-  for (unsigned int j = 0; j < data_->thermodynamicsMapXML->NumberOfSpecies(); j++) {
-    if (speciesIsSelected == true) {
-      if (species_ == data_->string_list_massfractions_sorted[j]) {
-        index_of_species = data_->sorted_index[j];
-        break;
+    unsigned int index_of_species;
+    bool species_not_found = true;
+    
+    { // Species search (it is probably not particularly efficient...)
+      unsigned int dummy_index = 0;
+      for (unsigned int j = 0; j < NSG; j++) {
+        if (species_ == data_->string_list_massfractions_sorted[j]) {
+          dummy_index = data_->sorted_index[j];
+          index_of_species = dummy_index;
+          species_not_found = false;
+          break;
+        }
+      }
+
+      if (species_not_found == true) {
+        for (unsigned int j = 0; j < NSS; j++) {
+          if (species_ == data_->string_list_surfacefractions_sorted[j]) {
+            dummy_index = data_->sorted_index_surface[j];
+            index_of_species = NSG + dummy_index;
+            species_not_found = false;
+            break;
+          }
+        }
+      }
+      if (species_not_found == true) {
+        for (unsigned int j = 0; j < NSB; j++) {
+          if (species_ == data_->string_list_bulkmasses_sorted[j]) {
+            dummy_index = data_->sorted_index_bulk[j];
+            index_of_species = NSG + NSS + dummy_index;
+            species_not_found = false;
+            break;
+          }
+        }
+      }
+
+      if (species_not_found == true) {
+        throw std::invalid_argument("Species not found in any phase!");
       }
     }
-  }
-  // Everything is defined regardless of whether we perform ROPA on homo or heterogeneous reactions
-  const unsigned int NSG = data_->thermodynamicsMapXML->NumberOfSpecies();
-  OpenSMOKE::OpenSMOKEVectorDouble x(NSG);
-  OpenSMOKE::OpenSMOKEVectorDouble omega(NSG);
-  OpenSMOKE::OpenSMOKEVectorDouble cGas(NSG);
 
-  const unsigned int NSS = data_->thermodynamicsMapSurfaceXML->number_of_site_species();
-  const unsigned int NSB = data_->thermodynamicsMapSurfaceXML->number_of_bulk_species();
-  OpenSMOKE::OpenSMOKEVectorDouble Z(NSS);
-  OpenSMOKE::OpenSMOKEVectorDouble cSurf(NSS);
-  OpenSMOKE::OpenSMOKEVectorDouble aBulk(NSB);  
-  // Important note: in the XML file, and in the ProfilesDatabase file, the bulk variable is massBulk which is the actual evolving variable
-  // For kinetics evaluations, however, we consider the solid activity to be equal to 1, which is also the parameter I'm passing to the ROPA function.
-  //OpenSMOKE::OpenSMOKEVectorDouble cAll(NSG + NSS + NSB);   // Previous implementation from OpenSMOKE
+    OpenSMOKE::OpenSMOKEVectorDouble x(NSG);
+    OpenSMOKE::OpenSMOKEVectorDouble omega(NSG);
+    OpenSMOKE::OpenSMOKEVectorDouble cGas(NSG);
+    OpenSMOKE::OpenSMOKEVectorDouble Z(NSS);
+    OpenSMOKE::OpenSMOKEVectorDouble cSurf(NSS);
+    OpenSMOKE::OpenSMOKEVectorDouble aBulk(NSB);
+    // Important note: in the XML file, and in the ProfilesDatabase file, the bulk variable is massBulk which is the actual evolving variable
+    // For kinetics evaluations, however, we consider the solid activity to be equal to 1, which is also the parameter I'm passing to the ROPA function.
 
-  std::vector<int> reaction_indices;
-  std::vector<double> reaction_coefficients;
-  // std::vector<int> reaction_indices_surface;
-  // std::vector<double> reaction_coefficients_surface;
-  // Local Analysis
-  if (ropaType_ == "local") {
-    unsigned int index = 0;
-    for (unsigned int j = 0; j < data_->number_of_abscissas_; j++) {
-      if (data_->additional[0][j] >= localValue_) {
-        index = j;
-        break;
+    std::vector<int> reaction_indices;
+    std::vector<double> reaction_coefficients;
+    
+    if (ropaType_ == "local") {
+      unsigned int index = 0;
+      for (unsigned int j = 0; j < data_->number_of_abscissas_; j++) {
+        if (data_->additional[0][j] >= localValue_) {
+          index = j;
+          break;
+        }
       }
-    }
-    const double Gamma = data_->additional[data_->index_surface_sites_concentration][index];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple surface phases). Honestly, I dont care.
-    
-    unsigned int k = 1;
-    for (unsigned int j = 0; j < NSG; j++)
-    {
-      omega[j+1] = data_->omega[j][index];
-      //cAll[k++] = omega[j+1];
-    }
+      const double Gamma = data_->additional[data_->index_surface_sites_concentration][index];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple surface phases). Honestly, I dont care.
       
-    for (unsigned int j = 0; j < NSS; j++)
-    {
-      Z[j+1] = data_->Z[j][index];
-      //cAll[k++] = Z[j+1]*Gamma;
-    }
-    for (unsigned int j = 0; j < NSB; j++)
-    {
-      aBulk[j + 1] = 1.; // If, in the future, a more complex model accounting for solid activity is introduced, this will have to be changed
-      //cAll[k++] = aBulk[j+1];
-    }
+      unsigned int k = 1;
+      for (unsigned int j = 0; j < NSG; j++)
+      {
+        omega[j+1] = data_->omega[j][index];
+      }
+        
+      for (unsigned int j = 0; j < NSS; j++)
+      {
+        Z[j+1] = data_->Z[j][index];
+      }
+      for (unsigned int j = 0; j < NSB; j++)
+      {
+        aBulk[j + 1] = 1.; // If, in the future, a more complex model accounting for solid activity is introduced, this will have to be changed
+      }
 
-    // Calculates mole fractions
-    double MWmix;
-    data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+      // Calculates mole fractions
+      double MWmix;
+      data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
 
-    // Calculates concentrations
-    const double P_Pa = data_->additional[data_->index_P][index];
-    const double T = data_->additional[data_->index_T][index];
-    const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
-      
-    Product(cTot, x, &cGas);
+      // Calculates gas-phase concentrations
+      const double P_Pa = data_->additional[data_->index_P][index];
+      const double T = data_->additional[data_->index_T][index];
+      const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+      Product(cTot, x, &cGas);
 
-    OpenSMOKE::ROPA_Data ropa;
-    
-    if (heterogeneous_reactions_ == true)
-    {
-      // Calculates formations rates heterogeneous
+      OpenSMOKE::ROPA_Data ropa;
+
+      // Calculates formations rates
       data_->kineticsMapSurfaceXML->SetTemperature(T);
       data_->kineticsMapSurfaceXML->SetPressure(P_Pa);
+      // Why are we setting T,P in thermo map? It does not seem to be used? (In standard ROPA it is the same)
       data_->thermodynamicsMapSurfaceXML->SetTemperature(T);
       data_->thermodynamicsMapSurfaceXML->SetPressure(P_Pa);
 
@@ -197,169 +175,122 @@ void ROPA_Surface::RateOfProductionAnalysis(const unsigned int number_of_reactio
       data_->kineticsMapSurfaceXML->ReactionRates(cGas.GetHandle(), Z.GetHandle(), aBulk.GetHandle(), &Gamma);
       // Performs ROPA
       data_->kineticsMapSurfaceXML->RateOfProductionAnalysis(ropa);
+
+      ROPA::MergePositiveAndNegativeBars(
+            ropa.production_reaction_indices[index_of_species],
+            ropa.destruction_reaction_indices[index_of_species],
+            ropa.production_coefficients[index_of_species],
+            ropa.destruction_coefficients[index_of_species], 
+            reaction_indices,
+            reaction_coefficients);
+  
     } else {
-      // Calculates formations rates homogeneous
-      data_->kineticsMapXML->SetTemperature(T);
-      data_->kineticsMapXML->SetPressure(P_Pa);
-      data_->thermodynamicsMapXML->SetTemperature(T);
-      data_->thermodynamicsMapXML->SetPressure(P_Pa);
-
-      data_->kineticsMapXML->KineticConstants();
-      data_->kineticsMapXML->ReactionRates(cGas.GetHandle());
-      // Performs ROPA
-      data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
-    }
-
-    // Ropa
-    
-    //OpenSMOKE::ROPA_Data ropaSurface;
-
-    MergePositiveAndNegativeBars(ropa.production_reaction_indices[index_of_species],
-                                 ropa.destruction_reaction_indices[index_of_species],
-                                 ropa.production_coefficients[index_of_species],
-                                 ropa.destruction_coefficients[index_of_species], reaction_indices,
-                                 reaction_coefficients);
-    
-    // This became useless due to introduction of previous if/else statement
-    // MergePositiveAndNegativeBars(ropaSurface.production_reaction_indices[index_of_species],
-    //                              ropaSurface.destruction_reaction_indices[index_of_species],
-    //                              ropaSurface.production_coefficients[index_of_species],
-    //                              ropaSurface.destruction_coefficients[index_of_species], 
-    //                              reaction_indices_surface, reaction_coefficients_surface);
-  }  // Global | Region
-  else {
-    unsigned int index_min = 0;
-    unsigned int index_max = data_->number_of_abscissas_ - 1;
-    if (ropaType_ == "region") {
-      for (unsigned int j = 0; j < data_->number_of_abscissas_; j++) {
-        if (data_->additional[0][j] >= lowerBound_) {
-          index_min = j;
-          break;
+      // Global/Region ROPA
+      unsigned int index_min = 0;
+      unsigned int index_max = data_->number_of_abscissas_ - 1;
+      if (ropaType_ == "region") {
+        for (unsigned int j = 0; j < data_->number_of_abscissas_; j++) {
+          if (data_->additional[0][j] >= lowerBound_) {
+            index_min = j;
+            break;
+          }
+        }
+        for (unsigned int j = index_min; j < data_->number_of_abscissas_; j++) {
+          if (data_->additional[0][j] >= upperBound_) {
+            index_max = j;
+            break;
+          }
+        }
+        if (index_min == index_max) {
+          if (index_max == data_->number_of_abscissas_ - 1)
+            index_min = index_max - 1;
+          else
+            index_max = index_min + 1;
         }
       }
-      for (unsigned int j = index_min; j < data_->number_of_abscissas_; j++) {
-        if (data_->additional[0][j] >= upperBound_) {
-          index_max = j;
-          break;
-        }
-      }
-      if (index_min == index_max) {
-        if (index_max == data_->number_of_abscissas_ - 1)
-          index_min = index_max - 1;
-        else
-          index_max = index_min + 1;
-      }
-    }
 
-    const double delta = data_->additional[0][index_max] - data_->additional[0][index_min];
+      const double delta = data_->additional[0][index_max] - data_->additional[0][index_min];
 
-    std::vector<double> global_production_coefficients;
-    std::vector<double> global_destruction_coefficients;
-    std::vector<unsigned int> global_production_reaction_indices;
-    std::vector<unsigned int> global_destruction_reaction_indices;
+      std::vector<double> global_production_coefficients;
+      std::vector<double> global_destruction_coefficients;
+      std::vector<unsigned int> global_production_reaction_indices;
+      std::vector<unsigned int> global_destruction_reaction_indices;
 
-    // std::vector<double> global_production_coefficients_surface;
-    // std::vector<double> global_destruction_coefficients_surface;
-    // std::vector<unsigned int> global_production_reaction_indices_surface;
-    // std::vector<unsigned int> global_destruction_reaction_indices_surface;
-    for (unsigned int idx = index_min; idx < index_max - 1; idx++) {
-      // Recovers mass fractions
-      const double Gamma = data_->additional[data_->index_surface_sites_concentration][idx];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple phases). Honestly, I dont care.
-      unsigned int k = 1;
-      
-      for (unsigned int j = 0; j < NSG; j++)
-      {
-        omega[j+1] = data_->omega[j][idx];
-        //cAll[k++] = omega[j+1];
-      }
-      for (unsigned int j = 0; j < NSS; j++)
-      {
-        Z[j+1] = data_->Z[j][idx];
-        //cAll[k++] = Z[j+1]*Gamma;
-      }
-      for (unsigned int j = 0; j < NSB; j++)
-      {
-        aBulk[j + 1] = 1.; // If, in the future, a more complex model accounting for solid activity is introduced, this will have to be changed
-        //cAll[k++] = aBulk[j+1];
-      }
+      for (unsigned int idx = index_min; idx < index_max - 1; idx++) {
+        const double Gamma = data_->additional[data_->index_surface_sites_concentration][idx];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple phases). Honestly, I dont care.
 
-      // Calculates mole fractions
-      double MWmix;
-      data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix,omega.GetHandle());
-      // Calculates concentrations
-      const double P_Pa = data_->additional[data_->index_P][idx];
-      const double T = data_->additional[data_->index_T][idx];
-      const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
-      Product(cTot, x, &cGas);
+        for (unsigned int j = 0; j < NSG; j++)
+          omega[j+1] = data_->omega[j][idx];
+        for (unsigned int j = 0; j < NSS; j++)
+          Z[j+1] = data_->Z[j][idx];
+        for (unsigned int j = 0; j < NSB; j++)
+          aBulk[j + 1] = 1.; 
+        // If, in the future, a more complex model accounting for solid activity is introduced, this will have to be changed
 
-      OpenSMOKE::ROPA_Data ropa;
-      if (heterogeneous_reactions_ == true)
-      {
+        // Calculates mole fractions
+        double MWmix;
+        data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix,omega.GetHandle());
+        // Calculates concentrations
+        const double P_Pa = data_->additional[data_->index_P][idx];
+        const double T = data_->additional[data_->index_T][idx];
+        const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+        Product(cTot, x, &cGas);
+
+        OpenSMOKE::ROPA_Data ropa;
         // Calculates formations rates heterogeneous
         data_->kineticsMapSurfaceXML->SetTemperature(T);
         data_->kineticsMapSurfaceXML->SetPressure(P_Pa);
+        // Why are we setting T,P in thermo map? It does not seem to be used? (In standard ROPA it is the same)
         data_->thermodynamicsMapSurfaceXML->SetTemperature(T);
         data_->thermodynamicsMapSurfaceXML->SetPressure(P_Pa);
 
         data_->kineticsMapSurfaceXML->KineticConstants();
-        data_->kineticsMapSurfaceXML->ReactionRates(cGas.GetHandle(), Z.GetHandle(), aBulk.GetHandle(), &Gamma);  // Im not sure whether this actually works (gamma...)
+        data_->kineticsMapSurfaceXML->ReactionRates(cGas.GetHandle(), Z.GetHandle(), aBulk.GetHandle(), &Gamma);
         // Performs ROPA
         data_->kineticsMapSurfaceXML->RateOfProductionAnalysis(ropa);
-      } else {
-        // Calculates formations rates homogeneous
-        data_->kineticsMapXML->SetTemperature(T);
-        data_->kineticsMapXML->SetPressure(P_Pa);
-        data_->thermodynamicsMapXML->SetTemperature(T);
-        data_->thermodynamicsMapXML->SetPressure(P_Pa);
 
-        data_->kineticsMapXML->KineticConstants();
-        data_->kineticsMapXML->ReactionRates(cGas.GetHandle());
-        // Performs ROPA
-        data_->kineticsMapXML->RateOfProductionAnalysis(ropa);
+        if (ropa.production_coefficients[index_of_species].size() !=
+                ropa.production_reaction_indices[index_of_species].size() ||
+            ropa.destruction_coefficients[index_of_species].size() !=
+                ropa.destruction_reaction_indices[index_of_species].size()) {
+          throw std::invalid_argument("SSS");
+        }
+
+        if (idx == index_min) {
+          global_production_coefficients.resize(
+              ropa.production_coefficients[index_of_species].size());
+          global_destruction_coefficients.resize(
+              ropa.destruction_coefficients[index_of_species].size());
+          global_production_reaction_indices = ropa.production_reaction_indices[index_of_species];
+          global_destruction_reaction_indices = ropa.destruction_reaction_indices[index_of_species];
+        }
+
+        const double dt = (data_->additional[0][idx + 1] - data_->additional[0][idx]) / delta;
+
+        for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size(); k++)
+          global_production_coefficients[k] += dt * ropa.production_coefficients[index_of_species][k];
+
+        for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++)
+          global_destruction_coefficients[k] += dt * ropa.destruction_coefficients[index_of_species][k];
+
       }
-      // Ropa
-
-      // What is this? It seems like (unnecessary) debug?
-      if (ropa.production_coefficients[index_of_species].size() !=
-              ropa.production_reaction_indices[index_of_species].size() ||
-          ropa.destruction_coefficients[index_of_species].size() !=
-              ropa.destruction_reaction_indices[index_of_species].size()) {
-        throw std::invalid_argument("SSS");
-      }
-
-      if (idx == index_min) {
-        global_production_coefficients.resize(
-            ropa.production_coefficients[index_of_species].size());
-        global_destruction_coefficients.resize(
-            ropa.destruction_coefficients[index_of_species].size());
-        global_production_reaction_indices = ropa.production_reaction_indices[index_of_species];
-        global_destruction_reaction_indices = ropa.destruction_reaction_indices[index_of_species];
-      }
-
-      const double dt = (data_->additional[0][idx + 1] - data_->additional[0][idx]) / delta;
-
-      for (unsigned int k = 0; k < ropa.production_coefficients[index_of_species].size(); k++)
-        global_production_coefficients[k] += dt * ropa.production_coefficients[index_of_species][k];
-
-      for (unsigned int k = 0; k < ropa.destruction_coefficients[index_of_species].size(); k++)
-        global_destruction_coefficients[k] += dt * ropa.destruction_coefficients[index_of_species][k];
-
+      ROPA::MergePositiveAndNegativeBars(
+                global_production_reaction_indices,
+                global_destruction_reaction_indices,
+                global_production_coefficients, 
+                global_destruction_coefficients,
+                reaction_indices, 
+                reaction_coefficients);
     }
-    MergePositiveAndNegativeBars(global_production_reaction_indices,
-                                 global_destruction_reaction_indices,
-                                 global_production_coefficients, 
-                                 global_destruction_coefficients,
-                                 reaction_indices, 
-                                 reaction_coefficients);
-  }
 
-  coefficients_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
-  reactions_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
+    coefficients_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
+    reactions_.resize(std::min<int>(number_of_reactions, reaction_coefficients.size()));
 
-  for (int i = 0; i < std::min<int>(number_of_reactions, reaction_coefficients.size()); i++) 
-  {
-    coefficients_[i] = reaction_coefficients[i];
-    reactions_[i] = reaction_indices[i];
+    for (int i = 0; i < std::min<int>(number_of_reactions, reaction_coefficients.size()); i++) 
+    {
+      coefficients_[i]= reaction_coefficients[i];
+      reactions_[i]   = reaction_indices[i];
+    }
   }
 }
 
@@ -476,117 +407,83 @@ void ROPA_Surface::RateOfProductionAnalysis(const unsigned int number_of_reactio
 //   computedLabel_ = flux_analysis.ComputedLabelValue;
 // }
 
-void ROPA_Surface::MergePositiveAndNegativeBars(
-                  const std::vector<unsigned int>& positive_indices,
-                  const std::vector<unsigned int>& negative_indices,
-                  const std::vector<double>& positive_coefficients,
-                  const std::vector<double>& negative_coefficients,
-                  std::vector<int>& indices,
-                  std::vector<double>& coefficients) {
-  unsigned int n = positive_indices.size() + negative_indices.size();
+void ROPA_Surface::GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates, const bool heterogeneous_reactions) {
+  heterogeneous_reactions_ = heterogeneous_reactions;
+  if (heterogeneous_reactions_ == false){ // For homogeneous reactions, fallback on standard function
+    ROPA::GetReactionRates(reaction_indices, sum_rates);
+  } else {  // Dedicated implementation
+    const unsigned int NR = data_->kineticsMapSurfaceXML->NumberOfReactions();
+    // Calculate the reaction rates
+    {
+      sumOfRates_.resize(data_->number_of_abscissas_);
+      reactionRates_.resize(NR, std::vector<double>(data_->number_of_abscissas_, 1));
 
-  std::vector<int> signum(n);
+      const unsigned int NSG = data_->thermodynamicsMapSurfaceXML->number_of_gas_species();
+      const unsigned int NSS = data_->thermodynamicsMapSurfaceXML->number_of_site_species();
+      const unsigned int NSB = data_->thermodynamicsMapSurfaceXML->number_of_bulk_species();
 
-  indices.resize(n);
-  coefficients.resize(n);
-  for (unsigned int i = 0; i < positive_coefficients.size(); i++) {
-    indices[i] = positive_indices[i];
-    coefficients[i] = positive_coefficients[i];
-    signum[i] = 1;
-  }
-  for (unsigned int i = 0; i < negative_coefficients.size(); i++) {
-    indices[i + positive_indices.size()] = -negative_indices[i];
-    coefficients[i + positive_indices.size()] = -negative_coefficients[i];
-    signum[i + positive_indices.size()] = -1;
-  }
+      OpenSMOKE::OpenSMOKEVectorDouble x(NSG);
+      OpenSMOKE::OpenSMOKEVectorDouble omega(NSG);
+      OpenSMOKE::OpenSMOKEVectorDouble cGas(NSG);
+      
+      OpenSMOKE::OpenSMOKEVectorDouble Z(NSS);
+      OpenSMOKE::OpenSMOKEVectorDouble cSurf(NSS);
+      OpenSMOKE::OpenSMOKEVectorDouble aBulk(NSB);
 
-  std::vector<double> tmp = coefficients;
+      OpenSMOKE::OpenSMOKEVectorDouble r(NR);
 
-  OpenSMOKE_Utilities::ReorderPairsOfVectors(coefficients, indices);
-  std::reverse(indices.begin(), indices.end());
-  std::reverse(coefficients.begin(), coefficients.end());
+      for (unsigned int idx = 0; idx < data_->number_of_abscissas_; idx++) {
+        const double Gamma = data_->additional[data_->index_surface_sites_concentration][idx];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple phases). Honestly, I dont care.
 
-  OpenSMOKE_Utilities::ReorderPairsOfVectors(tmp, signum);
-  std::reverse(signum.begin(), signum.end());
+        for (unsigned int j = 0; j < NSG; j++)
+          omega[j+1] = data_->omega[j][idx];
+        for (unsigned int j = 0; j < NSS; j++)
+          Z[j+1] = data_->Z[j][idx];
+        for (unsigned int j = 0; j < NSB; j++)
+          aBulk[j + 1] = 1.; 
+        // If, in the future, a more complex model accounting for solid activity is introduced, this will have to be changed
 
-  for (unsigned int i = 0; i < n; i++)
-    if (signum[i] == -1) {
-      indices[i] *= -1;
-      coefficients[i] *= -1.;
+        // Calculates mole fractions
+        double MWmix;
+        data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix,omega.GetHandle());
+        // Calculates concentrations
+        const double P_Pa = data_->additional[data_->index_P][idx];
+        const double T = data_->additional[data_->index_T][idx];
+        const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+        Product(cTot, x, &cGas);
+
+        OpenSMOKE::ROPA_Data ropa;
+        // Calculates formations rates heterogeneous
+        data_->kineticsMapSurfaceXML->SetTemperature(T);
+        data_->kineticsMapSurfaceXML->SetPressure(P_Pa);
+        data_->thermodynamicsMapSurfaceXML->SetTemperature(T);
+        data_->thermodynamicsMapSurfaceXML->SetPressure(P_Pa);
+
+        data_->kineticsMapSurfaceXML->ReactionRates(cGas.GetHandle(), Z.GetHandle(), aBulk.GetHandle(), &Gamma);
+        data_->kineticsMapSurfaceXML->GiveMeReactionRates(r.GetHandle());
+
+        if (sum_rates) {
+          double sum_rate = 0.;
+          for (unsigned int k = 0; k < NR; k++) {
+            double multiplication_factor = 1;
+            // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
+            const unsigned int j = reaction_indices[k] + 1;
+            sum_rate += multiplication_factor * r[j];
+          }
+          sumOfRates_[idx] = sum_rate;
+        } else {
+          for (unsigned int k = 0; k < NR; k++) {
+            double multiplication_factor = 1;
+            // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
+            const unsigned int j = reaction_indices[k] + 1;
+            // reactionRates_[k][i] = multiplication_factor * r[j];
+            reactionRates_[k][idx] = r[j];
+          }
+        }
+      }
     }
+  }
 }
-
-// TODO
-// void ROPA_Surface::GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates) {
-//   unsigned int numberOfReactions = reaction_indices.size();
-//   // Calculate the reaction rates
-//   {
-//     sumOfRates_.resize(data_->number_of_abscissas_);
-//     reactionRates_.resize(numberOfReactions, std::vector<double>(data_->number_of_abscissas_, 1));
-
-//     OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
-//     OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
-//     OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
-//     const unsigned int NSS = data_->thermodynamicsMapSurfaceXML->number_of_site_species();
-//     const unsigned int NSB = data_->thermodynamicsMapSurfaceXML->number_of_bulk_species();
-//     OpenSMOKE::OpenSMOKEVectorDouble Z(NSS);
-//     OpenSMOKE::OpenSMOKEVectorDouble cSurf(NSS);
-//     OpenSMOKE::OpenSMOKEVectorDouble aBulk(NSB);
-
-//     unsigned int NR;
-//     if (heterogeneous_reactions_ == true)
-//       NR = data_->kineticsMapSurfaceXML->NumberOfReactions();
-//     else
-//       NR = data_->kineticsMapXML->NumberOfReactions();
-//     OpenSMOKE::OpenSMOKEVectorDouble r(NR);
-
-//     for (unsigned int i = 0; i < data_->number_of_abscissas_; i++) {
-//       // Recovers mass fractions
-//       for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
-//         omega[k + 1] = data_->omega[k][i];
-
-//       // Calculate mole fractions
-//       double MWmix;
-//       data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix,
-//                                                                     omega.GetHandle());
-
-//       // Calculate concentrations
-//       const double P_Pa = data_->additional[data_->index_P][i];
-//       const double T = data_->additional[data_->index_T][i];
-//       const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
-//       Product(cTot, x, &c);
-
-//       // Calculate reaction rates
-//       data_->kineticsMapXML->SetTemperature(T);
-//       data_->kineticsMapXML->SetPressure(P_Pa);
-//       data_->thermodynamicsMapXML->SetTemperature(T);
-//       data_->thermodynamicsMapXML->SetPressure(P_Pa);
-
-//       // data_->kineticsMapXML->KineticConstants();
-//       data_->kineticsMapXML->ReactionRates(c.GetHandle());
-//       data_->kineticsMapXML->GiveMeReactionRates(r.GetHandle());
-
-//       if (sum_rates) {
-//         double sum_rate = 0.;
-//         for (unsigned int k = 0; k < numberOfReactions; k++) {
-//           double multiplication_factor = 1;
-//           // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
-//           const unsigned int j = reaction_indices[k] + 1;
-//           sum_rate += multiplication_factor * r[j];
-//         }
-//         sumOfRates_[i] = sum_rate;
-//       } else {
-//         for (unsigned int k = 0; k < numberOfReactions; k++) {
-//           double multiplication_factor = 1;
-//           // data_->isReactantProduct(reaction_indices[k], multiplication_factor);
-//           const unsigned int j = reaction_indices[k] + 1;
-//           // reactionRates_[k][i] = multiplication_factor * r[j];
-//           reactionRates_[k][i] = r[j];
-//         }
-//       }
-//     }
-//   }
-// }
 
 // void ROPA_Surface::GetFormationRates(std::string specie, std::string units, std::string type) {
 //   if (units != "mass" && units != "mole")

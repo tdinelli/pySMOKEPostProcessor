@@ -25,12 +25,15 @@ class PostProcessor:
         #   Check if surface kinetics is available
         surface_file = os.path.join(self.kineticFolder, "kinetics.surface.xml")
         self.isHeterogeneous = os.path.exists(surface_file)
-    
-        self.db.readFileResults(self.outputFolder, self.isHeterogeneous)
-        self.db.readKineticMechanism(self.kineticFolder)
 
+        # Reads Output
+        self.db.readFileResults(self.outputFolder, self.isHeterogeneous)
+        
+        # Reads kinetics and creates kineticMap
+        self.db.readKineticMechanism(self.kineticFolder)
         self.km = KineticMap(self.kineticFolder)
 
+        # Reads and creates kineticMapSurface (only if available)
         if self.isHeterogeneous:
             self.db.readHeterogeneousKineticMechanism(self.kineticFolder,"Surface")
             self.kms = KineticMapSurface(self.kineticFolder)
@@ -120,15 +123,16 @@ class PostProcessor:
             lower_value: Lower value of the domain for the region ROPA
             upper_value: Upper value of the domain for the region ROPA
             number_of_reactions: Number Of Reactions to return after the ROPA
-            mass_ropa: Return the ROPA coefficients in mass unit
+            heterogeneous_reactions: Decide if ROPA is performed on Gas (False) or Surface (True) reactions
 
         Returns:
             A dictionary as the following one:
                 ropa_results = {'coefficients': [...],
                                 'reaction_names': [...],
                                 'reaction_indices': [...]}
-                Containing the ROPA coefficients, the reaction names and the indices of the reactions, for both homogeneous and heterogeneous reactions
+                Containing the ROPA coefficients, the reaction names and the indices of the reactions in the selected phase
         """
+
         widget = ROPA_Surface()
         widget.setDataBase(self.db)
         widget.setROPAType(ropa_type)
@@ -138,18 +142,15 @@ class PostProcessor:
         widget.setLowerBound(lower_value)
         widget.setUpperBound(upper_value)
 
-        widget.rateOfProductionAnalysis(number_of_reactions) #  Currently not working for reaction classes implementation
+        widget.rateOfProductionAnalysis(number_of_reactions,heterogeneous_reactions) #  Currently not working for reaction classes implementation
         reaction_names = []
-        if heterogeneous_reactions:
-            reaction_indices = widget.reactions_surface()
-            ropa_coefficients = widget.coefficients_surface()
-            for i in reaction_indices:
+        
+        reaction_indices = widget.reactions()
+        ropa_coefficients = widget.coefficients()
+        for i in reaction_indices:
+            if heterogeneous_reactions:
                 reaction_names.append(self.kms.ReactionNameFromIndex(i))
-            
-        else:
-            reaction_indices = widget.reactions()
-            ropa_coefficients = widget.coefficients()
-            for i in reaction_indices:
+            else:
                 reaction_names.append(self.km.ReactionNameFromIndex(i))
 
         # if mass_ropa:
