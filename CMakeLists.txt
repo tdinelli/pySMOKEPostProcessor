@@ -112,86 +112,23 @@ set(INCLUDE ${Boost_INCLUDE_DIRS}
             ${Python3_INCLUDE_DIRS}
             )
 
-# Homogeneous Sensitivity
+## Heterogeneous ROPA
+# add_executable(ROPA_het
+#     cxx_wrapper/testfiles/ropa_het.cpp
+# )
 
-add_executable(Sensitivity_homo
-    cxx_wrapper/source/sensitivity_homo.cpp
-)
+# target_include_directories(ROPA_het
+#     PRIVATE
+#         ${Boost_INCLUDE_DIRS}
+#         ${EIGEN3_INCLUDE_DIR}
+#         ${OPENSMOKE_INCLUDE}
+#         ${Python3_INCLUDE_DIRS}
+# )
 
-target_include_directories(Sensitivity_homo
-    PRIVATE
-        ${Boost_INCLUDE_DIRS}
-        ${EIGEN3_INCLUDE_DIR}
-        ${OPENSMOKE_INCLUDE}
-        ${Python3_INCLUDE_DIRS}
-)
-
-target_link_libraries(Sensitivity_homo
-    PRIVATE
-        Boost::filesystem
-        Boost::system
-        Python3::Python
-)
-
-# Heterogeneous sensitivity
-
-add_executable(Sensitivity_het
-    cxx_wrapper/source/sensitivity_het.cpp
-)
-
-target_include_directories(Sensitivity_het
-    PRIVATE
-        ${Boost_INCLUDE_DIRS}
-        ${EIGEN3_INCLUDE_DIR}
-        ${OPENSMOKE_INCLUDE}
-        ${Python3_INCLUDE_DIRS}
-)
-
-target_link_libraries(Sensitivity_het
-    PRIVATE
-        Boost::filesystem
-        Boost::system
-        Python3::Python
-)
-
-
-# Homogeneous ROPA
-add_executable(ROPA_homo
-    cxx_wrapper/source/ropa_homo.cpp
-)
-
-target_include_directories(ROPA_homo
-    PRIVATE
-        ${Boost_INCLUDE_DIRS}
-        ${EIGEN3_INCLUDE_DIR}
-        ${OPENSMOKE_INCLUDE}
-        ${Python3_INCLUDE_DIRS}
-)
-
-target_link_libraries(ROPA_homo
-    PRIVATE
-        Boost::filesystem
-        Boost::system
-        Python3::Python
-)
-
-
-# Heterogeneous ROPA
-add_executable(ROPA_het
-    cxx_wrapper/source/ropa_het.cpp
-)
-
-target_include_directories(ROPA_het
-    PRIVATE
-        ${Boost_INCLUDE_DIRS}
-        ${EIGEN3_INCLUDE_DIR}
-        ${OPENSMOKE_INCLUDE}
-        ${Python3_INCLUDE_DIRS}
-)
-
-target_link_libraries(ROPA_het
-    PRIVATE
-        Boost::filesystem
-        Boost::system
-        Python3::Python
-)
+# target_link_libraries(ROPA_het
+#     PRIVATE
+#         Boost::filesystem
+#         Boost::system
+#         Python3::Python
+#         pybind11::headers
+# )
