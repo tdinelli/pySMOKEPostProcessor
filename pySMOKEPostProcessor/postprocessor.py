@@ -130,7 +130,7 @@ class PostProcessor:
                 ropa_results = {'coefficients': [...],
                                 'reaction_names': [...],
                                 'reaction_indices': [...]}
-                Containing the ROPA coefficients, the reaction names and the indices of the reactions in the selected phase
+                Containing the ROPA coefficients, the reaction names and the indices of the reactions in the selected reaction phase
         """
 
         widget = ROPA_Surface()
@@ -142,7 +142,7 @@ class PostProcessor:
         widget.setLowerBound(lower_value)
         widget.setUpperBound(upper_value)
 
-        widget.rateOfProductionAnalysis(number_of_reactions,heterogeneous_reactions) #  Currently not working for reaction classes implementation
+        widget.rateOfProductionAnalysis(number_of_reactions,heterogeneous_reactions)
         reaction_names = []
         
         reaction_indices = widget.reactions()
@@ -345,12 +345,21 @@ class PostProcessor:
 
         return Graph
 
-    def GetReactionRates(self, reaction_name: list = None, reaction_index: list = None, sum_rates: bool = False):
+    def GetReactionRates(self, reaction_name: list = None, reaction_index: list = None, sum_rates: bool = False, heterogeneous_reactions = False):
+        if not self.isHeterogeneous:
+            widget = ROPA()
+            widget.setDataBase(self.db)
+            widget.getReactionRates(reaction_index, sum_rates)
+        else:
+            widget = ROPA_Surface()
+            widget.setDataBase(self.db)
+            widget.getReactionRates(reaction_index, sum_rates,heterogeneous_reactions)
+
         if reaction_name is not None:
-            reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
-        widget = ROPA()
-        widget.setDataBase(self.db)
-        widget.getReactionRates(reaction_index, sum_rates)
+            if not heterogeneous_reactions: # If homogeneous, it will be false anyway
+                reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
+            else:
+                reaction_index = [self.kms.ReactionIndexFromName(name=i) for i in reaction_name]
 
         if sum_rates:
             reaction_rates = [widget.sumOfRates()]
@@ -360,6 +369,7 @@ class PostProcessor:
         return reaction_rates
 
     def GetFormationRates(self, formation_rate_type: str, species: str, units: str = "mole"):
+        # TODO @lgiardini implement this in the hpp and update for surface reactions
         widget = ROPA()
         widget.setDataBase(self.db)
         widget.getFormationRates(species, units, formation_rate_type)
@@ -367,6 +377,8 @@ class PostProcessor:
 
         return formationRates
 
+    # [LG] This function seems unused and redundant with respect to function within the sensitivity class in C++
+    #       plus it is not updated for heterogeneous stuff.
     def SensitivityCoefficients(
         self,
         target: str,
