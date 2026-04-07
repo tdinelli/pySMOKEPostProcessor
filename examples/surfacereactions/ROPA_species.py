@@ -10,7 +10,7 @@ from pySMOKEPostProcessor.plotting_utilities.bar_plot import plot_bars
 
 pp = PostProcessor(kineticFolder, resultsFolder)
 
-sp = 'CH3(S)'
+sp = 'C(B)'
 phase_ropa = True
 
 ropa = pp.RateOfProductionAnalysis_Surface(

@@ -422,7 +422,7 @@ class PostProcessor:
 
         return ropa_coefficients
 
-    def reactionrategroups(self, rxnnames_sr, xaxis: list, threshold: float = 0.01):
+    def reactionrategroups(self, rxnnames_sr, xaxis: list, threshold: float = 0.01, heterogeneous_reactions = False):
         # reaction rates by groups (example: by class)
         # rxnnames_sr: series with labels and reaction names
         # xaxis
@@ -430,7 +430,10 @@ class PostProcessor:
         rr = dict.fromkeys(rxnnames_sr.index)
         rrsum = pd.Series(index=rxnnames_sr.index, dtype=np.float64)
         for label, rxnnames in rxnnames_sr.items():
-            rr[label] = np.array(self.GetReactionRates(reaction_name=rxnnames, sum_rates=True)[0])
+            if not self.isHeterogeneous:
+                rr[label] = np.array(self.GetReactionRates(reaction_name=rxnnames, sum_rates=True)[0])
+            else:
+                rr[label] = np.array(self.GetReactionRates(reaction_name=rxnnames, sum_rates=True,heterogeneous_reactions=heterogeneous_reactions)[0])
             rrsum[label] = np.trapz(y=rr[label], x=xaxis)
 
         # check cumulative contribution and filter based on threshold
@@ -447,12 +450,14 @@ class PostProcessor:
         ropa_dct: dict,
         rate_type: str = "PC",
         threshold: float = 0.01,
+        heterogeneous_reactions: bool = False
     ):
-        # cumulative reaction rate matrix extract
-        # rate_type: PC, P, C (net, production, consumption)
-        # threshold: delete rates based on % contribution (default: keep only those contributing > 1%)
-        # xaxis: derived from output
-
+        """""
+        cumulative reaction rate matrix extract
+        rate_type: 'PC' = net, 'P' = production, 'C' = consumption
+        threshold: delete rates based on % contribution (default: keep only those contributing > 1%)
+        xaxis: derived from output
+        """""
         # 0. ropa DCT: sum coefficients for duplicates
         coefficients, indices, names, names_split = [], [], [], []
         allindices_array = np.array(ropa_dct["reaction_indices"])
@@ -491,7 +496,10 @@ class PostProcessor:
         for idx in ropa_df.index:
             check = False
 
-            rr_idx = np.array(self.GetReactionRates(reaction_index=[idx])[0])
+            if not self.isHeterogeneous:
+                rr_idx = np.array(self.GetReactionRates(reaction_index=[idx])[0])
+            else:
+                rr_idx = np.array(self.GetReactionRates(reaction_index=[idx],heterogeneous_reactions=heterogeneous_reactions)[0])
 
             rrsum_idx = np.trapz(y=rr_idx, x=xaxis)
             if (rrsum_idx * float(ropa_df["factor"][idx])) < 0:

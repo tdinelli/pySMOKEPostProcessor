@@ -238,7 +238,6 @@ class reaction_fluxes:
         """ delete all reactions with contributions below a threshold """
 
         indexes_filter = np.array([])
-
         for flux_sp_name in self.flux_cols:
             indexes_filter = np.append(indexes_filter,
                                        np.array(list(self.rxn_class_df[abs(self.rxn_class_df[flux_sp_name]) /
