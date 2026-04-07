@@ -15,4 +15,4 @@ sortlists = [['reactiontype']]  # Ask Luna why this is a list of lists
 obj = CumulativeDeposition(kineticFolder=kineticFolder, outputFolder=resultsFolder, class_group_file=class_groups_file)
 
 obj.setClassification(sort_type=sortlists)
-obj.plotCumulativeDeposition(lump_steps=3)
+obj.plotCumulativeDeposition(lump_steps=1)

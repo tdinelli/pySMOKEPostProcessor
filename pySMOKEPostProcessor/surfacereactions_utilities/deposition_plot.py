@@ -24,11 +24,15 @@ class CumulativeDeposition:
                 outputFolder: str,
                 class_group_file: str,
                 allCarbon: bool = False,
-                sort_type = [['reactiontype']]):
+                sort_type = [['reactiontype']],
+                area: float = None):
 
         self.kineticFolder = kineticFolder
         self.outputFolder = outputFolder
-        
+
+        self.MW = 12.01
+        self.area = area    # Hp constant area, will be eventually read from Output.xml when variable
+
         targets = ['C(B)']
         if allCarbon:
             print("Error! allCarbon option not implemented yet.")
@@ -44,7 +48,8 @@ class CumulativeDeposition:
     
     def plotCumulativeDeposition(self,
                     profilesTag: str = 'profiles',
-                    lump_steps: int = 1):
+                    lump_steps: int = 1,
+                    units: str = "specific-deposition"):
         # The tag argument is only useful for phases where it has a different name (Riccardo...)
         timesteps = self.getTimeProfile(tag=profilesTag)
 
@@ -67,7 +72,7 @@ class CumulativeDeposition:
         df_ROPAt = df_ROPAt.fillna(0)
         self.ROPAbyClass_t = df_ROPAt
         df_ROPAintegral = self.getROPAIntegralTimeHistory(df_ROPAt)
-        print(df_ROPAintegral)
+        # TODO: Conversion to user-specified units, then finally plot.
 
     def getTimeProfile(self,tag='profiles'):
         
