@@ -16,3 +16,5 @@ obj = CumulativeDeposition(kineticFolder=kineticFolder, outputFolder=resultsFold
 
 obj.setClassification(sort_type=sortlists)
 obj.plotCumulativeDeposition(lump_steps=1)
+
+plt.show()
