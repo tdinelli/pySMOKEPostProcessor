@@ -56,7 +56,10 @@ class CumulativeDeposition:
     def plotCumulativeDeposition(self,
                     profilesTag: str = 'profiles',
                     lump_steps: int = 1,
-                    units: str = "mass-specific"):
+                    units: str = "mass-specific",
+                    threshold: float = 0.01,
+                    fig: plt.Figure = None,
+                    ax: plt.Axes = None):
         
         """
         Parameters
@@ -68,6 +71,10 @@ class CumulativeDeposition:
             units: str
                 Units used as y-axis in the plot. Alternatives: 'mass-specific', 'moles-specific', 'mass', 'moles', 'thickness'
                 For extensive units (e.g. mass), it is required to also set the area in the class constructor.
+            threshold: float
+                Threshold for filtering reaction classes to plot. Only classes whose maximum contribution is above the (relative) threshold are plotted.
+            fig,ax: matplotlib.pyplot objects
+                If not provided, they are created by the function. Intended for subplots usage.
         
         Returns
         -------
@@ -98,14 +105,22 @@ class CumulativeDeposition:
         df_ROPAintegral = self.convertToDesiredUnits(data = df_ROPAintegral, units = units)
         ylab = self.getLabelFromUnits(units)
 
-        cols = [c for c in df_ROPAintegral.columns if c != "time"]
+        cols_unfiltered = [c for c in df_ROPAintegral.columns if c != "time"]
+        total_deposition = df_ROPAintegral[cols_unfiltered].sum(axis=1)
+        cols = [col for col in cols_unfiltered if (abs(df_ROPAintegral[col].max()) > threshold*total_deposition.max())]
 
-        fig,ax = plt.subplots(figsize=(10,7.2))
+        if fig is None or ax is None:
+            fig,ax = plt.subplots(figsize=(7.,6.))
         ax.stackplot( df_ROPAintegral["time"], *[df_ROPAintegral[col] for col in cols], labels=[col for col in cols] )
+        fontsz = 14
         ax.set_xlim(left=0,right=df_ROPAintegral['time'].values[-1])
-        ax.set_xlabel("Time [s]")
-        ax.set_ylabel(ylabel=ylab)
+        ax.set_xlabel("Time [s]",fontsize=fontsz)
+        ax.set_ylabel(ylabel=ylab,fontsize=fontsz)
+        ax.set_title("Cumulative deposition by reaction class",fontsize=fontsz+2)
+        
+        ax.grid(True,alpha=0.2)
         ax.legend()
+        fig.tight_layout()
         return fig,ax
 
 
@@ -160,7 +175,7 @@ class CumulativeDeposition:
             case 'moles-specific-volumetric':
                 raise ValueError("'specific-volumetric' units not implemented yet!")
             case 'thickness':
-                data[cols] *= self.MW/self.bulk_density
+                data[cols] *= self.MW/self.bulk_density * 1.E6
             case 'moles-specific':
                 dummy = True
             case _:
@@ -185,7 +200,7 @@ class CumulativeDeposition:
             case 'moles-specific-volumetric':
                 raise ValueError("'specific-volumetric' units not implemented yet!")
             case 'thickness':
-                ylab += '[m]'
+                ylab += r'[$\mu$m]'
             case _:
                 raise ValueError("Units not recognised")
         return ylab
