@@ -1,15 +1,15 @@
 #include "../PostProcessorWrapper_py.h"
-#include "ProfilesDatabase.h"
-#include "Sensitivities.h"
-#include "Sensitivities_Surface.h"
+#include "../source/ProfilesDatabase.h"
+#include "../source/Sensitivities.h"
+#include "../source/Sensitivities_Surface.h"
 //#include "ROPA.h"
 #include "maps/Maps_CHEMKIN"
 
 int main(int argc, char** argv)
 {
     // TOCHANGE
-    const std::string mechanism_folder = "/home/lgiardini/SimTesting/BatchHet/CVD_NO_SOOT";
-    const std::string output_folder = "/home/lgiardini/SimTesting/BatchHet/out";
+    const std::string mechanism_folder = "/home/lgiardini/pySMOKEPostProcessor/examples/data/Surface_Data/kinetics";
+    const std::string output_folder = "/home/lgiardini/pySMOKEPostProcessor/examples/data/Surface_Data/Output";
 
 
     ProfilesDatabase profiles_db;
@@ -54,9 +54,14 @@ int main(int argc, char** argv)
     for (unsigned int i = 0; i<sensicoeffs.size(); i++)
         std::cout << sensicoeffs[i] << std::endl;
 
+    std::cout << "Indices" << std::endl;
+    for (unsigned int i = 0; i<reactions.size(); i++)
+        std::cout << reactions[i] << std::endl;
+
     // Heterogeneous sensitivity analysis
     heterogeneousSensitivity = true;
     sensi.Prepare(heterogeneousSensitivity);
+    sensi.SetNormalizationType("max-value");
     sensi.ReadSensitvityCoefficients();
     sensi.Sensitivity_Analysis(NR);
     std::vector<unsigned int> reactions_het = sensi.reactions();
@@ -65,6 +70,10 @@ int main(int argc, char** argv)
     std::cout << "Heterogeneous Sensitivity coefficients" << std::endl;
     for (unsigned int i = 0; i<sensicoeffs_het.size(); i++)
         std::cout << sensicoeffs_het[i] << std::endl;
+    
+    std::cout << "Indices" << std::endl;
+    for (unsigned int i = 0; i<reactions.size(); i++)
+        std::cout << reactions_het[i] << std::endl;
 
     return 0;
 }

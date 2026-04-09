@@ -1,63 +1,62 @@
-#	TODO: Divide reaction classes between Armchair and Zigzag (and fix the names...)
 classtype ADDITION
-    ADD_A1
-	ADD_D
-	ADD_T
-	ADD_DD
-	ADD_SRF		# This is a single ADD_A1 reaction, ADD_SRF should not exist
-	ADD_Hs
 	ADD_H
-	ADD_HHs
+	ADD_C2.D-M
+	ADD_C2.T-M
+	ADD_C3.D-M
+	ADD_C3.T-M
+	ADD_C3.DD-M
+	ADD_C4.D-M
+	ADD_C4.T-M
+	ADD_A1-M
 	ADD_RTRANSFER
 end classtype
 
-classtype BETASCISSION
-    BETASCISSION_CC
-	BETASCISSION_CH
+classtype BETASCISS
+    BSCISS_CC
+	BSCISS_CH
 end classtype
 
-classtype DECOMPOSITION
-	DECO_MASSLOSS
-	DECO_NOMASSLOSS
+classtype RECOMBINATION
+	REC_H_WELL
+	REC_C1-R
+	REC_C2-R
+	REC_C3-R
+	REC_A1-R
+	REC_A1-RSR
 end classtype
 
 classtype ELIMH2
-	ELIM_H2
+	EL_H2
 end classtype
 
-# ADD_C3H6 and C4H4 will be re-absorbed into something else.
-classtype HABSTRACTION
-    HABS_H
-    HABS_CH3
-	HABS_C3H6
-    HABS_C4H4
-	HABS_D
-    HABS_T
-    HABS_C2H6
+classtype HABS
+	HABS_H
+	HABS_C1
+	HABS_C2.S
+	HABS_C2.D
+	HABS_C2.T
+	HABS_C3.D
+	HABS_C3.T 
+	HABS_C4.D
 	HABS_A1
-	HABS_SURF	# ????
+	HABS_A1,C2.T
 end classtype
 
 classtype IPSO
-	IPSO
+	IPSO_H
+	IPSO_CH3
 end classtype
 
-# [LG] Bad names
-classtype GROWTH-RADICAL
-	Cs-R,R
-	Cs-R,H
-	Cs-RSR,R
-	Cs-RSR,H
-	Cs-NRSR,R
-	Cs-RSR,Cs-RSR
+classtype RINGFORM
+	RCLOSE_CC
+	RCLOSE_CH
+	ROPEN
 end classtype
 
-# [LG] These names will be changed I promise
 classtype COVERAGE
-	NEUTRAL
-	CH2
-	RSR
-	NRSR
+	COVERAGE_H
+	COVERAGE_R
+	COVERAGE_BZ
 end classtype
 
 classtype UNSORTED
