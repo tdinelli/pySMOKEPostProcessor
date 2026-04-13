@@ -111,9 +111,10 @@ class CumulativeDeposition:
 
         if fig is None or ax is None:
             fig,ax = plt.subplots(figsize=(7.,6.))
-        ax.stackplot( df_ROPAintegral["time"], *[df_ROPAintegral[col] for col in cols], labels=[col for col in cols] )
+        ax.stackplot( df_ROPAintegral["time"], *[df_ROPAintegral[col] for col in cols], labels=[col for col in cols], alpha=0.87,
+                     edgecolor = 'k', linewidth = 0.6 )
         fontsz = 14
-        ax.set_xlim(left=0,right=df_ROPAintegral['time'].values[-1])
+        ax.set_xlim(left=0,right=df_ROPAintegral['time'].values[-1]*1.02)
         ax.set_xlabel("Time [s]",fontsize=fontsz)
         ax.set_ylabel(ylabel=ylab,fontsize=fontsz)
         ax.set_title("Cumulative deposition by reaction class",fontsize=fontsz+2)
