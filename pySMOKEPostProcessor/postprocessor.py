@@ -259,16 +259,15 @@ class PostProcessor:
     def SensitivityAnalysis_Surface(
         self,
         target: str,
-        sensitivity_type: str,
-        ordering_type: str,
-        normalization_type: str,
+        sensitivity_type: str = 'global',
+        ordering_type: str = 'peak-values',
+        normalization_type: str = 'max-value',
         local_value: float = 0,
         lower_value: float = 0,
         upper_value: float = 0,
         number_of_reactions: int = 10,
         heterogeneous_sensitivity: bool = False
     ) -> dict:
-        # SENSITIVITY HERE
         widget = Sensitivity_Surface()
 
         widget.setDataBase(self.db)
