@@ -41,9 +41,8 @@ class CumulativeDeposition:
             self.iExtensiveEnabled = False
 
         targets = ['C(B)']
+        self.allCarbon = allCarbon
         if allCarbon:
-            print("Error! allCarbon option not implemented yet.")
-            return None
             targets.append('c(B)')  # Non mi piace nemmeno hardcoded, va fatto meglio
         self.targets = targets
         self.sort_type = sort_type    # Default classification option
@@ -98,7 +97,13 @@ class CumulativeDeposition:
             else:
                 df["time"] = timesteps[i_lump]
                 df_ROPAt.append(df)
-        df_ROPAt = pd.concat(df_ROPAt, ignore_index=True)
+        if self.allCarbon:
+            collapsed = []
+            for df in df_ROPAt:
+                s = df.fillna(0).sum(axis=0)
+                s["time"] = df["time"].iloc[0]
+                collapsed.append(s)
+            df_ROPAt = pd.DataFrame(collapsed)
         df_ROPAt = df_ROPAt.fillna(0)
         self.ROPAbyClass_t = df_ROPAt
         df_ROPAintegral = self.getROPAIntegralTimeHistory(df_ROPAt)
@@ -114,7 +119,7 @@ class CumulativeDeposition:
         ax.stackplot( df_ROPAintegral["time"], *[df_ROPAintegral[col] for col in cols], labels=[col for col in cols], alpha=0.87,
                      edgecolor = 'k', linewidth = 0.6 )
         fontsz = 14
-        ax.set_xlim(left=0,right=df_ROPAintegral['time'].values[-1]*1.02)
+        ax.set_xlim(left=0,right=df_ROPAintegral['time'].values[-1])
         ax.set_xlabel("Time [s]",fontsize=fontsz)
         ax.set_ylabel(ylabel=ylab,fontsize=fontsz)
         ax.set_title("Cumulative deposition by reaction class",fontsize=fontsz+2)
