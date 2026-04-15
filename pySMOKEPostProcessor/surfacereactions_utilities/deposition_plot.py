@@ -118,9 +118,8 @@ class CumulativeDeposition:
         ax.set_xlabel("Time [s]",fontsize=fontsz)
         ax.set_ylabel(ylabel=ylab,fontsize=fontsz)
         ax.set_title("Cumulative deposition by reaction class",fontsize=fontsz+2)
-        
         ax.grid(True,alpha=0.2)
-        ax.legend()
+        ax.legend(fontsize=fontsz)
         fig.tight_layout()
         return fig,ax
 
