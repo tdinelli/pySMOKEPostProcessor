@@ -4,8 +4,8 @@ from IPython.display import Image, display
 import networkx as nx
 import os
 
-kineticFolder = os.path.join("..", "data", "ROPA-01", "kinetics")
-resultsFolder = os.path.join("..", "data", "ROPA-01", "Output")
+kineticFolder = os.path.join("..", "data", "ROPA", "kinetics")
+resultsFolder = os.path.join("..", "data", "ROPA", "Output")
 
 pp = PostProcessor(kineticFolder, resultsFolder)
 

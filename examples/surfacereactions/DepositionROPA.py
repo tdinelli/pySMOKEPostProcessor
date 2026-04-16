@@ -12,7 +12,7 @@ resultsFolder = os.path.join("..","data","Surface_Data","Output")
 class_groups_file = os.path.join('..', 'data', 'Surface_Data', 'surf_rxn_class.txt')
 sortlists = [['reactiontype']]  # Ask Luna why this is a list of lists  # classtype, speciestype, subclass, bimoltype, reactiontype
 
-obj = CumulativeDeposition(kineticFolder=kineticFolder, outputFolder=resultsFolder, class_group_file=class_groups_file)
+obj = CumulativeDeposition(kineticFolder=kineticFolder, outputFolder=resultsFolder, class_group_file=class_groups_file,allCarbon=False)
 
 obj.setClassification(sort_type=sortlists)
 obj.plotCumulativeDeposition(lump_steps=1,units='thickness')

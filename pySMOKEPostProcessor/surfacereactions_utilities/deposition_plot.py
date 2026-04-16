@@ -104,6 +104,8 @@ class CumulativeDeposition:
                 s["time"] = df["time"].iloc[0]
                 collapsed.append(s)
             df_ROPAt = pd.DataFrame(collapsed)
+        else:
+            df_ROPAt = pd.concat(df_ROPAt, ignore_index=True)
         df_ROPAt = df_ROPAt.fillna(0)
         self.ROPAbyClass_t = df_ROPAt
         df_ROPAintegral = self.getROPAIntegralTimeHistory(df_ROPAt)

@@ -23,6 +23,7 @@ classtype RECOMBINATION
 	REC_C3-R
 	REC_A1-R
 	REC_A1-RSR
+	REC_Cs-RSR
 end classtype
 
 classtype ELIMH2
