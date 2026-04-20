@@ -55,6 +55,8 @@ class ROPA_Surface : public virtual ROPA {
   void RateOfProductionAnalysis(const unsigned int number_of_reactions, const bool heterogeneous_reactions);
 
   void GetReactionRates(std::vector<unsigned int> reaction_indices, const bool sum_rates, const bool heterogeneous_reactions);
+
+  void GetFormationRates(std::string specie, std::string units, std::string type, const bool heterogeneous_reactions);
   
   // TODO: ROPA1D for UnsteadyPFR
   // void RateOfProductionAnalysis2D(const unsigned int number_of_reactions, const double local_x,

@@ -485,92 +485,166 @@ void ROPA_Surface::GetReactionRates(std::vector<unsigned int> reaction_indices, 
   }
 }
 
-// void ROPA_Surface::GetFormationRates(std::string specie, std::string units, std::string type) {
-//   if (units != "mass" && units != "mole")
-//     throw std::invalid_argument("Available Formation Rates units are: mole | mass");
+void ROPA_Surface::GetFormationRates(std::string specie, std::string units, std::string type, const bool heterogeneous_reactions) {
+  heterogeneous_reactions_ = heterogeneous_reactions;
+  if (heterogeneous_reactions_ == false){ // For homogeneous reactions, fallback on standard function
+    ROPA::GetFormationRates(specie, units, type);
+  } else {  // Dedicated implementation
 
-//   // As for the Reaction Rates keep in mind that AC allow the plot of
-//   // several species at the same time now let's stay simple one at the time
-//   // Select y variables among the species
-//   OpenSMOKE::OpenSMOKEVector<unsigned int> formation_rates_to_plot;
-//   std::string selected_species = specie;
+    if (units != "mass" && units != "mole")
+      throw std::invalid_argument("Available Formation Rates units are: mole | mass");
 
-//   {
-//     unsigned int n_selected_species = 1;
-//     ChangeDimensions(n_selected_species, &formation_rates_to_plot, true);
-//     for (unsigned int j = 0; j < n_selected_species; j++) {
-//       for (unsigned int k = 0; k < data_->string_list_massfractions_sorted.size(); k++) {
-//         if (selected_species == data_->string_list_massfractions_sorted[k]) {
-//           formation_rates_to_plot[j + 1] = k;
-//           break;
-//         }
-//       }
-//     }
-//   }
+    // As for the Reaction Rates keep in mind that AC allow the plot of
+    // several species at the same time now let's stay simple one at the time
+    // Select y variables among the species
+    OpenSMOKE::OpenSMOKEVector<unsigned int> formation_rates_to_plot;
+    std::string selected_species = specie;
 
-//   // Calculate the formation rates
-//   {
-//     formationRates_.resize(data_->number_of_abscissas_);
+    unsigned int index_of_species;
+    bool species_not_found = true;
+    unsigned int phase_of_species = 7; // 0 for gas, 1 for surface, 2 for bulk
 
-//     OpenSMOKE::OpenSMOKEVectorDouble P(data_->thermodynamicsMapXML->NumberOfSpecies());
-//     OpenSMOKE::OpenSMOKEVectorDouble D(data_->thermodynamicsMapXML->NumberOfSpecies());
-//     OpenSMOKE::OpenSMOKEVectorDouble x(data_->thermodynamicsMapXML->NumberOfSpecies());
-//     OpenSMOKE::OpenSMOKEVectorDouble omega(data_->thermodynamicsMapXML->NumberOfSpecies());
-//     OpenSMOKE::OpenSMOKEVectorDouble c(data_->thermodynamicsMapXML->NumberOfSpecies());
+    const unsigned int NSG = data_->thermodynamicsMapSurfaceXML->number_of_gas_species();
+    const unsigned int NSS = data_->thermodynamicsMapSurfaceXML->number_of_site_species();
+    const unsigned int NSB = data_->thermodynamicsMapSurfaceXML->number_of_bulk_species();
 
-//     for (unsigned int i = 0; i < data_->number_of_abscissas_; i++) {
-//       // Recovers mass fractions
-//       for (unsigned int k = 0; k < data_->thermodynamicsMapXML->NumberOfSpecies(); k++)
-//         omega[k + 1] = data_->omega[k][i];
+    {
+      for (unsigned int j = 0; j < NSG; j++) {
+        if (species_ == data_->string_list_massfractions_sorted[j]) {
+          species_not_found = false;
+          phase_of_species = 0;
+          break;
+        }
+      }
 
-//       // Calculates mole fractions
-//       double MWmix;
-//       data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix,
-//                                                                     omega.GetHandle());
+      if (species_not_found == true) {
+        for (unsigned int j = 0; j < NSS; j++) {
+          if (species_ == data_->string_list_surfacefractions_sorted[j]) {
+            species_not_found = false;
+            phase_of_species = 1;
+            break;
+          }
+        }
+      }
+      if (species_not_found == true) {
+        for (unsigned int j = 0; j < NSB; j++) {
+          if (species_ == data_->string_list_bulkmasses_sorted[j]) {
+            species_not_found = false;
+            phase_of_species = 2;
+            break;
+          }
+        }
+      }
 
-//       // Calculates concentrations
-//       const double P_Pa = data_->additional[data_->index_P][i];
-//       const double T = data_->additional[data_->index_T][i];
-//       const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
-//       Product(cTot, x, &c);
+      if (species_not_found == true) {
+        throw std::invalid_argument("Species not found in any phase!");
+      }
 
-//       // Calculates formations rates
-//       data_->kineticsMapXML->SetTemperature(T);
-//       data_->kineticsMapXML->SetPressure(P_Pa);
-//       data_->thermodynamicsMapXML->SetTemperature(T);
-//       data_->thermodynamicsMapXML->SetPressure(P_Pa);
+      unsigned int n_selected_species = 1;
+      ChangeDimensions(n_selected_species, &formation_rates_to_plot, true);
 
-//       data_->kineticsMapXML->KineticConstants();
-//       data_->kineticsMapXML->ReactionRates(c.GetHandle());
-//       data_->kineticsMapXML->ProductionAndDestructionRates(P.GetHandle(),
-//                                                            D.GetHandle());  // kmol/m3/s
+      if (phase_of_species == 0) {
+        for (unsigned int j = 0; j < n_selected_species; j++) {
+          for (unsigned int k = 0; k < data_->string_list_massfractions_sorted.size(); k++) {
+            if (selected_species == data_->string_list_massfractions_sorted[k]) {
+              formation_rates_to_plot[j + 1] = k;
+              break;
+            }
+          }
+        }
+      } else if (phase_of_species == 1) {
+        for (unsigned int j = 0; j < n_selected_species; j++) {
+          for (unsigned int k = 0; k < data_->string_list_surfacefractions_sorted.size(); k++) {
+            if (selected_species == data_->string_list_surfacefractions_sorted[k]) {
+              formation_rates_to_plot[j + 1] = k + NSG;
+              break;
+            }
+          }
+        }
+      } else {
+        for (unsigned int j = 0; j < n_selected_species; j++) {
+          for (unsigned int k = 0; k < data_->string_list_bulkmasses_sorted.size(); k++) {
+            if (selected_species == data_->string_list_bulkmasses_sorted[k]) {
+              formation_rates_to_plot[j + 1] = k + NSG + NSS;
+              break;
+            }
+          }
+        }
+      } // base case (exception) with phase_of_species should not be a problem as it is caught by previous checks
+    }
+    OpenSMOKE::OpenSMOKEVectorDouble P(NSG + NSS + NSB);
+    OpenSMOKE::OpenSMOKEVectorDouble D(NSG + NSS + NSB);
 
-//       if (type == "characteristic-time") {
-//         const unsigned k = data_->sorted_index[formation_rates_to_plot[1]] + 1;
-//         formationRates_[i] = c[k] / (D[k] + 1.e-32);
-//       } else {
-//         if (units == "mass") {
-//           OpenSMOKE::ElementByElementProduct(
-//               P.Size(), P.GetHandle(), data_->thermodynamicsMapXML->MWs().data(), P.GetHandle());
-//           OpenSMOKE::ElementByElementProduct(
-//               D.Size(), D.GetHandle(), data_->thermodynamicsMapXML->MWs().data(), D.GetHandle());
-//         }
+    OpenSMOKE::OpenSMOKEVectorDouble x(NSG);
+    OpenSMOKE::OpenSMOKEVectorDouble omega(NSG);
+    OpenSMOKE::OpenSMOKEVectorDouble cGas(NSG);
+    OpenSMOKE::OpenSMOKEVectorDouble Z(NSS);
+    OpenSMOKE::OpenSMOKEVectorDouble cSurf(NSS);
+    OpenSMOKE::OpenSMOKEVectorDouble aBulk(NSB);
 
-//         const unsigned k = data_->sorted_index[formation_rates_to_plot[1]] + 1;
-//         if (type == "net")
-//           formationRates_[i] = P[k] - D[k];
-//         else if (type == "production")
-//           formationRates_[i] = P[k];
-//         else if (type == "destruction")
-//           formationRates_[i] = D[k];
-//         else
-//           throw std::invalid_argument(
-//               "Available Formation Rates types are: net | production | destruction | "
-//               "characteristic-time");
-//       }
-//     }
-//   }
-// }
+    // Calculate the formation rates
+    {
+      formationRates_.resize(data_->number_of_abscissas_);
+
+      for (unsigned int index = 0; index < data_->number_of_abscissas_; index++) {
+        unsigned int k = 1;
+        for (unsigned int j = 0; j < NSG; j++)
+          omega[j+1] = data_->omega[j][index];
+          
+        for (unsigned int j = 0; j < NSS; j++)
+          Z[j+1] = data_->Z[j][index];
+
+        for (unsigned int j = 0; j < NSB; j++)
+          aBulk[j + 1] = 1.; // If, in the future, a more complex model accounting for solid activity is introduced, this will have to be changed
+
+        const double Gamma = data_->additional[data_->index_surface_sites_concentration][index];
+        // Calculates mole fractions
+        double MWmix;
+        data_->thermodynamicsMapXML->MoleFractions_From_MassFractions(x.GetHandle(), MWmix, omega.GetHandle());
+
+        // Calculates gas-phase concentrations
+        const double P_Pa = data_->additional[data_->index_P][index];
+        const double T = data_->additional[data_->index_T][index];
+        const double cTot = P_Pa / PhysicalConstants::R_J_kmol / T;
+        Product(cTot, x, &cGas);
+
+        // Calculates formations rates
+        data_->kineticsMapSurfaceXML->SetTemperature(T);
+        data_->kineticsMapSurfaceXML->SetPressure(P_Pa);
+
+        data_->thermodynamicsMapSurfaceXML->SetTemperature(T);
+        data_->thermodynamicsMapSurfaceXML->SetPressure(P_Pa);
+
+        data_->kineticsMapSurfaceXML->KineticConstants();
+        data_->kineticsMapSurfaceXML->ReactionRates(cGas.GetHandle(), Z.GetHandle(), aBulk.GetHandle(), &Gamma);
+        data_->kineticsMapSurfaceXML->ProductionAndDestructionRates(P.GetHandle(), D.GetHandle());
+
+        // LG: disabling characteristic times for now, maybe re-add later (cGas, Z, aBulk..., tau(Surf) = Z*Gamma/D I suppose?)
+        // if (type == "characteristic-time") {
+        //   const unsigned k = data_->sorted_index[formation_rates_to_plot[1]] + 1;
+        //   formationRates_[index] = c[k] / (D[k] + 1.e-32);
+        // } else {
+        if (units == "mass") {
+          OpenSMOKE::ElementByElementProduct( P.Size(), P.GetHandle(), data_->thermodynamicsMapSurfaceXML->MWs().data(), P.GetHandle());
+          OpenSMOKE::ElementByElementProduct( D.Size(), D.GetHandle(), data_->thermodynamicsMapSurfaceXML->MWs().data(), D.GetHandle());
+        }
+
+        const unsigned k = data_->sorted_index[formation_rates_to_plot[1]] + 1;
+        if (type == "net")
+          formationRates_[index] = P[k] - D[k];
+        else if (type == "production")
+          formationRates_[index] = P[k];
+        else if (type == "destruction")
+          formationRates_[index] = D[k];
+        else
+          throw std::invalid_argument(
+              "Available Formation Rates types are: net | production | destruction | "
+              "characteristic-time");
+        //} // End of characteristic time if/else
+      }
+    }
+  }
+}
 
 // void ROPA_Surface::RateOfProductionAnalysis2D(const unsigned int number_of_reactions, double local_x,
 //                                       double local_z, double region_low_x, double region_up_x,
