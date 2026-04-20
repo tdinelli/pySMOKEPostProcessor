@@ -10,13 +10,13 @@ kineticFolder = os.path.join("..","data","Surface_Data","kinetics")
 resultsFolder = os.path.join("..","data","Surface_Data","Output")
 
 surface_classes = os.path.join('..', 'data', 'Surface_Data', 'surf_rxn_class.txt')
-class_groups_file = os.path.join('..', 'data', 'ReactionClasses', 'rxn_class_groups.txt')
+gas_classes = os.path.join('..', 'data', 'ReactionClasses', 'rxn_class_groups.txt')
 sortlists = [['reactiontype']]  # Ask Luna why this is a list of lists  # classtype, speciestype, subclass, bimoltype, reactiontype
 
 lump_steps = 4  # To make it faster (less resolution)
 
 Bulk = CumulativeDeposition(    kineticFolder=kineticFolder, outputFolder=resultsFolder, class_group_file=surface_classes,  sort_type=sortlists, area=200./1E4, allCarbon=True)
-Soot = CumulativeSootProduction(kineticFolder=kineticFolder, outputFolder=resultsFolder, class_group_file=class_groups_file,sort_type=sortlists,volume=100./1E4)
+Soot = CumulativeSootProduction(kineticFolder=kineticFolder, outputFolder=resultsFolder, class_group_file=gas_classes,      sort_type=sortlists, volume=100./1E4)
 
 fig,ax = plt.subplots(2,1,figsize=(10.5,12.), sharex=True)
 

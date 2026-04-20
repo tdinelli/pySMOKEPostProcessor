@@ -86,7 +86,11 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m) {
                                                                                      py::arg("sum_rates") = false,
                                                                                      py::arg("heterogeneous_reactions") = false,
                                                                                      py::call_guard<py::gil_scoped_release>())
-//  .def("getFormationRates",           &ROPA::GetFormationRates,                    py::call_guard<py::gil_scoped_release>())
+     .def("getFormationRates",           &ROPA_Surface::GetFormationRates,           py::arg("specie"),
+                                                                                     py::arg("units") = "mole",
+                                                                                     py::arg("type") = "net",
+                                                                                     py::arg("heterogeneous_reactions") = false,
+                                                                                     py::call_guard<py::gil_scoped_release>())
      .def("setROPAPhase",               &ROPA_Surface::SetROPAPhase,                 py::arg("heterogeneous_reactions") = true,
                                                                                      py::call_guard<py::gil_scoped_release>());
 
