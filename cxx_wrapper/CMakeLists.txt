@@ -8,6 +8,10 @@ target_link_libraries(
         Eigen3::Eigen
 )
 
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE BUILD_PYTHON_BINDINGS
+)
+
 # -----------------------------------------------------------------------------
 # Link Boost libraries
 # Modern Boost (1.70+) is mostly header-only, but filesystem, timer, etc. still

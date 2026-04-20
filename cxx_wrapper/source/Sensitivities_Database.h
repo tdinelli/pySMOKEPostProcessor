@@ -54,39 +54,24 @@ class Sensitivities_Database
     std::vector<double> NormalizedProfile(const unsigned int index, bool local_normalization);
     double NormalizedProfile(const unsigned int index, bool local_normalization, unsigned int point);
 
-    boost::property_tree::ptree xml_main_input;
-
-    const std::vector<std::string> &names() const
-    {
-        return names_;
-    }
-    unsigned int number_of_variables() const
-    {
-        return number_of_variables_;
-    }
-    const std::vector<double> &variable() const
-    {
-        return variable_;
-    }
-
-    const std::vector<std::string> &string_list_reactions() const
-    {
-        return string_list_reactions_;
-    }
-    const std::vector<unsigned int> &current_coarse_index() const
-    {
-        return current_coarse_index_;
-    }
-
     void ReactionsCoarsening(const double threshold);
     void ReactionsReset();
 
-    unsigned int number_of_parameters() const
-    {
-        return number_of_parameters_;
-    }
+    boost::property_tree::ptree xml_main_input;
 
-  private:
+    const std::vector<std::string> &names() const   {   return names_;  }
+
+    unsigned int number_of_variables() const    {   return number_of_variables_;    }
+
+    const std::vector<double> &variable() const {   return variable_;   }
+
+    const std::vector<std::string> &string_list_reactions() const   {   return string_list_reactions_;  }
+
+    const std::vector<unsigned int> &current_coarse_index() const   {   return current_coarse_index_;   }
+
+    unsigned int number_of_parameters() const   {   return number_of_parameters_;   }
+
+  protected:
     ProfilesDatabase *data_;
     unsigned int number_of_variables_;
     unsigned int number_of_parameters_;

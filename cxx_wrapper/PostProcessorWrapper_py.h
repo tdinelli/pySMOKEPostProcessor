@@ -42,5 +42,10 @@
 #include <Eigen/Dense>
 
 // pyBIND11
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#pragma once
+
+#ifdef BUILD_PYTHON_BINDINGS
+    #include <pybind11/pybind11.h>
+    #include <pybind11/stl.h>
+#endif
+

@@ -42,58 +42,56 @@
 #include "Sensitivities_Database.h"
 
 class Sensitivities {
- public:
-  Sensitivities();
+  public:
+    Sensitivities();
 
-  ~Sensitivities();
+    ~Sensitivities();
 
-  void SetDatabase(ProfilesDatabase* data);
+    void SetDatabase(ProfilesDatabase* data);
 
-  void SetNormalizationType(std::string normalizationType);
+    void SetNormalizationType(std::string normalizationType);
 
-  void SetSensitivityType(std::string sensitivityType);
+    void SetSensitivityType(std::string sensitivityType);
 
-  void SetOrderingType(std::string orderingType);
+    void SetOrderingType(std::string orderingType);
 
-  void SetTarget(std::string target);
+    void SetTarget(std::string target);
 
-  void SetLocalValue(double localValue);
+    void SetLocalValue(double localValue);
 
-  void SetLowerBound(double lowerBound);
+    void SetLowerBound(double lowerBound);
 
-  void SetUpperBound(double upperBound);
+    void SetUpperBound(double upperBound);
 
-  void Prepare();
+    void Prepare();
 
-  void Sensitivity_Analysis(const unsigned int number_of_reactions);
+    void Sensitivity_Analysis(const unsigned int number_of_reactions);
 
-  void ReadSensitvityCoefficients();
+    void ReadSensitvityCoefficients();
 
-  void GetSensitivityProfile(unsigned int reaction_index); // Un getter void è sospetto
+    void GetSensitivityProfile(unsigned int reaction_index); // Un getter void è sospetto
 
-  inline const std::vector<unsigned int>& reactions() const { return reactions_; };
+    inline const std::vector<unsigned int>& reactions() const { return reactions_; };
 
-  inline const std::vector<double>& sensitivityCoefficients() const {
-    return sensitivity_coefficients_;
-  };
+    inline const std::vector<double>& sensitivityCoefficients() const { return sensitivity_coefficients_; };
 
- private:
-  ProfilesDatabase* data_;
+  protected:
+    ProfilesDatabase* data_;
+    Sensitivities_Database* sensitivities;
+    
+    std::string normalizationType_;
+    std::string sensitivityType_;
+    std::string orderingType_;
+    std::string target_;
 
-  Sensitivities_Database* sensitivities;
+    double localValue_;
+    double lowerBound_;
+    double upperBound_;
 
-  std::string normalizationType_;
-  std::string sensitivityType_;
-  std::string orderingType_;
-  std::string target_;
-
-  double localValue_;
-  double lowerBound_;
-  double upperBound_;
-
-  bool iLocalNormalization = false;
-  std::vector<double> sensitivity_coefficients_;
-  std::vector<unsigned int> reactions_;
+    bool iLocalNormalization = false;
+    std::vector<double> sensitivity_coefficients_;
+    std::vector<unsigned int> reactions_;
+    
 };
 
 #include "Sensitivities.hpp"

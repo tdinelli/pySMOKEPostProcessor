@@ -40,54 +40,10 @@
 #include "Utilities.h"
 
 Sensitivities_Surface::Sensitivities_Surface() {
-  sensitivityType_ = "global";
-  normalizationType_ = "local";
-  orderingType_ = "peak-values";
-  target_ = "";
-
-  localValue_ = 0;
-  lowerBound_ = 0;
-  upperBound_ = 0;
+  Sensitivities();
 }
 
-Sensitivities_Surface::~Sensitivities_Surface() {}
-
-void Sensitivities_Surface::SetDatabase(ProfilesDatabase* data) { data_ = data; }
-
-void Sensitivities_Surface::SetNormalizationType(std::string normalizationType) {
-  if (normalizationType != "local" && normalizationType != "max-value") {
-    throw std::invalid_argument("Available normalization types are: local | max-value");
-  }
-
-  normalizationType_ = normalizationType;
-  if (normalizationType_ == "local") {
-    iLocalNormalization = true;
-  }
-}
-
-void Sensitivities_Surface::SetSensitivityType(std::string sensitivityType) {
-  if (sensitivityType != "global" && sensitivityType != "local" && sensitivityType != "region") {
-    throw std::invalid_argument("Available sensitivity types are: global | local | region");
-  }
-
-  sensitivityType_ = sensitivityType;
-}
-
-void Sensitivities_Surface::SetOrderingType(std::string orderingType) {
-  if (orderingType != "peak-values" && orderingType != "area" && orderingType != "absolute-area") {
-    throw std::invalid_argument(
-        "Available sensitivity types are: peak-values | area | absolute-area");
-  }
-  orderingType_ = orderingType;
-}
-
-void Sensitivities_Surface::SetTarget(std::string target) { target_ = target; }
-
-void Sensitivities_Surface::SetLocalValue(double localValue) { localValue_ = localValue; }
-
-void Sensitivities_Surface::SetLowerBound(double lowerBound) { lowerBound_ = lowerBound; }
-
-void Sensitivities_Surface::SetUpperBound(double upperBound) { upperBound_ = upperBound; }
+//Sensitivities_Surface::~Sensitivities_Surface() {}
 
 void Sensitivities_Surface::Prepare(bool heterogeneousSensitivity) {
   heterogeneousSensitivity_ = heterogeneousSensitivity;
@@ -258,18 +214,4 @@ void Sensitivities_Surface::ReadSensitvityCoefficients() {
   if (target_ == "") throw std::invalid_argument("Select a target!");
 
   sensitivities->ReadFromChildFile(target_,heterogeneousSensitivity_);
-}
-
-void Sensitivities_Surface::GetSensitivityProfile(unsigned int reaction_index) {
-  std::string selected_y = target_;
-  if (target_ == "") {
-    throw std::invalid_argument("You have to select one of the available Y variables");
-  }
-
-  unsigned int selected_reaction_indices = reaction_index;
-  std::vector<double> senscoeff = sensitivities->NormalizedProfile(
-      sensitivities->current_coarse_index()[selected_reaction_indices] - 1, iLocalNormalization);
-
-  sensitivity_coefficients_.resize(senscoeff.size());
-  sensitivity_coefficients_ = senscoeff;
 }

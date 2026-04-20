@@ -35,11 +35,14 @@
 |                                                                         |
 \*-----------------------------------------------------------------------*/
 
-Sensitivities_Database_Surface::Sensitivities_Database_Surface(void) {}
+Sensitivities_Database_Surface::Sensitivities_Database_Surface() {
+  Sensitivities_Database();
+}
 
-Sensitivities_Database_Surface::~Sensitivities_Database_Surface(void) {}
 
-void Sensitivities_Database_Surface::SetDatabase(ProfilesDatabase* data) { data_ = data; }
+// Sensitivities_Database_Surface::~Sensitivities_Database_Surface() {
+//   ~Sensitivities_Database();
+// }
 
 void Sensitivities_Database_Surface::ReadParentFile(bool heterogeneousSensitivity) {
   boost::filesystem::path path_results;
@@ -204,100 +207,5 @@ void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name,bo
     // from mass to mole fractions (only performed on gas-phase species)
     for (unsigned int i = 0; i < number_of_points_; i++)
       variable_[i] = data_->omega[species_index][i] * data_->additional[data_->index_MW][i] / data_->mw_species_[species_index];
-  }
-}
-
-// zero-based
-std::vector<double> Sensitivities_Database_Surface::NormalizedProfile(const unsigned int index,
-                                                              bool local_normalization) {
-  std::vector<double> profile = coefficients_[index];
-  if (local_normalization == true) {
-    const double local_threshold = 1.e-40;
-
-    for (unsigned int i = 0; i < number_of_points_; i++)
-      if (fabs(variable_[i]) > local_threshold)
-        profile[i] *= parameters_[index] / variable_[i];
-      else
-        profile[i] = 0.;
-  } else {
-    double normalization_coefficient = -1.e100;
-    for (unsigned int i = 0; i < number_of_points_; i++)
-      if (fabs(variable_[i]) > normalization_coefficient)
-        normalization_coefficient = fabs(variable_[i]);
-
-    const double normalization_coefficient_threshold = 1.e-100;
-    if (normalization_coefficient > normalization_coefficient_threshold)
-      for (unsigned int i = 0; i < number_of_points_; i++)
-        profile[i] *= parameters_[index] / normalization_coefficient;
-    else
-      for (unsigned int i = 0; i < number_of_points_; i++) profile[i] = 0.;
-  }
-
-  return profile;
-}
-
-// zero-based
-double Sensitivities_Database_Surface::NormalizedProfile(const unsigned int index, bool local_normalization, unsigned int point) {
-  if (local_normalization == true) {
-    const double local_threshold = 1.e-16;
-
-    if (fabs(variable_[point]) > local_threshold)
-      return coefficients_[index][point] * parameters_[index] / variable_[point];
-    else
-      return 0.;
-  } else {
-    double normalization_coefficient = -1e100;
-    for (unsigned int i = 0; i < number_of_points_; i++)
-      if (fabs(variable_[i]) > normalization_coefficient)
-        normalization_coefficient = fabs(variable_[i]);
-
-    const double normalization_coefficient_threshold = 1.e-100;
-    if (normalization_coefficient > normalization_coefficient_threshold)
-      return coefficients_[index][point] * parameters_[index] / normalization_coefficient;
-    else
-      return 0.;
-  }
-}
-
-void Sensitivities_Database_Surface::ReactionsReset() {
-  // Fill the reaction indices
-  current_coarse_index_.resize(number_of_parameters_);
-  for (unsigned int j = 0; j < number_of_parameters_; j++) current_coarse_index_[j] = j + 1;
-}
-
-void Sensitivities_Database_Surface::ReactionsCoarsening(const double threshold) {
-  // Fill the reaction indices
-  std::vector<unsigned int> total_indices(number_of_parameters_);
-  for (unsigned int j = 0; j < number_of_parameters_; j++) total_indices[j] = j + 1;
-
-  // Evaluates the coefficients
-  std::vector<double> total_coefficients(number_of_parameters_);
-  std::vector<double> profile(data_->number_of_abscissas_);
-  for (unsigned int j = 0; j < number_of_parameters_; j++) {
-    profile = NormalizedProfile(j, false);
-
-    double max_value = -1.e100;
-    unsigned int max_index = 0;
-    for (unsigned int i = 0; i < data_->number_of_abscissas_; i++)
-      if (fabs(profile[i]) > max_value) {
-        max_value = fabs(profile[i]);
-        max_index = i;
-      }
-    total_coefficients[j] = profile[max_index];
-  }
-
-  // Reorder the coefficients
-  std::vector<int> indices;
-  std::vector<double> coefficients;
-  MergeBars(total_indices, total_coefficients, indices, coefficients);
-
-  current_coarse_index_.resize(0);
-  if (fabs(coefficients[0]) > 0.) {
-    for (unsigned int j = 0; j < number_of_parameters_; j++) {
-      if (fabs(coefficients[j]) / fabs(coefficients[0]) > threshold)
-        current_coarse_index_.push_back(indices[j]);
-      else
-        break;
-    }
   }
 }

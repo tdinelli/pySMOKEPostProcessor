@@ -1,6 +1,5 @@
 #include "../PostProcessorWrapper_py.h"
 #include "../source/ProfilesDatabase.h"
-#include "../source/Sensitivities.h"
 #include "../source/Sensitivities_Surface.h"
 //#include "ROPA.h"
 #include "maps/Maps_CHEMKIN"
@@ -11,26 +10,9 @@ int main(int argc, char** argv)
     const std::string mechanism_folder = "/home/lgiardini/pySMOKEPostProcessor/examples/data/Surface_Data/kinetics";
     const std::string output_folder = "/home/lgiardini/pySMOKEPostProcessor/examples/data/Surface_Data/Output";
 
-
     ProfilesDatabase profiles_db;
     bool dummy = profiles_db.ReadFileResults(output_folder,true);
     dummy = profiles_db.ReadHeterogeneousKineticMechanism(mechanism_folder,"Surface");
-
-    // Sensitivities sensi;
-    // sensi.SetDatabase(&profiles_db);
-    // sensi.SetSensitivityType("global");
-    // sensi.SetOrderingType("peak-values");
-    // sensi.SetNormalizationType("max-value");
-    // sensi.SetTarget("H2");
-    // sensi.Prepare();
-    // sensi.ReadSensitvityCoefficients();
-    // sensi.Sensitivity_Analysis(5);
-    // std::vector<unsigned int> reactions = sensi.reactions();
-    // std::vector<double> sensicoeffs = sensi.sensitivityCoefficients();
-    // for (unsigned int i = 0; i<sensicoeffs.size(); i++)
-    //     std::cout << sensicoeffs[i] << std::endl;
-    
-    
     Sensitivities_Surface sensi;
     bool heterogeneousSensitivity = false;
     const unsigned int NR = 5;
@@ -41,7 +23,6 @@ int main(int argc, char** argv)
     sensi.SetNormalizationType("max-value");
     sensi.SetTarget("CH4");
     // Until here, everything is the same for sensitivity homogeneous and heterogeneous
-
 
     // Homogeneous sensitivity analysis
     sensi.Prepare(heterogeneousSensitivity);
@@ -67,7 +48,7 @@ int main(int argc, char** argv)
     std::vector<unsigned int> reactions_het = sensi.reactions();
     std::vector<double> sensicoeffs_het = sensi.sensitivityCoefficients();
 
-    std::cout << "Heterogeneous Sensitivity coefficients" << std::endl;
+    std::cout << "\nHeterogeneous Sensitivity coefficients" << std::endl;
     for (unsigned int i = 0; i<sensicoeffs_het.size(); i++)
         std::cout << sensicoeffs_het[i] << std::endl;
     

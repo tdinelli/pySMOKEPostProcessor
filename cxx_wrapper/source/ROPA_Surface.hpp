@@ -37,7 +37,7 @@
 
 #include <algorithm>
 
-#include "PostProcessorFluxMap.h"
+#include "PostProcessorFluxMap.h"   // For gas-phase only
 #include "math/OpenSMOKEUtilities.h"
 
 ROPA_Surface::ROPA_Surface() {
@@ -587,7 +587,6 @@ void ROPA_Surface::GetFormationRates(std::string specie, std::string units, std:
       formationRates_.resize(data_->number_of_abscissas_);
 
       for (unsigned int index = 0; index < data_->number_of_abscissas_; index++) {
-        unsigned int k = 1;
         for (unsigned int j = 0; j < NSG; j++)
           omega[j+1] = data_->omega[j][index];
           

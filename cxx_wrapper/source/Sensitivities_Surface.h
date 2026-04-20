@@ -40,62 +40,24 @@
 
 #include "ProfilesDatabase.h"
 #include "Sensitivities_Database_Surface.h"
+#include "Sensitivities.h"
 
-class Sensitivities_Surface {
- public:
-  Sensitivities_Surface();
+class Sensitivities_Surface: public virtual Sensitivities {
+  public:
+    Sensitivities_Surface();
 
-  ~Sensitivities_Surface();
+    //~Sensitivities_Surface();
 
-  void SetDatabase(ProfilesDatabase* data);
+    void Prepare(bool heterogeneousSensitivity);
 
-  void SetNormalizationType(std::string normalizationType);
+    void ReadSensitvityCoefficients();
 
-  void SetSensitivityType(std::string sensitivityType);
+    void Sensitivity_Analysis(const unsigned int number_of_reactions);
+    
+  private:
+    Sensitivities_Database_Surface* sensitivities;
 
-  void SetOrderingType(std::string orderingType);
-
-  void SetTarget(std::string target);
-
-  void SetLocalValue(double localValue);
-
-  void SetLowerBound(double lowerBound);
-
-  void SetUpperBound(double upperBound);
-
-  void Prepare(bool heterogeneousSensitivity);
-
-  void Sensitivity_Analysis(const unsigned int number_of_reactions);
-
-  void ReadSensitvityCoefficients();
-
-  void GetSensitivityProfile(unsigned int reaction_index);
-
-  inline const std::vector<unsigned int>& reactions() const { return reactions_; };
-
-  inline const std::vector<double>& sensitivityCoefficients() const {
-    return sensitivity_coefficients_;
-  };
-
- private:
-  ProfilesDatabase* data_;
-
-  Sensitivities_Database_Surface* sensitivities;
-
-  std::string normalizationType_;
-  std::string sensitivityType_;
-  std::string orderingType_;
-  std::string target_;
-
-  double localValue_;
-  double lowerBound_;
-  double upperBound_;
-
-  bool iLocalNormalization = false;
-  std::vector<double> sensitivity_coefficients_;
-  std::vector<unsigned int> reactions_;
-
-  bool heterogeneousSensitivity_;
+    bool heterogeneousSensitivity_;
 };
 
 #include "Sensitivities_Surface.hpp"
