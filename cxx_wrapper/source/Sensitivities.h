@@ -67,7 +67,7 @@ class Sensitivities {
 
     void Sensitivity_Analysis(const unsigned int number_of_reactions);
 
-    void ReadSensitvityCoefficients();
+    void ReadSensitivityCoefficients();
 
     void GetSensitivityProfile(unsigned int reaction_index); // Un getter void è sospetto
 
@@ -77,8 +77,7 @@ class Sensitivities {
 
   protected:
     ProfilesDatabase* data_;
-    Sensitivities_Database* sensitivities;
-    
+
     std::string normalizationType_;
     std::string sensitivityType_;
     std::string orderingType_;
@@ -91,7 +90,8 @@ class Sensitivities {
     bool iLocalNormalization = false;
     std::vector<double> sensitivity_coefficients_;
     std::vector<unsigned int> reactions_;
-    
+  private:
+    Sensitivities_Database* sensitivities;
 };
 
 #include "Sensitivities.hpp"

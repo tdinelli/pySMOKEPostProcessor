@@ -24,9 +24,10 @@ int main(int argc, char** argv)
     sensi.SetTarget("CH4");
     // Until here, everything is the same for sensitivity homogeneous and heterogeneous
 
+    
     // Homogeneous sensitivity analysis
     sensi.Prepare(heterogeneousSensitivity);
-    sensi.ReadSensitvityCoefficients();
+    sensi.ReadSensitivityCoefficients();
     sensi.Sensitivity_Analysis(NR);
     std::vector<unsigned int> reactions = sensi.reactions();
     std::vector<double> sensicoeffs = sensi.sensitivityCoefficients();
@@ -42,8 +43,7 @@ int main(int argc, char** argv)
     // Heterogeneous sensitivity analysis
     heterogeneousSensitivity = true;
     sensi.Prepare(heterogeneousSensitivity);
-    sensi.SetNormalizationType("max-value");
-    sensi.ReadSensitvityCoefficients();
+    sensi.ReadSensitivityCoefficients();
     sensi.Sensitivity_Analysis(NR);
     std::vector<unsigned int> reactions_het = sensi.reactions();
     std::vector<double> sensicoeffs_het = sensi.sensitivityCoefficients();

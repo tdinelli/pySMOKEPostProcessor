@@ -47,20 +47,20 @@ Sensitivities_Surface::Sensitivities_Surface() {
 
 void Sensitivities_Surface::Prepare(bool heterogeneousSensitivity) {
   heterogeneousSensitivity_ = heterogeneousSensitivity;
-  sensitivities = new Sensitivities_Database_Surface();
-  sensitivities->SetDatabase(data_);
-  sensitivities->ReadParentFile(heterogeneousSensitivity_);
+  sensitivities_het = new Sensitivities_Database_Surface();
+  sensitivities_het->SetDatabase(data_);
+  sensitivities_het->ReadParentFile(heterogeneousSensitivity_);
 
   // Widget: reactions
   {
-    sensitivities->ReactionsReset();
+    sensitivities_het->ReactionsReset();
   }
   // Widget: variables y
   {
     std::vector<std::string> string_list_variables_y;
-    string_list_variables_y.reserve(sensitivities->number_of_variables());
-    for (unsigned int j = 0; j < sensitivities->number_of_variables(); j++)
-      string_list_variables_y.push_back(sensitivities->names()[j]);
+    string_list_variables_y.reserve(sensitivities_het->number_of_variables());
+    for (unsigned int j = 0; j < sensitivities_het->number_of_variables(); j++)
+      string_list_variables_y.push_back(sensitivities_het->names()[j]);
   }
 }
 
@@ -79,30 +79,21 @@ void Sensitivities_Surface::Sensitivity_Analysis(const unsigned int number_of_re
     }
 
     // Fill the reaction indices
-    std::vector<unsigned int> total_indices(sensitivities->number_of_parameters());
-    for (unsigned int j = 0; j < sensitivities->number_of_parameters(); j++)
+    std::vector<unsigned int> total_indices(sensitivities_het->number_of_parameters());
+    for (unsigned int j = 0; j < sensitivities_het->number_of_parameters(); j++)
       total_indices[j] = j + 1;
 
     // Evaluates the coefficients
-    std::vector<double> total_coefficients(sensitivities->number_of_parameters());
-    for (unsigned int j = 0; j < sensitivities->number_of_parameters(); j++) {
-      total_coefficients[j] = sensitivities->NormalizedProfile(j, iLocalNormalization, index);
-      if (total_coefficients[j] != 0)
-        std::cout << total_coefficients[j] << std::endl;
-    }
+    std::vector<double> total_coefficients(sensitivities_het->number_of_parameters());
+    for (unsigned int j = 0; j < sensitivities_het->number_of_parameters(); j++)
+      total_coefficients[j] = sensitivities_het->NormalizedProfile(j, iLocalNormalization, index);
     // Reorder the coefficients
     MergeBars(total_indices, total_coefficients, indices, coefficients);
 
     // Fill the vector containing the reaction strings
     std::vector<std::string> reaction_names(indices.size());
-    if (heterogeneousSensitivity_ == true)
-    {
-      for (unsigned int i = 0; i < indices.size(); i++)
-        reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
-    } else {
-      for (unsigned int i = 0; i < indices.size(); i++)
-        reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
-    }
+    for (unsigned int i = 0; i < indices.size(); i++)
+      reaction_names[i] = sensitivities_het->string_list_reactions()[indices[i] - 1];
     
 
     // Printaggio risultati
@@ -140,17 +131,17 @@ void Sensitivities_Surface::Sensitivity_Analysis(const unsigned int number_of_re
     const double delta = data_->additional[0][index_max] - data_->additional[0][index_min];
 
     // Fill the reaction indices
-    std::vector<unsigned int> total_indices(sensitivities->number_of_parameters());
-    for (unsigned int j = 0; j < sensitivities->number_of_parameters(); j++)
+    std::vector<unsigned int> total_indices(sensitivities_het->number_of_parameters());
+    for (unsigned int j = 0; j < sensitivities_het->number_of_parameters(); j++)
       total_indices[j] = j + 1;
 
     // Evaluates the coefficients
-    std::vector<double> total_coefficients(sensitivities->number_of_parameters());
-    std::vector<double> total_peaks(sensitivities->number_of_parameters());
+    std::vector<double> total_coefficients(sensitivities_het->number_of_parameters());
+    std::vector<double> total_peaks(sensitivities_het->number_of_parameters());
     std::vector<double> profile(data_->number_of_abscissas_);
 
-    for (unsigned int j = 0; j < sensitivities->number_of_parameters(); j++) {
-      profile = sensitivities->NormalizedProfile(j, iLocalNormalization);
+    for (unsigned int j = 0; j < sensitivities_het->number_of_parameters(); j++) {
+      profile = sensitivities_het->NormalizedProfile(j, iLocalNormalization);
 
       if (orderingType_ == "peak-values") {
         double max_value = -1.e100;
@@ -199,7 +190,7 @@ void Sensitivities_Surface::Sensitivity_Analysis(const unsigned int number_of_re
     // Fill the vector containing the reaction strings
     std::vector<std::string> reaction_names(indices.size());
     for (unsigned int i = 0; i < indices.size(); i++)
-      reaction_names[i] = sensitivities->string_list_reactions()[indices[i] - 1];
+      reaction_names[i] = sensitivities_het->string_list_reactions()[indices[i] - 1];
   }
   // indices it's 1-based since we have to postprocess here it is returned 0-based
   sensitivity_coefficients_.resize(std::min<int>(number_of_reactions, coefficients.size()));
@@ -210,8 +201,8 @@ void Sensitivities_Surface::Sensitivity_Analysis(const unsigned int number_of_re
   }
 }
 
-void Sensitivities_Surface::ReadSensitvityCoefficients() {
+void Sensitivities_Surface::ReadSensitivityCoefficients() {
   if (target_ == "") throw std::invalid_argument("Select a target!");
 
-  sensitivities->ReadFromChildFile(target_,heterogeneousSensitivity_);
+  sensitivities_het->ReadFromChildFile(target_,heterogeneousSensitivity_);
 }

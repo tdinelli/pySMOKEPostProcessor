@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     sensi.SetNormalizationType("max-value");
     sensi.SetTarget("CH4");
     sensi.Prepare();
-    sensi.ReadSensitvityCoefficients();
+    sensi.ReadSensitivityCoefficients();
     sensi.Sensitivity_Analysis(5);
     std::vector<unsigned int> reactions = sensi.reactions();
     std::vector<double> sensicoeffs = sensi.sensitivityCoefficients();

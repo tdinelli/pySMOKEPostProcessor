@@ -245,7 +245,7 @@ void Sensitivities::Sensitivity_Analysis(const unsigned int number_of_reactions)
   }
 }
 
-void Sensitivities::ReadSensitvityCoefficients() {
+void Sensitivities::ReadSensitivityCoefficients() {
   if (target_ == "") throw std::invalid_argument("Select a target!");
 
   sensitivities->ReadFromChildFile(target_);

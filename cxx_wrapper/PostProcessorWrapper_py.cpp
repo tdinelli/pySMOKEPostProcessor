@@ -96,43 +96,37 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m) {
 
   py::class_<Sensitivities>(m, "Sensitivity")
      .def(py::init<>())
-     .def("setDataBase", &Sensitivities::SetDatabase, py::call_guard<py::gil_scoped_release>())
-     .def("setNormalizationType", &Sensitivities::SetNormalizationType,
-          py::call_guard<py::gil_scoped_release>())
-     .def("setSensitivityType", &Sensitivities::SetSensitivityType,
-          py::call_guard<py::gil_scoped_release>())
-     .def("setOrderingType", &Sensitivities::SetOrderingType,
-          py::call_guard<py::gil_scoped_release>())
-     .def("setTarget", &Sensitivities::SetTarget, py::call_guard<py::gil_scoped_release>())
-     .def("setLocalValue", &Sensitivities::SetLocalValue, py::call_guard<py::gil_scoped_release>())
-     .def("setLowerBound", &Sensitivities::SetLowerBound, py::call_guard<py::gil_scoped_release>())
-     .def("setUpperBound", &Sensitivities::SetUpperBound, py::call_guard<py::gil_scoped_release>())
-     .def("prepare", &Sensitivities::Prepare, py::call_guard<py::gil_scoped_release>())
-     .def("sensitivityAnalysis", &Sensitivities::Sensitivity_Analysis,
-          py::call_guard<py::gil_scoped_release>())
-     .def("readSensitivityCoefficients", &Sensitivities::ReadSensitvityCoefficients,
-          py::call_guard<py::gil_scoped_release>())
-     .def("getSensitivityProfile", &Sensitivities::GetSensitivityProfile,
-          py::call_guard<py::gil_scoped_release>())
-     .def("reactions", &Sensitivities::reactions, py::call_guard<py::gil_scoped_release>())
-     .def("sensitivityCoefficients", &Sensitivities::sensitivityCoefficients,
-          py::call_guard<py::gil_scoped_release>());
+     .def("setDataBase",                &Sensitivities::SetDatabase,                 py::arg("data"),
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("setNormalizationType",       &Sensitivities::SetNormalizationType,        py::arg("normalizationType") = "max-value",
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("setSensitivityType",         &Sensitivities::SetSensitivityType,          py::arg("sensitivityType") = "global",
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("setOrderingType",            &Sensitivities::SetOrderingType,             py::arg("orderingType") = "peak-values",
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("setTarget",                  &Sensitivities::SetTarget,                   py::arg("target"),
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("setLocalValue",              &Sensitivities::SetLocalValue,               py::arg("localValue"),
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("setLowerBound",              &Sensitivities::SetLowerBound,               py::arg("lowerBound"),
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("setUpperBound",              &Sensitivities::SetUpperBound,               py::arg("upperBound"),
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("prepare",                    &Sensitivities::Prepare,                     py::call_guard<py::gil_scoped_release>())
+     .def("sensitivityAnalysis",        &Sensitivities::Sensitivity_Analysis,        py::arg("number_of_reactions") = 10,
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("readSensitivityCoefficients",&Sensitivities::ReadSensitivityCoefficients,  py::call_guard<py::gil_scoped_release>())
+     .def("getSensitivityProfile",      &Sensitivities::GetSensitivityProfile,       py::arg("reaction_index"),
+                                                                                     py::call_guard<py::gil_scoped_release>())
+     .def("reactions",                  &Sensitivities::reactions,                   py::call_guard<py::gil_scoped_release>())
+     .def("sensitivityCoefficients",    &Sensitivities::sensitivityCoefficients,     py::call_guard<py::gil_scoped_release>());
 
 
-  py::class_<Sensitivities_Surface>(m, "Sensitivity_Surface")
+  py::class_<Sensitivities_Surface,Sensitivities>(m, "Sensitivity_Surface")
      .def(py::init<>())
-     .def("setDataBase",                    &Sensitivities_Surface::SetDatabase,                   py::call_guard<py::gil_scoped_release>())
-     .def("setNormalizationType",           &Sensitivities_Surface::SetNormalizationType,          py::call_guard<py::gil_scoped_release>())
-     .def("setSensitivityType",             &Sensitivities_Surface::SetSensitivityType,            py::call_guard<py::gil_scoped_release>())
-     .def("setOrderingType",                &Sensitivities_Surface::SetOrderingType,               py::call_guard<py::gil_scoped_release>())
-     .def("setTarget",                      &Sensitivities_Surface::SetTarget,                     py::call_guard<py::gil_scoped_release>())
-     .def("setLocalValue",                  &Sensitivities_Surface::SetLocalValue,                 py::call_guard<py::gil_scoped_release>())
-     .def("setLowerBound",                  &Sensitivities_Surface::SetLowerBound,                 py::call_guard<py::gil_scoped_release>())
-     .def("setUpperBound",                  &Sensitivities_Surface::SetUpperBound,                 py::call_guard<py::gil_scoped_release>())
-     .def("prepare",                        &Sensitivities_Surface::Prepare,                       py::call_guard<py::gil_scoped_release>())
-     .def("sensitivityAnalysis",            &Sensitivities_Surface::Sensitivity_Analysis,          py::call_guard<py::gil_scoped_release>())
-     .def("readSensitivityCoefficients",    &Sensitivities_Surface::ReadSensitvityCoefficients,    py::call_guard<py::gil_scoped_release>())
-     .def("getSensitivityProfile",          &Sensitivities_Surface::GetSensitivityProfile,         py::call_guard<py::gil_scoped_release>())
-     .def("reactions",                      &Sensitivities_Surface::reactions,                     py::call_guard<py::gil_scoped_release>())
-     .def("sensitivityCoefficients",        &Sensitivities_Surface::sensitivityCoefficients,       py::call_guard<py::gil_scoped_release>());
+     .def("prepare",                        &Sensitivities_Surface::Prepare,                        py::arg("heterogeneousSensitivity") = false,
+                                                                                                    py::call_guard<py::gil_scoped_release>())
+     .def("sensitivityAnalysis",            &Sensitivities_Surface::Sensitivity_Analysis,           py::arg("number_of_reactions") = 10,
+                                                                                                    py::call_guard<py::gil_scoped_release>())
+     .def("readSensitivityCoefficients",    &Sensitivities_Surface::ReadSensitivityCoefficients,    py::call_guard<py::gil_scoped_release>());
 }
