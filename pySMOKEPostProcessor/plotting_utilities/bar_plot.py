@@ -98,9 +98,11 @@ def plot_multiple_bars(ax, data, colors=None, total_width=0.8,
     return ax
 
 
-def plot_bars(data: dict, ax=None):
+def plot_bars(data: dict, ax=None, font: float = None):
     n_of_bars = len(data['coefficients'])
-    font = 11-5*int(n_of_bars>20)
+    if font is None:
+        font =11-5*int(n_of_bars>20)
+
     index = np.arange(0, n_of_bars, 1)
     colors = []
 
@@ -113,6 +115,8 @@ def plot_bars(data: dict, ax=None):
     if ax is None:
         fig = plt.figure()
         ax = plt.subplot()
+    else:
+        fig = ax.figure
 
     bar = ax.barh(index, data['coefficients'], color=colors)
 
@@ -153,3 +157,49 @@ def plot_bars(data: dict, ax=None):
     ax.invert_yaxis()
 
     return fig, ax
+
+
+# [LG]  I think this might have been thought of with the plot_multiple_bars, but I found no example and I'm making this probably more general.
+def plot_bars_multiSimulation(data_list: list, ax_list: list = None, cols: int = None, rows: int = None):
+    is_nested = isinstance(data_list[0], (list, tuple))
+
+    if is_nested:
+        rows = len(data_list)
+        cols = len(data_list[0])
+
+        for row in data_list:
+            if len(row) != cols:
+                raise ValueError("data_list is non-rectangular")
+
+        flat_data = [d for row in data_list for d in row]
+
+    else:
+        flat_data = data_list
+        if rows is None and cols is None:
+            rows = 1
+            cols = len(flat_data)
+        elif rows is None:
+            rows = int(np.ceil(len(flat_data) / cols))
+        elif cols is None:
+            cols = int(np.ceil(len(flat_data) / rows))
+
+    if ax_list is None:
+        if rows * cols < len(flat_data):
+            raise ValueError("Inconsistent number of points: grid too small for number of simulations")
+        elif rows * cols > len(flat_data):
+            raise ValueError("Inconsistent number of points: grid too big for number of simulations")
+
+        fig, ax_list = plt.subplots(rows, cols)
+        ax_list = np.atleast_1d(ax_list).flatten()
+    else:
+        fig = plt.gcf()
+        ax_list = np.atleast_1d(ax_list).flatten()
+
+    new_ax_list = []
+
+    for data, ax in zip(flat_data, ax_list):
+        fig, ax = plot_bars(data=data, ax=ax, font = 9)
+        new_ax_list.append(ax)
+
+    return fig, new_ax_list
+
