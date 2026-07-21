@@ -55,7 +55,7 @@ class PostProcessor:
         Function that performs the [R]ate [O]f [P]roduction [A]nalysis
         Args:
             species: Name of the target species for the ROPA
-            ropa_type: Type of ROPA to be performed available are: gloabal | local | region
+            ropa_type: Type of ROPA to be performed available are: global | local | region
             local_value: Local value of the domain in where perform the ROPA
             lower_value: Lower value of the domain for the region ROPA
             upper_value: Upper value of the domain for the region ROPA
