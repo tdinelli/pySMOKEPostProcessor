@@ -1,0 +1,65 @@
+classtype ADDITION
+	ADD_H
+	ADD_C2.D-M
+	ADD_C2.T-M
+	ADD_C3.D-M
+	ADD_C3.T-M
+	ADD_C3.DD-M
+	ADD_C4.D-M
+	ADD_C4.T-M
+	ADD_A1-M
+	ADD_RTRANSFER
+end classtype
+
+classtype BETASCISS
+    BSCISS_CC
+	BSCISS_CH
+end classtype
+
+classtype RECOMBINATION
+	REC_H_WELL
+	REC_C1-R
+	REC_C2-R
+	REC_C3-R
+	REC_A1-R
+	REC_A1-RSR
+	REC_Cs-RSR
+end classtype
+
+classtype ELIMH2
+	EL_H2
+end classtype
+
+classtype HABS
+	HABS_H
+	HABS_C1
+	HABS_C2.S
+	HABS_C2.D
+	HABS_C2.T
+	HABS_C3.D
+	HABS_C3.T 
+	HABS_C4.D
+	HABS_A1
+	HABS_A1,C2.T
+end classtype
+
+classtype IPSO
+	IPSO_H
+	IPSO_CH3
+end classtype
+
+classtype RINGFORM
+	RCLOSE_CC
+	RCLOSE_CH
+	ROPEN
+end classtype
+
+classtype COVERAGE
+	COVERAGE_H
+	COVERAGE_R
+	COVERAGE_BZ
+end classtype
+
+classtype UNSORTED
+    UNSORTED
+end classtype

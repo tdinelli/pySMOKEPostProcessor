@@ -46,10 +46,12 @@ class ProfilesDatabase {
   ~ProfilesDatabase(void);
 
   bool ReadKineticMechanism(const std::string& folder_name);
+  bool ReadHeterogeneousKineticMechanism(const std::string& folder_name, const std::string& phase_name); // Function added
 
-  bool ReadFileResults(const std::string& folder_name);
+  bool ReadFileResults(const std::string& folder_name, bool isHeterogeneous); // Modified number of input (added the isHeterogeneous variable)
 
   void Prepare();
+  void PrepareHeterogeneous();  // Function added
 
   void SpeciesCoarsening(const double threshold);
 
@@ -79,26 +81,62 @@ class ProfilesDatabase {
   unsigned int index_x_coord;
   unsigned int index_z_coord;
 
-  std::vector<double> mw_species_;
+  // Surface-specific properties and quantities
+  std::vector<std::vector<double>> Z;
+  std::vector<std::vector<double>> massBulk;
+  unsigned int index_area_over_volume;
+  unsigned int index_surface_sites_concentration;
+  std::vector<int> column_index_of_surfacefractions_profiles;
+  std::vector<int> column_index_of_bulkmasses_profiles;
+  std::vector<std::string> string_list_surfacefractions_sorted;
+  std::vector<std::string> string_list_bulkmasses_sorted;
+  std::vector<int> sorted_index_surface;
+  std::vector<int> current_sorted_index_surface;
+  std::vector<double> sorted_max_surface;
+  std::vector<int> sorted_index_bulk;
+  std::vector<int> current_sorted_index_bulk;
+  std::vector<double> sorted_max_bulk;
+  unsigned int number_of_gas_species;
+  unsigned int number_of_surface_species;
+  unsigned int number_of_bulk_species;
+
+  std::vector<double> mw_species_;  // Note: for now, saving only the gas-phase molecular weights. 
+      // Since surface species are already saved in molar fractions, and bulk species are in mass, 
+      // but their activity is 1, no need to save their MW (no use for it)
+      // Maybe, in different phases it is required to save those.
 
   boost::property_tree::ptree xml_main_input;
 
   OpenSMOKE::ThermodynamicsMap_CHEMKIN* thermodynamicsMapXML;
   OpenSMOKE::KineticsMap_CHEMKIN* kineticsMapXML;
+  OpenSMOKE::ThermodynamicsMap_Surface_CHEMKIN* thermodynamicsMapSurfaceXML;
+  OpenSMOKE::KineticsMap_Surface_CHEMKIN* kineticsMapSurfaceXML;
 
   bool iSensitivityEnabled_;
   bool iROPAEnabled_;
   bool is_kinetics_available_;
 
+  bool is_mechanism_heterogeneous_;
+  bool iROPAHeterogeneousEnabled_;
+  bool iSensitivityHeterogeneousEnabled_;
+  bool is_heterogeneous_kinetics_available_;
+  
+  // Folder of kinetic mechanism and output are the same for heterogeneous mechanisms, no need to duplicate.
   boost::filesystem::path path_folder_results_;
   boost::filesystem::path path_folder_mechanism_;
 
   void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int>& indices);
-
   void isReactantProduct(const unsigned int reaction_index, double& netStoichiometry);
+  
+  void ReactionsAssociatedToSpecies_Surface(const unsigned int index, std::vector<unsigned int>& indices);  // Function added
+  void isReactantProduct_Surface(const unsigned int reaction_index, double& netStoichiometry);              // Function added
+  // In here I think its just adding a parameter kineticsMap and the functions are exactly the same, but templetization of the map is required.
 
   std::string name_reactions_;
   std::vector<std::string> reaction_strings_;
+  
+  std::string name_reactions_heterogeneous_;
+  std::vector<std::string> reaction_strings_heterogeneous_;
 };
 
 #include "ProfilesDatabase.hpp"

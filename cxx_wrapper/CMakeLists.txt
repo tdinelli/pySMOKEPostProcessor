@@ -8,6 +8,10 @@ target_link_libraries(
         Eigen3::Eigen
 )
 
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE BUILD_PYTHON_BINDINGS
+)
+
 # -----------------------------------------------------------------------------
 # Link Boost libraries
 # Modern Boost (1.70+) is mostly header-only, but filesystem, timer, etc. still
@@ -114,3 +118,64 @@ install(
     LIBRARY DESTINATION .
     RUNTIME DESTINATION .
 )
+
+# add_executable(sensitivity_het
+#     ${CMAKE_CURRENT_LIST_DIR}/testfiles/sensitivity_het.cpp
+# )
+
+# target_include_directories(sensitivity_het
+#     PRIVATE
+#         ${OPENSMOKE_INCLUDE}
+#         ${CMAKE_CURRENT_LIST_DIR}/source
+# )
+
+# if(TARGET Boost::headers)
+#     target_link_libraries(sensitivity_het
+#         PRIVATE
+#             Eigen3::Eigen
+#             Boost::headers
+#     )
+
+#     if(BOOST_FILESYSTEM_LIB)
+#         target_link_libraries(sensitivity_het PRIVATE ${BOOST_FILESYSTEM_LIB})
+#     endif()
+
+#     if(BOOST_SYSTEM_LIB)
+#         target_link_libraries(sensitivity_het PRIVATE ${BOOST_SYSTEM_LIB})
+#     endif()
+
+# elseif(TARGET Boost::boost)
+
+#     target_link_libraries(sensitivity_het
+#         PRIVATE
+#             Eigen3::Eigen
+#             Boost::boost
+#     )
+
+#     if(BOOST_FILESYSTEM_LIB)
+#         target_link_libraries(sensitivity_het PRIVATE ${BOOST_FILESYSTEM_LIB})
+#     endif()
+
+#     if(BOOST_SYSTEM_LIB)
+#         target_link_libraries(sensitivity_het PRIVATE ${BOOST_SYSTEM_LIB})
+#     endif()
+
+# else()
+
+#     target_link_libraries(sensitivity_het
+#         PRIVATE
+#             Eigen3::Eigen
+#             Boost::date_time
+#             Boost::filesystem
+#             Boost::program_options
+#             Boost::system
+#             Boost::regex
+#             Boost::timer
+#             Boost::chrono
+#     )
+
+# endif()
+
+# target_compile_definitions(sensitivity_het
+#     PRIVATE NO_PYTHON_BINDINGS
+# )

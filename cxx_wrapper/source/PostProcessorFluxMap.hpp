@@ -38,8 +38,8 @@
 namespace pySMOKEPostProcessor {
 PostProcessorFluxMap::PostProcessorFluxMap(
     OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML,
-    OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML)
-    : OpenSMOKE::FluxAnalysisMap(thermodynamicsMapXML, kineticsMapXML) {}
+    OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML):
+    OpenSMOKE::FluxAnalysisMap(thermodynamicsMapXML, kineticsMapXML) {}
 
 void PostProcessorFluxMap::ComputeFluxAnalysis() {
   for (unsigned int j = 0; j < list_of_analyzed_species_.size(); j++) {

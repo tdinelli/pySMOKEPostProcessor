@@ -55,7 +55,8 @@ message(STATUS "Searching for Boost...")
 # Try to find Boost with modern config first (Boost 1.70+)
 # If not found, fall back to FindBoost module for older versions
 # (e.g., manylinux boost169)
-find_package(Boost 1.70 QUIET CONFIG)
+#find_package(Boost 1.70 QUIET CONFIG)
+find_package(Boost 1.70 REQUIRED COMPONENTS filesystem system)
 
 if(NOT Boost_FOUND)
   # Fallback to FindBoost module for older versions (Boost < 1.70)
@@ -75,7 +76,7 @@ endif()
 if(Boost_FOUND)
   message(STATUS "Boost found: ${Boost_VERSION}")
   if(Boost_INCLUDE_DIRS)
-    message(STATUS "Boost include: ${Boost_INCLUDE_DIRS}")
+    message(STATUS "Boost include: ${Boost_INCLUDE_DIRS}") # This is the correct one
   elseif(Boost_INCLUDE_DIR)
     message(STATUS "Boost include: ${Boost_INCLUDE_DIR}")
   endif()
@@ -99,3 +100,35 @@ include(cmake/external/OpenSMOKEpp.cmake)
 # Source code subdirectories
 # -----------------------------------------------------------------------------
 add_subdirectory(cxx_wrapper)
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+
+set(LIBRARIES ${Boost_LIBRARIES}
+              ${Python3_LIBRARIES}
+              )
+set(INCLUDE ${Boost_INCLUDE_DIRS}
+            ${EIGEN3_INCLUDE_DIR}
+            ${OPENSMOKE_INCLUDE}
+            ${Python3_INCLUDE_DIRS}
+            )
+
+## Heterogeneous ROPA
+# add_executable(ROPA_het
+#     cxx_wrapper/testfiles/ropa_het.cpp
+# )
+
+# target_include_directories(ROPA_het
+#     PRIVATE
+#         ${Boost_INCLUDE_DIRS}
+#         ${EIGEN3_INCLUDE_DIR}
+#         ${OPENSMOKE_INCLUDE}
+#         ${Python3_INCLUDE_DIRS}
+# )
+
+# target_link_libraries(ROPA_het
+#     PRIVATE
+#         Boost::filesystem
+#         Boost::system
+#         Python3::Python
+#         pybind11::headers
+# )

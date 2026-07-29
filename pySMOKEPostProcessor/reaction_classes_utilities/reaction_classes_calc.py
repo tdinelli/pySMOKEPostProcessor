@@ -237,15 +237,25 @@ class reaction_fluxes:
     def filter_flux(self, threshold=1e-3):
         """ delete all reactions with contributions below a threshold """
 
-        indexes_filter = np.array([])
+        indexes_filter = []
 
         for flux_sp_name in self.flux_cols:
-            indexes_filter = np.append(indexes_filter,
-                                       np.array(list(self.rxn_class_df[abs(self.rxn_class_df[flux_sp_name]) /
-                                                                       max(abs(self.rxn_class_df[flux_sp_name])) > threshold].index))
-                                       )
+            col = self.rxn_class_df[flux_sp_name]
 
-        self.rxn_class_df = self.rxn_class_df.loc[np.array(list(set(indexes_filter)))]
+            if col.empty:   # [LG] Addded for time-integral computations (soot)
+                continue
+
+            max_val = col.abs().max()
+            if max_val == 0:
+                continue
+
+            mask = col.abs() / max_val > threshold
+            indexes_filter.extend(self.rxn_class_df[mask].index.tolist())
+
+        if len(indexes_filter) == 0:
+            self.rxn_class_df = self.rxn_class_df.iloc[0:0]
+        else:
+            self.rxn_class_df = self.rxn_class_df.loc[list(set(indexes_filter))]
 
     def sortby(self,
                sortlist,

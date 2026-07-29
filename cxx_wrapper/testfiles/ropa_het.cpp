@@ -1,0 +1,84 @@
+#include "../PostProcessorWrapper_py.h"
+#include "ProfilesDatabase.h"
+#include "ROPA_Surface.h"
+#include "maps/Maps_CHEMKIN"
+
+int main(int argc, char** argv)
+{
+    const std::string mechanism_folder = "/home/lgiardini/pySMOKEPostProcessor/examples/data/Surface_Data/kinetics";
+    const std::string output_folder = "/home/lgiardini/pySMOKEPostProcessor/examples/data/Surface_Data/Output";
+
+    ProfilesDatabase profiles_db;
+    bool dummy = profiles_db.ReadFileResults(output_folder,true);
+    dummy = profiles_db.ReadHeterogeneousKineticMechanism(mechanism_folder,"Surface");
+
+    const unsigned int N_rxns = 5;
+    std::vector<unsigned int> rxns_indices(N_rxns);
+    std::vector<double> rxns_coefficients(N_rxns);
+
+    bool heterogeneous_reactions = false;
+
+    ROPA_Surface ropa;
+    ropa.SetDatabase(&profiles_db);
+    ropa.SetROPAType("global");
+    // ropa.SetSpecies("CH4");
+    // ropa.RateOfProductionAnalysis(N_rxns,heterogeneous_reactions);
+    
+    // rxns_indices = ropa.reactions();
+    // rxns_coefficients = ropa.coefficients();
+
+    // std::cout << "Species CH4" << std::endl;
+    // std::cout << "Homogeneous reactions " << std::endl;
+    // for (unsigned int i = 0; i<N_rxns; i++){
+    //     std::cout << "Reaction index: " << rxns_indices[i] << std::endl;
+    //     std::cout << "Reaction coeff: " << rxns_coefficients[i] << std::endl;
+    // }
+
+    // Setting heterogeneous reactions
+    heterogeneous_reactions = true;
+    // ropa.RateOfProductionAnalysis(N_rxns,heterogeneous_reactions);
+    
+    // rxns_indices = ropa.reactions();
+    // rxns_coefficients = ropa.coefficients();
+
+    // std::cout << "Heterogeneous reactions " << std::endl;
+    // for (unsigned int i = 0; i<N_rxns; i++){
+    //     std::cout << "Reaction index: " << rxns_indices[i] << std::endl;
+    //     std::cout << "Reaction coeff: " << rxns_coefficients[i] << std::endl;
+    // }
+
+    ////////////////////////////// CH3(S)
+    // std::cout << std::endl;
+    // ropa.SetSpecies("CH3(S)");
+
+    // std::cout << "Species CH3(S)" << std::endl;
+    // ropa.RateOfProductionAnalysis(N_rxns,heterogeneous_reactions);
+    
+    // rxns_indices = ropa.reactions();
+    // rxns_coefficients = ropa.coefficients();
+
+    // std::cout << "Heterogeneous reactions " << std::endl;
+    // for (unsigned int i = 0; i<N_rxns; i++){
+    //     std::cout << "Reaction index: " << rxns_indices[i] << std::endl;
+    //     std::cout << "Reaction coeff: " << rxns_coefficients[i] << std::endl;
+    // }
+
+    //////////////////////// Species C(B)
+    std::string sp_name = "CH3(S)";
+
+    std::cout << std::endl;
+    ropa.SetSpecies(sp_name);
+    std::cout << "Species " << sp_name << std::endl;
+    ropa.RateOfProductionAnalysis(N_rxns,heterogeneous_reactions);
+    
+    rxns_indices = ropa.reactions();
+    rxns_coefficients = ropa.coefficients();
+
+    std::cout << "Heterogeneous reactions " << std::endl;
+    for (unsigned int i = 0; i<N_rxns; i++){
+        std::cout << "Reaction index: " << rxns_indices[i] << std::endl;
+        std::cout << "Reaction coeff: " << rxns_coefficients[i] << std::endl;
+    }
+
+    return 0;
+}

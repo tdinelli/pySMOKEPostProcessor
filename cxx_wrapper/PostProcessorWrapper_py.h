@@ -22,6 +22,15 @@
 #include "math/PhysicalConstants.h"
 #include "kernel/kinetics/KineticsUtilityFunctions.h"
 
+// Surface phase additions
+#include "kernel/kinetics/ReactionPolicy_Surface_CHEMKIN.h"
+#include "maps/ThermodynamicsMap_Surface_CHEMKIN.h"
+#include "maps/KineticsMap_Surface_CHEMKIN.h"
+
+// [LG] This was added in a second moment, it might not be required.
+#include "source/ROPA_Surface.h"
+#include "source/Sensitivities_Surface.h"
+
 // Boost library
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -32,5 +41,10 @@
 #include <Eigen/Dense>
 
 // pyBIND11
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#pragma once
+
+#ifdef BUILD_PYTHON_BINDINGS
+    #include <pybind11/pybind11.h>
+    #include <pybind11/stl.h>
+#endif
+

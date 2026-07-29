@@ -44,6 +44,9 @@ class PostProcessorFluxMap : public OpenSMOKE::FluxAnalysisMap {
   PostProcessorFluxMap(OpenSMOKE::ThermodynamicsMap_CHEMKIN& thermodynamicsMapXML,
                        OpenSMOKE::KineticsMap_CHEMKIN& kineticsMapXML);
 
+  // Flux analysis for heterogeneous reactions requires addition of flux analysis map in OpenSMOKE previous to postprocessing.
+  // As of right now, it is only developed for gas-phase reactions.
+
   void ComputeFluxAnalysis();
   void ComputeValues(const unsigned int index_j, std::vector<unsigned int>& local_indices,
                      std::vector<double>& local_thickness, std::vector<double>& local_normal_fluxes,

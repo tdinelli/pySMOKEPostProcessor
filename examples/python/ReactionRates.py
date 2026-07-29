@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from pySMOKEPostProcessor.postprocessor import PostProcessor
 import pySMOKEPostProcessor.maps.OpenSMOKEppXMLFile as OpenSMOKEppXMLFile
 
-kineticFolder = os.path.join("..", "data", "ROPA-01", "kinetics")
-resultsFolder = os.path.join("..", "data", "ROPA-01", "Output")
+kineticFolder = os.path.join("..", "data", "ROPA", "kinetics")
+resultsFolder = os.path.join("..", "data", "ROPA", "Output")
 
 out_xml = OpenSMOKEppXMLFile(resultsFolder, kineticFolder)
 
