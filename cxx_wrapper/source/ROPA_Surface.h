@@ -73,7 +73,6 @@ class ROPA_Surface : public virtual ROPA {
   // inline const std::vector<double>& computedLabel() const { return computedLabel_; };
 
  protected:
-  //  bool speciesIsSelected;   // Inherited from parent class
   bool heterogeneous_reactions_;
 
 };

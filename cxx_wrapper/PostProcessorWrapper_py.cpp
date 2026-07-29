@@ -80,7 +80,7 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m) {
  py::class_<ROPA_Surface, ROPA>(m, "ROPA_Surface")
      .def(py::init<>())
      .def("rateOfProductionAnalysis",   &ROPA_Surface::RateOfProductionAnalysis,     py::arg("number_of_reactions") = 10,
-                                                                                     py::arg("heterogeneous_reactions") = true,
+                                                                                     py::arg("heterogeneous_reactions") = false,
                                                                                      py::call_guard<py::gil_scoped_release>())
      .def("getReactionRates",           &ROPA_Surface::GetReactionRates,             py::arg("reaction_indices"),
                                                                                      py::arg("sum_rates") = false,
@@ -91,7 +91,7 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m) {
                                                                                      py::arg("type") = "net",
                                                                                      py::arg("heterogeneous_reactions") = false,
                                                                                      py::call_guard<py::gil_scoped_release>())
-     .def("setROPAPhase",               &ROPA_Surface::SetROPAPhase,                 py::arg("heterogeneous_reactions") = true,
+     .def("setROPAPhase",               &ROPA_Surface::SetROPAPhase,                 py::arg("heterogeneous_reactions") = false,
                                                                                      py::call_guard<py::gil_scoped_release>());
 
   py::class_<Sensitivities>(m, "Sensitivity")

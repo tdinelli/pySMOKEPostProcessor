@@ -38,7 +38,10 @@
 Sensitivities_Database_Surface::Sensitivities_Database_Surface() {
   Sensitivities_Database();
 }
-
+// Having this _Surface file makes it necessary for the Sensitivities files to be duplicate as well.
+// It IS possible to bring everything together in a single Sensitivities_Database, however it requires
+// to use heterogeneous version always. I'm not sure I like it as I see heterogeneous as extending gas,
+// so it should stay dependent on it and not the other way round.
 
 // Sensitivities_Database_Surface::~Sensitivities_Database_Surface() {
 //   ~Sensitivities_Database();
@@ -46,7 +49,7 @@ Sensitivities_Database_Surface::Sensitivities_Database_Surface() {
 
 void Sensitivities_Database_Surface::ReadParentFile(bool heterogeneousSensitivity) {
   boost::filesystem::path path_results;
-  if (heterogeneousSensitivity == true)
+  if (heterogeneousSensitivity == true) // We should look for this using the phase_name, not implemented here yet.
     path_results = data_->path_folder_results_ / "Sensitivities.Surface.xml";
   else
     path_results = data_->path_folder_results_ / "Sensitivities.xml";
@@ -146,9 +149,9 @@ void Sensitivities_Database_Surface::ReadParentFile(bool heterogeneousSensitivit
   }
 }
 
-void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name,bool heterogeneousSensitivity) {
+void Sensitivities_Database_Surface::ReadFromChildFile(const std::string name, bool heterogeneousSensitivity) {
   std::string local_name;
-  if (heterogeneousSensitivity == true)
+  if (heterogeneousSensitivity == true) // As above, we should look for the name using the phase_name variable
     local_name = "Sensitivities.Surface." + name + ".xml";
   else
     local_name = "Sensitivities." + name + ".xml";

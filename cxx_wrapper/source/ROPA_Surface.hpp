@@ -50,7 +50,7 @@ void ROPA_Surface::SetROPAPhase(const bool heterogeneous_reactions) { heterogene
 void ROPA_Surface::RateOfProductionAnalysis(const unsigned int number_of_reactions, const bool heterogeneous_reactions) {
   heterogeneous_reactions_ = heterogeneous_reactions; // Update internal variable (maybe useless)
   if (heterogeneous_reactions_ == false) {
-    // It would be correct to throw an exception here if het_rxns == false and the selected species is from heterogeneous phase.
+    // It might be correct to throw an exception here if het_rxns == false and the selected species is from heterogeneous phase.
     // Case homogeneous reactions: fallback on homogeneous ROPA functions
     ROPA::RateOfProductionAnalysis(number_of_reactions);
   } else {
@@ -135,7 +135,7 @@ void ROPA_Surface::RateOfProductionAnalysis(const unsigned int number_of_reactio
           break;
         }
       }
-      const double Gamma = data_->additional[data_->index_surface_sites_concentration][index];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple surface phases). Honestly, I dont care.
+      const double Gamma = data_->additional[data_->index_surface_sites_concentration][index];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple surface phases).
       
       unsigned int k = 1;
       for (unsigned int j = 0; j < NSG; j++)
@@ -217,7 +217,8 @@ void ROPA_Surface::RateOfProductionAnalysis(const unsigned int number_of_reactio
       std::vector<unsigned int> global_destruction_reaction_indices;
 
       for (unsigned int idx = index_min; idx < index_max - 1; idx++) {
-        const double Gamma = data_->additional[data_->index_surface_sites_concentration][idx];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple phases). Honestly, I dont care.
+        const double Gamma = data_->additional[data_->index_surface_sites_concentration][idx];  
+        // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple phases).
 
         for (unsigned int j = 0; j < NSG; j++)
           omega[j+1] = data_->omega[j][idx];
@@ -433,7 +434,8 @@ void ROPA_Surface::GetReactionRates(std::vector<unsigned int> reaction_indices, 
       OpenSMOKE::OpenSMOKEVectorDouble r(NR);
 
       for (unsigned int idx = 0; idx < data_->number_of_abscissas_; idx++) {
-        const double Gamma = data_->additional[data_->index_surface_sites_concentration][idx];  // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple phases). Honestly, I dont care.
+        const double Gamma = data_->additional[data_->index_surface_sites_concentration][idx];  
+        // In OpenSMOKE, this is a OpenSMOKEVectorDouble (more general for multiple phases).
 
         for (unsigned int j = 0; j < NSG; j++)
           omega[j+1] = data_->omega[j][idx];
@@ -637,8 +639,8 @@ void ROPA_Surface::GetFormationRates(std::string specie, std::string units, std:
           formationRates_[index] = D[k];
         else
           throw std::invalid_argument(
-              "Available Formation Rates types are: net | production | destruction | "
-              "characteristic-time");
+              "Available Heterogeneous Formation Rates types are: net | production | destruction");// | "
+              //"characteristic-time");
         //} // End of characteristic time if/else
       }
     }

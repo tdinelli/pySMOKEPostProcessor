@@ -23,12 +23,11 @@
 #include "kernel/kinetics/KineticsUtilityFunctions.h"
 
 // Surface phase additions
-#include "kernel/kinetics/ReactionPolicy_Surface_CHEMKIN.h"     // Maybe not used -- let's see
+#include "kernel/kinetics/ReactionPolicy_Surface_CHEMKIN.h"
 #include "maps/ThermodynamicsMap_Surface_CHEMKIN.h"
 #include "maps/KineticsMap_Surface_CHEMKIN.h"
 
-
-// [LG] Additions 2026/04/02 - This thing did not work I had to add this ? 
+// [LG] This was added in a second moment, it might not be required.
 #include "source/ROPA_Surface.h"
 #include "source/Sensitivities_Surface.h"
 

@@ -114,10 +114,10 @@ bool ProfilesDatabase::ReadKineticMechanism(const std::string& folder_name) {
 
 bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& folder_name, const std::string& phase_name) {
   // phase name is not used right now, but it can be in the future (e.g. phase_name == Surface or Liquid etc)
-  is_mechanism_heterogeneous_ = ReadKineticMechanism(folder_name);
+  is_mechanism_heterogeneous_ = ReadKineticMechanism(folder_name); // The homogeneous kinetics.xml must be read regardless of heterogeneous.
   path_folder_mechanism_ = folder_name;
 
-  // my idea here is to use the phase_name variable, it requires some form of casting but it should be doable
+  // Using phase_name we can understand the name of the file. kinetics.?.xml
   boost::filesystem::path path_mechanism_het = path_folder_mechanism_ / "kinetics.surface.xml";
 
   if (!boost::filesystem::exists(path_mechanism_het)) {
@@ -155,7 +155,9 @@ bool ProfilesDatabase::ReadHeterogeneousKineticMechanism(const std::string& fold
   iROPAHeterogeneousEnabled_ = true;
 
   // Read the reaction strings
-  { // The reaction_names file has a different name depending on phase. for me it's that, for liquid its reaction_names.liquid.xml, for solid no file exists (@Riccardo)
+  { // The reaction_names file has a different name depending on phase. 
+    // For me it's that, for liquid its reaction_names.liquid.xml, for solid no file exists (@Riccardo)
+    // Again the phase_name arg should be used to define this variable properly.
     std::string local_name_het = "surface_reaction_names.xml"; 
     boost::filesystem::path path_reaction_names_het = path_folder_mechanism_ / local_name_het;
     if (!boost::filesystem::exists(path_reaction_names_het)) {
@@ -207,7 +209,7 @@ bool ProfilesDatabase::ReadFileResults(const std::string& folder_name, bool isHe
   if (is_mechanism_heterogeneous_ == true)
   {
     boost::filesystem::path path_sensitivities_heterogeneous_ = path_folder_results_ / "Sensitivities.Surface.xml";
-    if (boost::filesystem::exists(path_sensitivities)) 
+    if (boost::filesystem::exists(path_sensitivities_heterogeneous_))
       iSensitivityHeterogeneousEnabled_ = true;
   }
   
@@ -392,7 +394,8 @@ void ProfilesDatabase::PrepareHeterogeneous() {
   }
 
   // Additional
-  // here I just have more/different additional parameters
+  // In heterogeneous phases, we need more/different additional parameters
+  // For instance, in the surface phase we need A/V and the site density
   {
     boost::optional<boost::property_tree::ptree&> child =
         xml_main_input.get_child_optional("opensmoke.additional");
@@ -421,11 +424,14 @@ void ProfilesDatabase::PrepareHeterogeneous() {
         if (dummy == "volume") index_volume = j;
         if (dummy == "area-over-volume") index_area_over_volume = j;
         if (dummy == "CARBON") index_surface_sites_concentration = j; 
-              // Qui è un po' una merda, perché a me interessa solo CARBON perché so che si chiama così, 
-              // ma in generale i reattori surface possono lavorare con una superficie qualunque
-              // Ho aggiunto io alla stampa questa cosa, quindi posso anche chiamarla direttamente Surface-CARBON
-              // come nel dizionario opensmoke e cerchiamo il Surface iniziale.
-              // Nell'output.out, invece, era già stampata come solo CARBON, mi sono tenuto coerente a quello.
+        /*
+        About the "CARBON" name: I added its print in the OpenSMOKEpp library,and it is the sites concentration in kmol/m2. 
+        For C-deposition, it is ok, while for catalytic-type problems, it is not: in the input, the surface would be called
+        something like "Surface-NI", and the printed name would then be just "NI". It might be better to look not for the
+        exact name but to print the "Surface-" keyword and look for anything that starts with that.
+        Further note: in OpenSMOKEpp, AC allowed to have multiple surface phases. 
+                      This is not considered here, and also not important at the moment.
+        */
 
         stream >> dummy;
       }
@@ -434,7 +440,7 @@ void ProfilesDatabase::PrepareHeterogeneous() {
     }
   }
 
-  // Species (mass fractions)
+  // Species (gas mass fractions)
   std::vector<std::string> string_list_massfractions_unsorted;
   {
     boost::optional<boost::property_tree::ptree&> child =
@@ -478,7 +484,7 @@ void ProfilesDatabase::PrepareHeterogeneous() {
     }
   }
 
-  // QUESTE DEVONO DIVENTARE FUNCTIONS.
+  // Enhancement: create a sorting function and pass all of these "subsections" to that function sequentially. (Same story for the homogeneous call) 
   // Species (surface fractions)
   std::vector<std::string> string_list_surfacefractions_unsorted;
   {
@@ -639,8 +645,8 @@ void ProfilesDatabase::PrepareHeterogeneous() {
     }
   }
 
-  // Conversions (probably not required in general)
-  // This is wrong there is no mass loss correction. Not a priority right now but it has to be changed. I'll do it eventually.
+  // Reactants conversion (probably not required in general)
+  // This is wrong as there is no mass loss correction. Not a priority right now but it has to be changed. I'll do it eventually.
   {
     for (unsigned int j = 0; j < number_of_gas_species; j++) {
       if (omega[j][0] > 1e-8) {
@@ -655,11 +661,12 @@ void ProfilesDatabase::PrepareHeterogeneous() {
   }
 }
 
+// Unused function, probably old, can we delete this?
 void ProfilesDatabase::SpeciesCoarsening(const double threshold) {
   current_sorted_index.resize(0);
   for (unsigned int k = 0; k < string_list_massfractions_sorted.size(); k++)
     if (sorted_max[k] > threshold) current_sorted_index.push_back(k);
-}     // This function is not used.
+}
 
 // 0-based
 void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index,
@@ -684,6 +691,9 @@ void ProfilesDatabase::ReactionsAssociatedToSpecies(const unsigned int index,
   std::sort(indices.begin(), indices.end());
 }
 
+// Function duplicated only cause it calls the kineticsMapSurface instead of the kineticsMap. (Same problem below)
+// Map templatization and passing it as argument would remove duplicate code.
+// As it is only required for the stoichiometric map, functions are exactly the same always.
 void ProfilesDatabase::ReactionsAssociatedToSpecies_Surface(const unsigned int index,
                                                     std::vector<unsigned int>& indices) {
   kineticsMapSurfaceXML->stoichiometry().BuildStoichiometricMatrix();

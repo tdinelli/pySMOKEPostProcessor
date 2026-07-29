@@ -60,8 +60,6 @@ class Sensitivities_Surface: public virtual Sensitivities {
     Sensitivities_Database_Surface* sensitivities_het;  
     // This thing is a mess, the issue is with the type of the pointer that changes with respect to parent.
     // this variable is the only reason why we need to duplicate the code of Sensitivity_Analysis.
-    // In previous implementation where everything was duplicated, this variable was just called sensitivities as the homogeneous case
-    // Now I changed the name for clarity
 
     bool heterogeneousSensitivity_;
 };

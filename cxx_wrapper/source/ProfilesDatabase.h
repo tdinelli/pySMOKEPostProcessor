@@ -121,15 +121,16 @@ class ProfilesDatabase {
   bool iSensitivityHeterogeneousEnabled_;
   bool is_heterogeneous_kinetics_available_;
   
-  boost::filesystem::path path_folder_results_;     // the folder of the result is the same as that of the heterogeneous -- no need to duplicate
-  boost::filesystem::path path_folder_mechanism_;   // the folder of the mechanism is the same as that of the heterogeneous -- no need to duplicate
+  // Folder of kinetic mechanism and output are the same for heterogeneous mechanisms, no need to duplicate.
+  boost::filesystem::path path_folder_results_;
+  boost::filesystem::path path_folder_mechanism_;
 
   void ReactionsAssociatedToSpecies(const unsigned int index, std::vector<unsigned int>& indices);
   void isReactantProduct(const unsigned int reaction_index, double& netStoichiometry);
   
   void ReactionsAssociatedToSpecies_Surface(const unsigned int index, std::vector<unsigned int>& indices);  // Function added
   void isReactantProduct_Surface(const unsigned int reaction_index, double& netStoichiometry);              // Function added
-  // In here I think its just adding a parameter kineticsMap and the functions are exactly the same, map template is required.
+  // In here I think its just adding a parameter kineticsMap and the functions are exactly the same, but templetization of the map is required.
 
   std::string name_reactions_;
   std::vector<std::string> reaction_strings_;

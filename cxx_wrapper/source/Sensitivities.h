@@ -69,8 +69,8 @@ class Sensitivities {
 
     void ReadSensitivityCoefficients();
 
-    void GetSensitivityProfile(unsigned int reaction_index); // Un getter void è sospetto
-
+    void GetSensitivityProfile(unsigned int reaction_index);
+    
     inline const std::vector<unsigned int>& reactions() const { return reactions_; };
 
     inline const std::vector<double>& sensitivityCoefficients() const { return sensitivity_coefficients_; };

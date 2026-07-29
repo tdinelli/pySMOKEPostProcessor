@@ -6,7 +6,15 @@ from scipy.integrate import cumulative_trapezoid
 
 # The time profile should come from reading the Output.xml, maybe it is already saved somewhere and I don't remember it.
 def getTimeProfile(outputFolder: str = "Output", 
-                   tag: str ='profiles'):
+                   tag: str ='profiles') -> np.array:
+    """
+    Returns a numpy array containing the time integration steps of the simulation.
+    Args:
+        outputFolder: string (default: "Output") with the path to the output FOLDER
+        tag: string (default: "profiles") with the tag name for the profiles inside the XML file.
+    Returns:
+        timesteps: np.array
+    """
     
     output_root = ET.parse(os.path.join(outputFolder, "Output.xml")).getroot()
     node = output_root.find(tag)
@@ -17,7 +25,14 @@ def getTimeProfile(outputFolder: str = "Output",
     timesteps = np.fromiter( (float(line.split()[0]) for line in node.text.strip().splitlines() if line.strip()), dtype=float )
     return timesteps
 
-def getROPAIntegralTimeHistory(df_ROPAt):
+def getROPAIntegralTimeHistory(df_ROPAt: pd.DataFrame) -> pd.DataFrame:
+    """
+    Returns a pandas.DataFrame object containing the integrated values of the ROPAs.
+    Args: 
+        df_ROPAt: pd.DataFrame containing local values of the ROPA
+    Returns:
+        df_integrated: pd.DataFrame containing integrated values of ROPA
+    """
 
     if "time" not in df_ROPAt.columns:
         raise ValueError("Column 'time' not found")

@@ -127,6 +127,8 @@ void ROPA::RateOfProductionAnalysis(const unsigned int number_of_reactions) {
   std::vector<double> reaction_coefficients;
 
   // Local Analysis
+  // TODO: are we sure that we cannot put this as a function and call it multiple times with slightly different arguments?
+  // It is basically the same thing twice on ROPA and twice on GetReactionRates (+ Surface, which has the same problem with its implementation)
   if (ropaType_ == "local") {
     unsigned int index = 0;
     for (unsigned int j = 0; j < data_->number_of_abscissas_; j++) {

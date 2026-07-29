@@ -62,7 +62,7 @@ def process_classes(
         flat_species_list = species_list
 
     tot_rop_dct = dict.fromkeys(flat_species_list)
-    if not pp.isHeterogeneous:  # [LG] I'm the one who made this if/else and still I don't like it at all
+    if not pp.isHeterogeneous:
         for sp in flat_species_list:
             tot_rop_dct[sp] = pp.RateOfProductionAnalysis(
                 sp,
