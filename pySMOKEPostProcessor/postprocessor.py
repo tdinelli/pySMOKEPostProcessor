@@ -4,7 +4,7 @@ import os   # Added import for auto check surface mech
 
 from .graph_writer import GraphWriter
 from .maps.KineticMap import KineticMap, KineticMapSurface
-from .pySMOKEPostProcessor import ROPA, ProfilesDatabase, Sensitivity, ROPA_Surface, Sensitivity_Surface
+from .pySMOKEPostProcessor import ROPA, ProfilesDatabase, Sensitivity, ROPA_Surface, Sensitivity_Surface, SpeciesClass
 
 
 class PostProcessor:
@@ -344,7 +344,161 @@ class PostProcessor:
 
         return Graph
 
+    def _species_class_widget(self):
+        """
+        Builds the C++ SpeciesClass widget.
+        The <SpeciesClasses> block inside kinetics.xml is optional,
+        This function is an intermediate to raise a clear python error 
+        instead of core-dumping as soon as the block is not found.
+        """
+        widget = SpeciesClass()
+        widget.setDataBase(self.db)
+        if not widget.speciesClassesAvailable():
+            raise Exception(
+                "The kinetic mechanism does not contain a <SpeciesClasses> block."
+                "Species-class post-processing is not available for this mechanism."
+            )
+        return widget
+
+    def ElementalDistributionByClass(self, element: str, normalize: bool = True) -> pd.DataFrame:
+        """
+        Distribution of an atomic element across the species classes along the
+        independent variable (e.g. time for a batch reactor).
+
+        Args:
+            element: element symbol as written in the mechanism (e.g. "C", "H", "O").
+            normalize: if True every abscissa column sums to 1 (fraction of the
+                element carried by each class); if False the values are moles of
+                the element per unit mass of mixture. Moles conserve over all phases,
+                but it does not necessarily conserve for single phases (e.g. surface depo)
+
+        Returns:
+            DataFrame indexed by the independent variable, one column per class.
+        """
+        widget = self._species_class_widget()
+        widget.elementalDistribution(element, normalize)
+
+        class_names = widget.classNames()
+        fractions = np.array(widget.elementalFractions(), dtype=np.float64)  # [class][point]
+        return pd.DataFrame(fractions.T, index=np.array(widget.abscissa()), columns=class_names)
+
+    def FluxAnalysisByClass(
+        self,
+        element: str,
+        flux_analysis_type: str,
+        class_name: str = None,
+        species_name: str = None,
+        flux_per_class: bool = True,
+        thickness: str = "relative",
+        thickness_log_scale: bool = True,
+        label_type: str = "relative",
+        depth: int = 2,
+        width: int = 3,
+        threshold: float = 0.02,
+        local_value: float = 0.01,
+        carbon_weighted: bool = True,
+        auto_prune_diagonal: bool = True,
+    ) -> dict:
+        """
+        Element flux between species classes at a point of the independent
+        variable.
+
+        The full directed class -> class element-flux matrix is computed from
+        every reaction (no species-level pruning). ``depth``, ``width`` and
+        ``threshold`` only prune the *graph*, which is walked breadth-first from
+        a seed class: ``depth`` class generations, at most ``width`` links per
+        class node, each link at least ``threshold`` % of that node's flux.
+        ``flux_analysis_type`` picks the walk direction ("destruction" = where
+        the element goes, "production" = where it comes from).
+
+        auto_prune_diagonal (default True):
+            Intra-class flux (a class's flux to itself) is typically far larger
+            than any cross-class one and makes a heatmap of ``matrix``
+            unreadable; the graph never draws it either way (self-loops are
+            excluded from the walk). With the default, the diagonal of
+            ``matrix`` is zeroed too, so the returned matrix is heatmap-ready.
+            Pass False to get the raw diagonal back (e.g. to inspect intra-class
+            activity numerically).
+
+        Seed selection -- pass exactly one of:
+            flux_per_class=True  (default): ``class_name`` -- walk from that class.
+            flux_per_class=False:           ``species_name`` -- walk from the
+                                            class that contains that species.
+
+        carbon_weighted (default True):
+            True  -- OpenSMOKE's element-flux weighting n_i*n_j*|R_r| / N_C,r
+                (maps/FluxAnalysisMap.hpp::AnalyzeNetFluxes): the actual
+                carbon-atom throughput. Faithful; note (bin carbon count)^2 makes
+                soot-soot terms dominate a mechanism with lumped BINs.
+            False -- each reaction contributes its own molar rate |R_r|, split
+                between (source class, target class) pairs by the carbon share of
+                each species. Bounded per reaction, so lumped soot/BIN classes
+                stay comparable to small gas species.
+
+        Returns:
+            {"matrix": DataFrame, rows = source class, columns = target class,
+                       full directed element flux (diagonal zeroed unless
+                       auto_prune_diagonal=False);
+             "graph":  graphviz.Digraph of the pruned class walk}
+        """
+        widget = self._species_class_widget()
+        class_names = widget.classNames()
+
+        if flux_per_class:
+            if class_name is None or species_name is not None:
+                raise ValueError(
+                    "flux_per_class=True requires 'class_name' and no 'species_name'"
+                )
+            if class_name not in class_names:
+                raise ValueError(
+                    "class_name '{}' is not a species class in this mechanism; available: {}".format(
+                        class_name, ", ".join(class_names)
+                    )
+                )
+        else:
+            if species_name is None or class_name is not None:
+                raise ValueError(
+                    "flux_per_class=False requires 'species_name' and no 'class_name'"
+                )
+            if species_name not in self.km.species:
+                raise ValueError(
+                    "species_name '{}' is not in the mechanism".format(species_name)
+                )
+
+        widget.setFluxPerClass(flux_per_class)
+        widget.setClassName(class_name or "")
+        widget.setSpecies(species_name or "")
+        widget.setElement(element)
+        widget.setFluxAnalysisType(flux_analysis_type)
+        widget.setThickness(thickness)
+        widget.setThicknessLogScale(thickness_log_scale)
+        widget.setLabelType(label_type)
+        widget.setDepth(depth)
+        widget.setWidth(width)
+        widget.setThreshold(threshold)
+        widget.setLocalValue(local_value)
+        widget.setCarbonWeighted(carbon_weighted)
+        widget.setAutoPruneDiagonal(auto_prune_diagonal)
+        widget.fluxByClass()
+
+        matrix = pd.DataFrame(
+            np.array(widget.fluxMatrix(), dtype=np.float64), index=class_names, columns=class_names
+        )
+
+        first_names = [class_names[a] for a in widget.indexFirstClass()]
+        second_names = [class_names[b] for b in widget.indexSecondClass()]
+        graph = GraphWriter(flux_analysis_type).CreateGraph(
+            first_names, second_names, widget.computedThickness(), widget.computedLabel()
+        )
+        return {"graph": graph, "matrix": matrix}
+
     def GetReactionRates(self, reaction_name: list = None, reaction_index: list = None, sum_rates: bool = False, heterogeneous_reactions = False):
+        if reaction_name is not None:
+            if not heterogeneous_reactions: # If homogeneous, it will be false anyway
+                reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
+            else:
+                reaction_index = [self.kms.ReactionIndexFromName(name=i) for i in reaction_name]
+
         if not self.isHeterogeneous:
             widget = ROPA()
             widget.setDataBase(self.db)
@@ -353,12 +507,6 @@ class PostProcessor:
             widget = ROPA_Surface()
             widget.setDataBase(self.db)
             widget.getReactionRates(reaction_index, sum_rates,heterogeneous_reactions)
-
-        if reaction_name is not None:
-            if not heterogeneous_reactions: # If homogeneous, it will be false anyway
-                reaction_index = [self.km.ReactionIndexFromName(name=i) for i in reaction_name]
-            else:
-                reaction_index = [self.kms.ReactionIndexFromName(name=i) for i in reaction_name]
 
         if sum_rates:
             reaction_rates = [widget.sumOfRates()]

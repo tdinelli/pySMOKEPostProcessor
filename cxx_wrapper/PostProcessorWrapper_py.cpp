@@ -8,6 +8,7 @@
 #include "source/Sensitivities.h"
 #include "source/ROPA_Surface.h"
 #include "source/Sensitivities_Surface.h"
+#include "source/SpeciesClasses.h"
 
 namespace py = pybind11;
 constexpr auto byref = py::return_value_policy::reference_internal;
@@ -129,4 +130,51 @@ PYBIND11_MODULE(pySMOKEPostProcessor, m) {
      .def("sensitivityAnalysis",            &Sensitivities_Surface::Sensitivity_Analysis,           py::arg("number_of_reactions") = 10,
                                                                                                     py::call_guard<py::gil_scoped_release>())
      .def("readSensitivityCoefficients",    &Sensitivities_Surface::ReadSensitivityCoefficients,    py::call_guard<py::gil_scoped_release>());
+
+  py::class_<SpeciesClass>(m, "SpeciesClass")
+     .def(py::init<>())
+     .def("setDataBase",              &SpeciesClass::SetDatabase,              py::arg("data"),
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("speciesClassesAvailable",  &SpeciesClass::speciesClassesAvailable,  py::call_guard<py::gil_scoped_release>())
+     .def("elementalDistribution",    &SpeciesClass::ElementalDistribution,    py::arg("element"),
+                                                                              py::arg("normalize") = false,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setFluxPerClass",          &SpeciesClass::SetFluxPerClass,          py::arg("flux_per_class") = true,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setClassName",             &SpeciesClass::SetClassName,             py::arg("class_name") = "",
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setSpecies",               &SpeciesClass::SetSpecies,               py::arg("species") = "",
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setElement",               &SpeciesClass::SetElement,               py::arg("element"),
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setFluxAnalysisType",      &SpeciesClass::SetFluxAnalysisType,      py::arg("type") = "production",
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setLocalValue",            &SpeciesClass::SetLocalValue,            py::arg("localValue") = 0.,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setThickness",             &SpeciesClass::SetThickness,             py::arg("thickness") = "relative",
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setLabelType",             &SpeciesClass::SetLabelType,             py::arg("type") = "relative",
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setThicknessLogScale",     &SpeciesClass::SetThicknessLogScale,     py::arg("thicknesslogscale") = true,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setWidth",                 &SpeciesClass::SetWidth,                 py::arg("width") = 3,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setDepth",                 &SpeciesClass::SetDepth,                 py::arg("depth") = 2,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setThreshold",             &SpeciesClass::SetThreshold,             py::arg("threshold") = 0.1,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setCarbonWeighted",        &SpeciesClass::SetCarbonWeighted,        py::arg("carbon_weighted") = true,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("setAutoPruneDiagonal",     &SpeciesClass::SetAutoPruneDiagonal,     py::arg("auto_prune_diagonal") = true,
+                                                                              py::call_guard<py::gil_scoped_release>())
+     .def("fluxByClass",              &SpeciesClass::FluxByClass,              py::call_guard<py::gil_scoped_release>())
+     .def("classNames",               &SpeciesClass::classNames,               py::call_guard<py::gil_scoped_release>())
+     .def("speciesToClass",           &SpeciesClass::speciesToClass,           py::call_guard<py::gil_scoped_release>())
+     .def("abscissa",                 &SpeciesClass::abscissa,                 py::call_guard<py::gil_scoped_release>())
+     .def("elementalFractions",       &SpeciesClass::elementalFractions,       py::call_guard<py::gil_scoped_release>())
+     .def("fluxMatrix",               &SpeciesClass::fluxMatrix,               py::call_guard<py::gil_scoped_release>())
+     .def("indexFirstClass",          &SpeciesClass::indexFirstClass,          py::call_guard<py::gil_scoped_release>())
+     .def("indexSecondClass",         &SpeciesClass::indexSecondClass,         py::call_guard<py::gil_scoped_release>())
+     .def("computedThickness",        &SpeciesClass::computedThickness,        py::call_guard<py::gil_scoped_release>())
+     .def("computedLabel",            &SpeciesClass::computedLabel,            py::call_guard<py::gil_scoped_release>());
 }

@@ -169,6 +169,31 @@ class KineticMap:
 
         self.classes = classes
 
+    def SpeciesClasses(self) -> None:
+        """
+        Read species classes if present.
+        Populates:
+            self.speciesClasses: {className: [speciesName, ...]}
+            self.speciesclass:   {speciesName: className}  (species with no class absent)
+        Raises:
+            Exception: if the mechanism carries no <SpeciesClasses> block.
+        """
+        species_classes = self.kinetics.find("SpeciesClasses")
+
+        if species_classes is None:
+            raise Exception("The kinetic mechanism provided does not contain any species class!")
+
+        self.speciesClasses = {}
+        self.speciesclass = {}
+        for child in species_classes.findall("ClassSpecies"):
+            classname = child.attrib["name"]
+            members = []
+            for i in map(int, child.text.split()):
+                name = self.species[i]
+                members.append(name)
+                self.speciesclass[name] = classname
+            self.speciesClasses[classname] = members
+
     def ReactionNameFromIndex(self, reactionIndex: int) -> str:
         """
         Function that given the index of a reaction returns its name.
